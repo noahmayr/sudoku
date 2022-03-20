@@ -13,31 +13,6 @@ interface Vector {
 
 interface Point extends Vector {};
 
-type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-type AbstractCellValue = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I';
-enum CellColor {
-    lightgray,
-    darkgray,
-    red,
-    orange,
-    yellow,
-    green,
-    teal,
-    blue,
-    purple
-}
-
-interface CellInterface extends Point {
-    value?: CellValue | AbstractCellValue;
-    given?: CellValue;
-    pencilMark?: {
-        center: CellValue | AbstractCellValue;
-        corner: CellValue | AbstractCellValue;
-    }
-    color?: CellColor;
-    errors?: string[];
-};
-
 interface Size {
     width: number,
     height: number

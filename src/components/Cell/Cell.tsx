@@ -1,4 +1,5 @@
 import classes from './Cell.module.scss';
+import { CellInterface } from './useCells';
 
 interface CellProps {
     cell: CellInterface;

@@ -1,6 +1,6 @@
 import { useValidator } from '../../context/Validation';
 import { getKey } from '../../hooks/useSelection';
-import { CellIndex } from '../Cell/useCells';
+import { CellIndex, CellInterface, CellValue } from '../Cell/useCells';
 import Region, { RegionProps } from '../Region/Region';
 
 interface UniqueRegionProps extends RegionProps {
