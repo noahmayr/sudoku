@@ -1,12 +1,15 @@
 import classes from './ThreeByThree.module.scss';
-import Region, { RegionCells } from './Region';
 import { getKey } from '../../hooks/useSelection';
 import { useMemo } from 'react';
+import UniqueRegion from './UniqueRegion';
+import { RegionCells } from './useRegionPath';
+import { CellIndex } from '../Cell/useCells';
 
 interface ThreeByThreeProps {
+    cells: CellIndex
 }
 
-const ThreeByThree = () => {
+const ThreeByThree = ({cells}: ThreeByThreeProps) => {
     const regions = useMemo(() => {
         const topLefts: Point[] = [0, 1, 2].map(y => {
             return [0, 1, 2].map(x => {
@@ -27,8 +30,8 @@ const ThreeByThree = () => {
     }, [])
     return (<>
         {regions.map((region, index) =>
-        (<Region key={index} className={classes.root} region={region} />)
-    )}
+            (<UniqueRegion key={index} className={classes.root} region={region} cells={cells} />)
+        )}
     </>)
 }
 

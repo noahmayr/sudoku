@@ -5,6 +5,7 @@ import Cell from '../Cell/Cell';
 import LinePath, { Line } from '../SVG/LinePath';
 import Region from '../Region/Region';
 import ThreeByThree from '../Region/ThreeByThree';
+import useCells from '../Cell/useCells';
 
 const createLine = (start: Point, vector: Vector) => {
     return {
@@ -14,6 +15,12 @@ const createLine = (start: Point, vector: Vector) => {
             y: start.y + vector.y
         }
     }
+}
+
+
+interface DimensionProps {
+    width: number;
+    height: number;
 }
 
 const useGridDimensions = ({ width, height }: DimensionProps): { lines: Line[], bounds: Bounds, size: Size } => {
@@ -37,30 +44,6 @@ const useGridDimensions = ({ width, height }: DimensionProps): { lines: Line[], 
             height,
         }
     }
-}
-
-interface DimensionProps {
-    width: number;
-    height: number;
-}
-
-const useCells = ({ width, height }: DimensionProps) => {
-
-    return useMemo(() => {
-        const cellIndex: Record<string, CellInterface> = {};
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
-                const cell: CellInterface = {
-                    x: x,
-                    y: y,
-                    //@ts-ignore
-                    given: Math.ceil((Math.random() * 9))
-                };
-                cellIndex[getKey(cell)] = cell;
-            }
-        }
-        return cellIndex;
-    }, [width, height]);
 }
 
 const useGrid = ({ width = 9, height = 9 }: GridProps) => {
@@ -105,7 +88,7 @@ const Grid = (props: GridProps) => {
                     })}
                 </g>
                 <g id="3x3-regions">
-                    <ThreeByThree />
+                    <ThreeByThree cells={cells} />
                 </g>
                 <g id="selection">
                     <Region className={classes.selection} region={selection} />
