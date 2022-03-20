@@ -46,21 +46,27 @@ interface DimensionProps {
 
 const useCells = ({ width, height }: DimensionProps) => {
 
-    return useMemo(() => Array.from({ length: width }, (_, x): CellInterface[] => {
-        return Array.from({ length: height }, (_, y): CellInterface => {
-            return {
-                x: x,
-                y: y,
-                //@ts-ignore
-                given: Math.ceil((Math.random() * 9))
+    return useMemo(() => {
+        const cellIndex: Record<string, CellInterface> = {};
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const cell: CellInterface = {
+                    x: x,
+                    y: y,
+                    //@ts-ignore
+                    given: Math.ceil((Math.random() * 9))
+                };
+                cellIndex[getKey(cell)] = cell;
             }
-        });
-    }).flat(1), [width, height]);
+        }
+        return cellIndex;
+    }, [width, height]);
 }
 
-const useGrid = ({ width = 9, height = 9}: GridProps) => {
+const useGrid = ({ width = 9, height = 9 }: GridProps) => {
     const dimensions = useGridDimensions({ width, height });
-    const { cells, ref, selection } = useSelection({ dimensions, cells: useCells({ width, height }) })
+    const cells = useCells({ width, height });
+    const { ref, selection } = useSelection({ dimensions })
     return {
         dimensions,
         cells,
@@ -83,26 +89,26 @@ const Grid = (props: GridProps) => {
             className="boardsvg"
             xmlns="http://www.w3.org/2000/svg"
             version="1.1"
-            style={{ vectorEffect: "non-scaling-stroke", width: bounds.width*64, height: bounds.height*64, fontSize: `${1/32}rem`, strokeWidth: '0.05em' }}
+            style={{ vectorEffect: "non-scaling-stroke", width: bounds.width * 64, height: bounds.height * 64, fontSize: `${1 / 32}rem`, strokeWidth: '0.05em' }}
             viewBox={`${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`}
             ref={ref}
         >
             <g id="scale" >
                 <g id="background">
-                    <LinePath lines={lines} className={classes.cellGrid}/>
+                    <LinePath lines={lines} className={classes.cellGrid} />
                 </g>
                 <g id="cells">
-                    {cells.map((cell: CellInterface) => {
+                    {Object.values(cells).map((cell) => {
                         return (
                             <Cell key={getKey(cell)} cell={cell}></Cell>
                         )
                     })}
                 </g>
                 <g id="3x3-regions">
-                    <ThreeByThree/>
+                    <ThreeByThree />
                 </g>
                 <g id="selection">
-                    <Region className={classes.selection} region={selection}/>
+                    <Region className={classes.selection} region={selection} />
                 </g>
             </g>
         </svg>

@@ -3,7 +3,6 @@ import useMouseSelection from "./useMouseSelection";
 
 interface SelectProps {
     dimensions: Dimensions;
-    cells: CellInterface[];
 }
 
 export const getKey = ({x, y}: Point): string => {
@@ -46,7 +45,7 @@ interface UseLocalPositionProps {
     dimensions: Dimensions
 }
 
-const useSelection = ({ dimensions, cells }: SelectProps) => {
+const useSelection = ({ dimensions }: SelectProps) => {
     const [selecting, setSelecting] = useState<boolean | null>(null);
     const ref = useRef<SVGSVGElement>(null);
     const [selection, dispatchSelect] = useReducer(selectionReducer, {});
@@ -84,23 +83,8 @@ const useSelection = ({ dimensions, cells }: SelectProps) => {
         }
     }, [mouseDown, position, selecting, setSelecting, JSON.stringify(selection), dispatchSelect]);
 
-    const { enrichedCells } = useMemo(() => {
-        const enrichedCells = cells.map(cell => {
-            const key = getKey(cell);
-            const selected = selection[getKey(cell)];
-            return {
-                ...cell,
-                selected: selected
-            }
-        });
-        return {
-            enrichedCells
-        }
-    }, [JSON.stringify(selection), JSON.stringify(cells)]);
-
     return {
         selection,
-        cells: enrichedCells,
         ref
     }
 }
