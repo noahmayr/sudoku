@@ -4,10 +4,12 @@ import useSelection, { getKey } from '../../hooks/useSelection';
 import Cell from '../Cell/Cell';
 import LinePath, { Line } from '../SVG/LinePath';
 import Region from '../Region/Region';
-import ThreeByThree from '../Region/ThreeByThree';
+import ThreeByThree from '../Rules/ThreeByThree';
 import useCells from '../Cell/useCells';
 import { ValidationProvider } from '../../context/Validation';
 import GridErrors from '../Error/GridErrors';
+import UniqueRows from '../Rules/UniqueRows';
+import UniqueColumns from '../Rules/UniqueColumns';
 
 const createLine = (start: Point, vector: Vector) => {
     return {
@@ -72,7 +74,7 @@ const Grid = (props: GridProps) => {
         <ValidationProvider>
             <svg
                 id="svgrenderer"
-                className="boardsvg"
+                className={classes.svg}
                 xmlns="http://www.w3.org/2000/svg"
                 version="1.1"
                 style={{ vectorEffect: "non-scaling-stroke", width: bounds.width * 64, height: bounds.height * 64, fontSize: `${1 / 32}rem`, strokeWidth: '0.05em' }}
@@ -90,11 +92,13 @@ const Grid = (props: GridProps) => {
                             )
                         })}
                     </g>
-                    <g id="3x3-regions">
+                    <g id="regions">
                         <ThreeByThree cells={cells} />
+                        <UniqueRows cells={cells} />
+                        <UniqueColumns cells={cells} />
                     </g>
                     <g id="errors">
-                        <GridErrors cells={cells}/>
+                        <GridErrors cells={cells} />
                     </g>
                     <g id="selection">
                         <Region className={classes.selection} region={selection} />
