@@ -1,0 +1,26 @@
+.cellRect {
+    fill: transparent;
+}
+
+.cell {
+    &:hover, &.active {
+        .cellRect {
+            fill: #fff2;
+        }
+    }
+}
+
+.cellValue {
+    fill: #fff;
+    stroke: #fff;
+    font-size: 1.5em;
+    text-anchor: middle;
+    
+    dominant-baseline: central;
+    stroke-width: 0.05em;
+    stroke-linecap: butt;
+    stroke-linejoin: miter;
+    paint-order: stroke fill;
+    pointer-events: none;
+    user-select: none;
+}
