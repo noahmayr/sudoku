@@ -36,7 +36,6 @@ interface CellInterface extends Point {
     }
     color?: CellColor;
     errors?: string[];
-    selected?: boolean;
 };
 
 interface Size {
