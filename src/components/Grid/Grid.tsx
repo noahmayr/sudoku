@@ -6,6 +6,8 @@ import LinePath, { Line } from '../SVG/LinePath';
 import Region from '../Region/Region';
 import ThreeByThree from '../Region/ThreeByThree';
 import useCells from '../Cell/useCells';
+import { ValidationProvider } from '../../context/Validation';
+import GridErrors from '../Error/GridErrors';
 
 const createLine = (start: Point, vector: Vector) => {
     return {
@@ -67,34 +69,40 @@ const Grid = (props: GridProps) => {
     } = useGrid(props);
 
     return (
-        <svg
-            id="svgrenderer"
-            className="boardsvg"
-            xmlns="http://www.w3.org/2000/svg"
-            version="1.1"
-            style={{ vectorEffect: "non-scaling-stroke", width: bounds.width * 64, height: bounds.height * 64, fontSize: `${1 / 32}rem`, strokeWidth: '0.05em' }}
-            viewBox={`${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`}
-            ref={ref}
-        >
-            <g id="scale" >
-                <g id="background">
-                    <LinePath lines={lines} className={classes.cellGrid} />
+        <ValidationProvider>
+            <svg
+                id="svgrenderer"
+                className="boardsvg"
+                xmlns="http://www.w3.org/2000/svg"
+                version="1.1"
+                style={{ vectorEffect: "non-scaling-stroke", width: bounds.width * 64, height: bounds.height * 64, fontSize: `${1 / 32}rem`, strokeWidth: '0.05em' }}
+                viewBox={`${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`}
+                ref={ref}
+            >
+                <g id="scale" >
+                    <g id="background">
+                        <LinePath lines={lines} className={classes.cellGrid} />
+                    </g>
+                    <g id="cells">
+                        {Object.values(cells).map((cell) => {
+                            return (
+                                <Cell key={getKey(cell)} cell={cell}></Cell>
+                            )
+                        })}
+                    </g>
+                    <g id="3x3-regions">
+                        <ThreeByThree cells={cells} />
+                    </g>
+                    <g id="errors">
+                        <GridErrors cells={cells}/>
+                    </g>
+                    <g id="selection">
+                        <Region className={classes.selection} region={selection} />
+                    </g>
                 </g>
-                <g id="cells">
-                    {Object.values(cells).map((cell) => {
-                        return (
-                            <Cell key={getKey(cell)} cell={cell}></Cell>
-                        )
-                    })}
-                </g>
-                <g id="3x3-regions">
-                    <ThreeByThree cells={cells} />
-                </g>
-                <g id="selection">
-                    <Region className={classes.selection} region={selection} />
-                </g>
-            </g>
-        </svg>
+            </svg>
+        </ValidationProvider>
+
     );
 }
 
