@@ -76,6 +76,4 @@ export const useValidator = (validator: Validator, deps: DependencyList): void =
 export const useValidation = (cells: CellIndex): ValidationResult[] => {
     const { state } = useValidationContext();
     return state.map(validatorRef => validatorRef.current(cells))
-    // return useCallback((cells: CellIndex): ValidationResult[] => {
-    // }, [state]);
 }
