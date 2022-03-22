@@ -1,5 +1,6 @@
-import { createContext, DependencyList, PropsWithChildren, Ref, useCallback, useContext, useEffect, useReducer, useRef } from "react";
+import { createContext, DependencyList, PropsWithChildren, useCallback, useEffect, useReducer, useRef } from "react";
 import { CellIndex } from "../components/Cell/useCells";
+import useSafeContext from "../hooks/useSafeContext";
 
 export type Validator = (cells: CellIndex) => ValidationResult;
 
@@ -9,26 +10,25 @@ export interface ValidationResult {
     errorSource?: string;
 }
 
-type ValidatorRef = React.MutableRefObject<Validator>
+type ValidatorRef = React.MutableRefObject<Validator>;
 
 interface ValidatorReducerAction {
     type: 'add' | 'remove';
     validator: ValidatorRef;
 }
 
-interface ValidationContextProps {
-    state: ValidatorRef[];
-    dispatch: React.Dispatch<ValidatorReducerAction>;
+type ValidationDispatch = React.Dispatch<ValidatorReducerAction>;
+type ValidationState = ValidatorRef[];
+
+const ValidationDispatchContext = createContext<ValidationDispatch | undefined>(undefined);
+const ValidationStateContext = createContext<ValidationState | undefined>(undefined);
+
+const useValidationDispatch = () => {
+    return useSafeContext(ValidationDispatchContext, 'useValidationDispatch can only be used inside ValidationProvider');
 }
 
-const ValidationContext = createContext<ValidationContextProps | undefined>(undefined);
-
-const useValidationContext = () => {
-    const context = useContext(ValidationContext);
-    if (context === undefined) {
-        throw Error('useValidationContext can only be used inside ValidationProvider');
-    }
-    return context;
+const useValidationState = () => {
+    return useSafeContext(ValidationStateContext, 'useValidationState can only be used inside ValidationProvider');
 }
 
 const reduceValidatorList = (state: ValidatorRef[], { type, validator }: ValidatorReducerAction): ValidatorRef[] => {
@@ -44,15 +44,17 @@ const reduceValidatorList = (state: ValidatorRef[], { type, validator }: Validat
 export const ValidationProvider = ({ children }: PropsWithChildren<any>) => {
     const [state, dispatch] = useReducer(reduceValidatorList, []);
     return (
-        <ValidationContext.Provider value={{ state, dispatch }}>
-            {children}
-        </ValidationContext.Provider>
-    )
+        <ValidationDispatchContext.Provider value={dispatch}>
+            <ValidationStateContext.Provider value={state}>
+                {children}
+            </ValidationStateContext.Provider>
+        </ValidationDispatchContext.Provider>
+    );
 }
 
 export const useValidator = (validator: Validator, deps: DependencyList): void => {
-    const { dispatch } = useValidationContext();
-    const callback = useCallback(validator, deps) 
+    const dispatch = useValidationDispatch();
+    const callback = useCallback(validator, deps);
     const ref: ValidatorRef = useRef<Validator>(validator);
 
     useEffect(() => {
@@ -74,6 +76,6 @@ export const useValidator = (validator: Validator, deps: DependencyList): void =
 }
 
 export const useValidation = (cells: CellIndex): ValidationResult[] => {
-    const { state } = useValidationContext();
-    return state.map(validatorRef => validatorRef.current(cells))
+    const state = useValidationState();
+    return state.map(validatorRef => validatorRef.current(cells));
 }
