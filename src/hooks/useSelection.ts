@@ -9,7 +9,7 @@ export const getKey = ({x, y}: Point): string => {
     return JSON.stringify({x, y});
 }
 
-type Selection = Record<string, true>;
+export type Selection = Record<string, true>;
 
 interface SelectionReducerProps {
     position?: Point;

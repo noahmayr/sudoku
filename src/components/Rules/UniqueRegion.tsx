@@ -1,3 +1,4 @@
+import { useInputState } from '../../context/Input';
 import { useValidator } from '../../context/Validation';
 import { getKey } from '../../hooks/useSelection';
 import { CellIndex, CellInterface, CellValue } from '../Cell/useCells';
@@ -8,12 +9,15 @@ interface UniqueRegionProps extends RegionProps {
 }
 
 const UniqueRegion = ({ className, region }: UniqueRegionProps) => {
+    const inputState = useInputState();
+
     useValidator(cellIndex => {
         const regionCells = Object.keys(region).map((key) => cellIndex[key]);
         const seen: Record<CellValue, CellInterface[]> = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] };
 
         regionCells.forEach(cell => {
-            const val = cell.given ?? cell.value;
+            const {value, given} = inputState[getKey(cell)] ?? {};
+            const val = value ?? given;
             if (typeof val !== 'number') {
                 return;
             }
@@ -28,7 +32,7 @@ const UniqueRegion = ({ className, region }: UniqueRegionProps) => {
         return {
             errorCells
         }
-    }, [region])
+    }, [region, inputState])
 
     return (<Region className={className} region={region} />);
 }

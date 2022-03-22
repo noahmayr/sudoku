@@ -23,13 +23,6 @@ export enum CellColor {
 }
 
 export interface CellInterface extends Point {
-    value?: CellValue | AbstractCellValue;
-    given?: CellValue;
-    // pencilMark?: {
-    //     center: CellValue | AbstractCellValue;
-    //     corner: CellValue | AbstractCellValue;
-    // }
-    // color?: CellColor;
 };
 
 const useCells = ({ width, height }: UseCellsProps) => {
@@ -40,8 +33,8 @@ const useCells = ({ width, height }: UseCellsProps) => {
                 const cell: CellInterface = {
                     x: x,
                     y: y,
-                    //@ts-ignore
-                    given: Math.ceil((Math.random() * 9))
+                    // //@ts-ignore
+                    // given: Math.ceil((Math.random() * 9))
                 };
                 cellIndex[getKey(cell)] = cell;
             }

@@ -1,4 +1,3 @@
-import { MouseEvent, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import classes from './Grid.module.scss';
 import useSelection, { getKey } from '../../hooks/useSelection';
 import Cell from '../Cell/Cell';
@@ -6,10 +5,10 @@ import LinePath, { Line } from '../SVG/LinePath';
 import Region from '../Region/Region';
 import ThreeByThree from '../Rules/ThreeByThree';
 import useCells from '../Cell/useCells';
-import { ValidationProvider } from '../../context/Validation';
 import GridErrors from '../Error/GridErrors';
 import UniqueRows from '../Rules/UniqueRows';
 import UniqueColumns from '../Rules/UniqueColumns';
+import useInput from '../../hooks/useInput';
 
 const createLine = (start: Point, vector: Vector) => {
     return {
@@ -54,6 +53,7 @@ const useGrid = ({ width = 9, height = 9 }: GridProps) => {
     const dimensions = useGridDimensions({ width, height });
     const cells = useCells({ width, height });
     const { ref, selection } = useSelection({ dimensions })
+    useInput(selection);
     return {
         dimensions,
         cells,
@@ -71,42 +71,39 @@ const Grid = (props: GridProps) => {
     } = useGrid(props);
 
     return (
-        <ValidationProvider>
-            <svg
-                id="svgrenderer"
-                className={classes.svg}
-                xmlns="http://www.w3.org/2000/svg"
-                version="1.1"
-                style={{ vectorEffect: "non-scaling-stroke", width: bounds.width * 64, height: bounds.height * 64, fontSize: `${1 / 32}rem`, strokeWidth: '0.05em' }}
-                viewBox={`${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`}
-                ref={ref}
-            >
-                <g id="scale" >
-                    <g id="background">
-                        <LinePath lines={lines} className={classes.cellGrid} />
-                    </g>
-                    <g id="cells">
-                        {Object.values(cells).map((cell) => {
-                            return (
-                                <Cell key={getKey(cell)} cell={cell}></Cell>
-                            )
-                        })}
-                    </g>
-                    <g id="regions">
-                        <ThreeByThree cells={cells} />
-                        <UniqueRows cells={cells} />
-                        <UniqueColumns cells={cells} />
-                    </g>
-                    <g id="errors">
-                        <GridErrors cells={cells} />
-                    </g>
-                    <g id="selection">
-                        <Region className={classes.selection} region={selection} />
-                    </g>
+        <svg
+            id="svgrenderer"
+            className={classes.svg}
+            xmlns="http://www.w3.org/2000/svg"
+            version="1.1"
+            style={{ vectorEffect: "non-scaling-stroke", width: bounds.width * 64, height: bounds.height * 64, fontSize: `${1 / 32}rem`, strokeWidth: '0.05em' }}
+            viewBox={`${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`}
+            ref={ref}
+        >
+            <g id="scale" >
+                <g id="background">
+                    <LinePath lines={lines} className={classes.cellGrid} />
                 </g>
-            </svg>
-        </ValidationProvider>
-
+                <g id="cells">
+                    {Object.values(cells).map((cell) => {
+                        return (
+                            <Cell key={getKey(cell)} cell={cell}></Cell>
+                        )
+                    })}
+                </g>
+                <g id="regions">
+                    <ThreeByThree cells={cells} />
+                    <UniqueRows cells={cells} />
+                    <UniqueColumns cells={cells} />
+                </g>
+                <g id="errors">
+                    <GridErrors cells={cells} />
+                </g>
+                <g id="selection">
+                    <Region className={classes.selection} region={selection} />
+                </g>
+            </g>
+        </svg>
     );
 }
 
