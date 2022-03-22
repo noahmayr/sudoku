@@ -9,14 +9,11 @@ interface UniqueRegionProps extends RegionProps {
 }
 
 const UniqueRegion = ({ className, region }: UniqueRegionProps) => {
-    const inputState = useInputState();
-
-    useValidator(cellIndex => {
-        const regionCells = Object.keys(region).map((key) => cellIndex[key]);
+    useValidator(region, ({items}) => {
         const seen: Record<CellValue, CellInterface[]> = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] };
 
-        regionCells.forEach(cell => {
-            const {value, given} = inputState[getKey(cell)] ?? {};
+        items.forEach(({cell, state}) => {
+            const {value, given} = state;
             const val = value ?? given;
             if (typeof val !== 'number') {
                 return;
@@ -32,7 +29,7 @@ const UniqueRegion = ({ className, region }: UniqueRegionProps) => {
         return {
             errorCells
         }
-    }, [region, inputState])
+    }, [region]);
 
     return (<Region className={className} region={region} />);
 }

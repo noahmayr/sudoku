@@ -33,8 +33,6 @@ const useCells = ({ width, height }: UseCellsProps) => {
                 const cell: CellInterface = {
                     x: x,
                     y: y,
-                    // //@ts-ignore
-                    // given: Math.ceil((Math.random() * 9))
                 };
                 cellIndex[getKey(cell)] = cell;
             }

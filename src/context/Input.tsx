@@ -2,17 +2,27 @@ import { createContext, PropsWithChildren, useReducer } from "react";
 import { AbstractCellValue, CellColor, CellInterface, CellValue } from "../components/Cell/useCells";
 import useSafeContext from "../hooks/useSafeContext";
 import { getKey, Selection } from "../hooks/useSelection";
+import {merge} from "../util";
 
-interface InputStateReducerAction {
+interface InputAction {
     type: 'value' | 'center' | 'corner' | 'color';
     value?: CellValue;
     selection: Selection
 }
 
+export type GivenDigits = Record<string, CellValue|undefined>;
+
+interface InitAction {
+    type: 'given';
+    values: GivenDigits;
+}
+
+type ReducerAction = InputAction | InitAction;
+
 type AnyCellValue = CellValue | AbstractCellValue;
 type PencilMarks = Set<AnyCellValue>;
 
-interface CellState {
+export interface CellState {
     given?: CellValue;
     value?: CellValue | AbstractCellValue;
     center?: PencilMarks;
@@ -20,65 +30,67 @@ interface CellState {
     color?: CellColor;
 }
 
-type InputDispatch = React.Dispatch<InputStateReducerAction>
-type InputState = Record<string, CellState|undefined>;
+type InputDispatch = React.Dispatch<ReducerAction>
+export type InputState = Record<string, CellState|undefined>;
 
 const InputDispatchContext = createContext<InputDispatch | undefined>(undefined);
 const InputStateContext = createContext<InputState | undefined>(undefined);
 
-const reduceInputState = (state: InputState, { type, value, selection }: InputStateReducerAction): InputState => {
-    const keys = Object.keys(selection);
-    if (type === 'value' || type === 'color') {
-        if (value !== undefined && keys.some(key => state[key]?.[type] !== value)) {
-            const changes = keys.map((key): InputState => ({ [key]: { ...state[key], [type]: value } }));
+const reduceInputState = (oldState: InputState, action: ReducerAction): InputState => {
+    if (action.type === 'given') {
+        const { values } = action;
+        const initialCommit = Object.entries(values).map(([key, value]): InputState => {
             return {
-                ...state,
-                ...changes.reduce((a, b) => ({ ...a, ...b }), {})
-            };
+                [key]: {
+                    given: value
+                }
+            }
+        })
+        return merge(oldState, ...initialCommit);
+    }
+
+    const { type, value, selection } = action;
+    const cells = Object.keys(selection).map(key => ({key, state: oldState[key]}))
+        .filter(cell => cell.state?.given === undefined || type === 'color' );
+
+    if (type === 'value' || type === 'color') {
+        if (value !== undefined && !cells.every(({state}) => state?.[type] === value )) {
+            const changes = cells.map(({key, state}): InputState => ({ [key]: { ...state, [type]: value } }));
+            return merge(oldState, ...changes);
         }
-        const changes = keys.map((key): InputState => {
-            const {[type]: _, ...old} = state[key] ?? {};
+        const changes = cells.map(({key, state = {}}): InputState => {
+            const {[type]: _, ...old} = state;
             return { [key]: { ...old } };
         });
-        return {
-            ...state,
-            ...changes.reduce((a, b) => ({ ...a, ...b }), {})
-        };
+        return merge(oldState, ...changes);
     }
     if (type === 'center' || type === 'corner') {
         if (value === undefined) {
-            const changes = keys.map((key): InputState => {
-                const {[type]: marks, ...old} = state[key] ?? {};
-                marks?.clear();
+            const changes = cells.map(({key, state = {}}): InputState => {
+                const {[type]: oldMarks, ...old} = state;
+                const marks = new Set<AnyCellValue>();
                 return { [key]: { ...old, [type]: marks } };
             });
-            return {
-                ...state,
-                ...changes.reduce((a, b) => ({ ...a, ...b }), {})
-            };
+            return merge(oldState, ...changes);
         }
-        if (keys.some(key => !state[key]?.[type]?.has(value))) {
-            const changes = keys.map((key): InputState => {
-                const {[type]: marks = new Set<AnyCellValue>(), ...old} = state[key] ?? {};
+        if (!cells.every(({state}) => state?.[type]?.has(value))) {
+            const changes = cells.map(({key, state = {}}): InputState => {
+                const {[type]: oldMarks, ...old} = state;
+                const marks = new Set<AnyCellValue>(oldMarks);
                 marks.add(value);
                 return { [key]: { ...old, [type]: marks } };
             });
-            return {
-                ...state,
-                ...changes.reduce((a, b) => ({ ...a, ...b }), {})
-            };
+            return merge(oldState, ...changes);
         }
-        const changes = keys.map((key): InputState => {
-            const {[type]: marks, ...old} = state[key] ?? {};
-            marks?.delete(value);
-            return { [key]: { ...old, [type]: marks } };
+        const changes = cells.map(({key, state = {}}): InputState => {
+            const {[type]: oldMarks, ...old} = state;
+            const marks = new Set<AnyCellValue>(oldMarks);
+            marks.delete(value);
+        return { [key]: { ...old, [type]: marks } };
         });
-        return {
-            ...state,
-            ...changes.reduce((a, b) => ({ ...a, ...b }), {})
-        };
+        return merge(oldState, ...changes);
     }
-    return state;
+    return oldState;
 }
 
 export const InputProvider = ({ children }: PropsWithChildren<any>) => {
@@ -104,3 +116,48 @@ export const useCellState = (cell: CellInterface): CellState => {
     const {[getKey(cell)]: state} = useInputState();
     return state ?? {};
 }
+
+
+// const newReduceInputState = (oldState: InputState, { type, value, selection }: InputStateReducerAction): InputState => {
+//     const cells = Object.keys(selection).map(key => ({key, state: oldState[key]}))
+//         .filter(cell => cell.state?.given === undefined || type === 'color' );
+
+//     if (type === 'value' || type === 'color') {
+//         if (value !== undefined && cells.some(({state}) => state?.[type] !== value )) {
+//             const changes = cells.map(({key, state}): InputState => ({ [key]: { ...state, [type]: value } }));
+//             return merge(oldState, changes);
+//         }
+//         const changes = cells.map(({key, state = {}}): InputState => {
+//             const {[type]: _, ...old} = state;
+//             return { [key]: { ...old } };
+//         });
+//         return merge(oldState, changes);
+//     }
+//     if (type === 'center' || type === 'corner') {
+//         if (value === undefined) {
+//             const changes = cells.map(({key, state = {}}): InputState => {
+//                 const {[type]: oldMarks, ...old} = state;
+//                 const marks = new Set<AnyCellValue>();
+//                 return { [key]: { ...old, [type]: marks, given: 1 } };
+//             });
+//             return merge(oldState, changes);
+//         }
+//         if (cells.some(({state}) => state?.[type]?.has(value))) {
+//             const changes = cells.map(({key, state = {}}): InputState => {
+//                 const {[type]: oldMarks, ...old} = state;
+//                 const marks = new Set<AnyCellValue>(oldMarks);
+//                 marks.add(value);
+//                 return { [key]: { ...old, [type]: marks } };
+//             });
+//             return merge(oldState, changes);
+//         }
+//         const changes = cells.map(({key, state = {}}): InputState => {
+//             const {[type]: oldMarks, ...old} = state;
+//             const marks = new Set<AnyCellValue>(oldMarks);
+//             marks.delete(value);
+//         return { [key]: { ...old, [type]: marks } };
+//         });
+//         return merge(oldState, changes);
+//     }
+//     return oldState;
+// }

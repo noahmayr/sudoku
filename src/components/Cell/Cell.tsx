@@ -13,6 +13,13 @@ const Cell = ({ cell }: CellProps) => {
     return (
         <svg x={cell.x} y={cell.y} width={1} height={1} className={classes.cell}>
             <rect x="0%" y="0%" width="100%" height="100%" className={classes.cellRect} />
+            {
+                (value ===undefined && state.center !== undefined) ? (
+                    <text width="1" height="1" x="50%" y="50%" className={classes.centerMark} data-count={state.center.size}>
+                        {Array.from(state.center?.values()).sort()}
+                    </text>
+                ) : null
+            }
             <text width="1" height="1" x="50%" y="50%" className={classes.cellValue}>
                 {value}
             </text>

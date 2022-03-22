@@ -19,21 +19,23 @@ const getCellValue = (value: number): CellValue|undefined => {
 const useInput = (selection: Selection) => {
     const dispatch = useInputDispatch();
     useOnGlobalDomEvent(['keydown'], (event) => {
-        const numKey = Number(event.key);
-        if (!isNaN(numKey)) {
-            const value = getCellValue(numKey);
+        const type = event.metaKey ? 'center' : 'value'
+        if (event.code.startsWith('Digit')) {
+            event.preventDefault();
+            const value = getCellValue(Number(event.code.replace('Digit', '')));
             if (value === undefined) {
                 return;
             }
             dispatch({
-                type: 'value',
+                type: type,
                 value: value, 
                 selection: selection
             });
         }
+        const numKey = Number(event.code);
         if (event.key === 'Backspace') {
             dispatch({
-                type: 'value',
+                type: type,
                 value: undefined, 
                 selection: selection
             });

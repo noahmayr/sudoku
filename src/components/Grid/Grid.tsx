@@ -76,7 +76,7 @@ const Grid = (props: GridProps) => {
             className={classes.svg}
             xmlns="http://www.w3.org/2000/svg"
             version="1.1"
-            style={{ vectorEffect: "non-scaling-stroke", width: bounds.width * 64, height: bounds.height * 64, fontSize: `${1 / 32}rem`, strokeWidth: '0.05em' }}
+            style={{ vectorEffect: "non-scaling-stroke", width: bounds.width * 80, height: bounds.height * 80, fontSize: `${1 / 32}rem`, strokeWidth: '0.05em' }}
             viewBox={`${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`}
             ref={ref}
         >
