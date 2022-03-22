@@ -1,5 +1,5 @@
-import { useCallback, useState } from "react";
-import useGlobalDomEvents from "./useGlobalDomEvents";
+import { useState } from "react";
+import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 
 interface MouseState {
     mouse: {
@@ -58,7 +58,7 @@ const useMouseSelection = (dimensions: Dimensions): MouseState => {
         }
     });
 
-    const mouseEventListener = useCallback((event: MouseEvent) => {
+    useOnGlobalDomEvent(['mousedown', 'mouseup', 'mousemove'], (event) => {
         setMouseState({
             mouse: {
                 buttons: getMouseButtons(event),
@@ -74,13 +74,7 @@ const useMouseSelection = (dimensions: Dimensions): MouseState => {
                 meta: event.metaKey,
             }
         });
-    }, [setMouseState, JSON.stringify(dimensions)]);
-
-    useGlobalDomEvents({
-        mousedown: mouseEventListener,
-        mouseup: mouseEventListener,
-        mousemove: mouseEventListener,
-    });
+    }, [setMouseState]);
 
     return mouseState;
 }
