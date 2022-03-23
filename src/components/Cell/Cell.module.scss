@@ -24,28 +24,37 @@
         stroke-width: 0.05em;
         width: 100%;
     }
-}
 
-.centerMark {
-    letter-spacing: -0.1em;
-    font-size: 0.6em;
-    &[data-count="5"] {
-        font-size: 0.55em;
+    .centerMark {
+        letter-spacing: -0.1em;
+        font-size: 0.6em;
+        &[data-count="5"] {
+            font-size: 0.55em;
+        }
+        &[data-count="6"] {
+            font-size: 0.48em;
+        }
+        &[data-count="7"] {
+            font-size: 0.42em;
+        }
+        &[data-count="8"] {
+            font-size: 0.36em;
+        }
+        &[data-count="9"] {
+            font-size: 0.32em;
+        }
     }
-    &[data-count="6"] {
-        font-size: 0.48em;
-    }
-    &[data-count="7"] {
-        font-size: 0.42em;
-    }
-    &[data-count="8"] {
-        font-size: 0.36em;
-    }
-    &[data-count="9"] {
-        font-size: 0.32em;
-    }
-}
 
-.cellValue {
-    font-size: 1.5em;
+    .cellValue {
+        stroke: transparent;
+    }
+    
+    .cellValue, .given {
+        font-size: 1.5em;
+    }
+    
+    .given {
+        stroke: #fff;
+        fill: #333;
+    }
 }
