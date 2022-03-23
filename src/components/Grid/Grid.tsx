@@ -4,11 +4,13 @@ import Cell from '../Cell/Cell';
 import LinePath, { Line } from '../SVG/LinePath';
 import Region from '../Region/Region';
 import ThreeByThree from '../Rules/ThreeByThree';
-import useCells from '../Cell/useCells';
+import useCells, { CellInterface, CellValue } from '../Cell/useCells';
 import GridErrors from '../Error/GridErrors';
 import UniqueRows from '../Rules/UniqueRows';
 import UniqueColumns from '../Rules/UniqueColumns';
 import useInput from '../../hooks/useInput';
+import { useEffect } from 'react';
+import { GivenDigits, useInputDispatch } from '../../context/Input';
 
 const createLine = (start: Point, vector: Vector) => {
     return {
@@ -49,11 +51,41 @@ const useGridDimensions = ({ width, height }: DimensionProps): { lines: Line[], 
     }
 }
 
+const GAME: (CellValue | undefined)[][] = [
+    [, , 4, , 5],
+    [9, , , 7, 3, 4, 6],
+    [, , 3, , 2, 1, , 4, 9],
+    [, 3, 5, , 9, , 4, 8],
+    [, 9, , , , , , 3],
+    [, 7, 6, , 1, , 9, 2],
+    [3, 1, , 9, 7, , 2],
+    [, , 9, 1, 8, 2, , ,3],
+    [, , , , 6, , 1]
+];
+
 const useGrid = ({ width = 9, height = 9 }: GridProps) => {
     const dimensions = useGridDimensions({ width, height });
     const cells = useCells({ width, height });
     const { ref, selection } = useSelection({ dimensions })
     useInput(selection);
+    const dispatch = useInputDispatch();
+    useEffect(() => {
+        dispatch({
+            type: 'given',
+            values: GAME.map((row, y): GivenDigits[] => {
+                return row.map((value, x): GivenDigits => {
+                    if (value === null) {
+                        return {};
+                    }
+                    return {
+                        [getKey({ x, y })]: value
+                    };
+                })
+                // return ({[getKey(cell)]: value }))
+            }).flat(1).reduce((a, b) => Object.assign(a, b), {})
+        })
+    })
+
     return {
         dimensions,
         cells,
