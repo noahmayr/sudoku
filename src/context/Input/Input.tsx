@@ -1,8 +1,8 @@
 import { createContext, PropsWithChildren, useMemo, useReducer } from "react";
-import { AbstractCellValue, CellColor, CellInterface, CellValue } from "../components/Cell/useCells";
-import useSafeContext from "../hooks/useSafeContext";
-import { getKey, Selection } from "../hooks/useSelection";
-import { merge } from "../util";
+import { AbstractCellValue, CellColor, CellInterface, CellValue } from "../../components/Cell/useCells";
+import useSafeContext from "../../hooks/useSafeContext";
+import { getKey, Selection } from "../../hooks/useSelection";
+import { merge } from "../../util";
 
 interface InputAction {
     type: 'value' | 'center' | 'corner' | 'color';
