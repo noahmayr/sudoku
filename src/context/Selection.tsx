@@ -58,3 +58,41 @@ export const useSelectionState = () => {
     return useSafeContext(SelectionStateContext, 'useSelectionState can only be used inside SelectionProvider');
 }
 
+interface UseDraggingSelectionProps {
+    shouldSelect: boolean;
+    position?: Point;
+    intersect: boolean;
+}
+
+export const useDraggingSelection = ({ shouldSelect, position, intersect }: UseDraggingSelectionProps) => {
+    const [selecting, setSelecting] = useState<boolean | null>(null);
+    const state = useSelectionState();
+    const dispatch = useSelectionDispatch();
+
+    useEffect(() => {
+        
+        if (!shouldSelect) {
+            return setSelecting(null);
+        }
+
+        if (position === undefined && !selecting) {
+            dispatch({ reset: true });
+        }
+
+        if (position !== undefined) {
+            const positionIsSelected = state[getKey(position)];
+
+            if (selecting === null) {
+                setSelecting(intersect ? !positionIsSelected : true);
+                return dispatch({ position, selected: intersect ? !positionIsSelected : true, reset: !intersect });
+            }
+
+            if (selecting === positionIsSelected) {
+                return;
+            }
+
+            return dispatch({ position, selected: selecting });
+        }
+
+    }, [shouldSelect, position, selecting, setSelecting, JSON.stringify(state), dispatch]);
+}

@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo, useRef, RefObject } from "react";
-import { useSelectionState, useSelectionDispatch } from "../context/Selection";
-import { getKey } from "../util";
+import { useState, useMemo, useRef, RefObject } from "react";
+import { useSelectionState, useSelectionDispatch, useDraggingSelection } from "../context/Selection";
 import useMouse from "./useMouse";
 
 interface UseLocalPositionProps {
@@ -14,7 +13,7 @@ const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionPr
     
     const transform = useMemo(() => {
         if (rect === undefined || viewBox === undefined) {
-            return null;
+            return;
         }
         const scale = {
             x: rect.width / viewBox.width,
@@ -33,8 +32,8 @@ const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionPr
         }
     }, [clientPos, JSON.stringify(rect), JSON.stringify(viewBox)]);
 
-    if (transform === null) {
-        return null;
+    if (transform === undefined) {
+        return;
     }
 
     const {scale, offset, size} = transform;
@@ -45,7 +44,7 @@ const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionPr
     }
 
     if (position.x < 0 || position.x >= size.width|| position.y < 0 || position.y >= size.height){
-        return null;
+        return;
     }
 
     return position;
@@ -53,10 +52,7 @@ const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionPr
 
 
 const useSelection = () => {
-    const [selecting, setSelecting] = useState<boolean | null>(null);
     const ref = useRef<SVGSVGElement>(null);
-    const selection = useSelectionState();
-    const dispatchSelect = useSelectionDispatch();
 
     const {
         mouse: {
@@ -68,28 +64,14 @@ const useSelection = () => {
 
     const position = useLocalPosition({ clientPosition, ref });
 
-    const mouseDown = buttons.primary;
+    const shouldSelect = buttons.primary;
     const intersect = mods.ctrl || mods.alt || mods.meta || mods.shift;
 
-    useEffect(() => {
-        if (!mouseDown) {
-            return setSelecting(null);
-        }
-        if (position === null && !selecting) {
-            dispatchSelect({ reset: true });
-        }
-        if (position !== null) {
-            const positionIsSelected = selection[getKey(position)];
-            if (selecting === null) {
-                setSelecting(intersect ? !positionIsSelected : true);
-                return dispatchSelect({ position, selected: intersect ? !positionIsSelected : true, reset: !intersect });
-            }
-            if (selecting === positionIsSelected) {
-                return;
-            }
-            return dispatchSelect({ position, selected: selecting });
-        }
-    }, [mouseDown, position, selecting, setSelecting, JSON.stringify(selection), dispatchSelect]);
+    useDraggingSelection({
+        shouldSelect,
+        position,
+        intersect
+    });
 
     return {
         ref
