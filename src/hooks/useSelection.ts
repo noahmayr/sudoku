@@ -1,90 +1,12 @@
-import { useState, useReducer, useCallback, useEffect, useMemo, useRef, RefObject } from "react";
+import { useState, useEffect, useMemo, useRef, RefObject } from "react";
+import { useSelectionState, useSelectionDispatch } from "../context/Selection";
+import { getKey } from "../util";
 import useMouse from "./useMouse";
-
-export const getKey = ({x, y}: Point): string => {
-    return JSON.stringify({x, y});
-}
-
-export type CellSelection = Record<string, true>;
-
-interface SelectionReducerProps {
-    position?: Point;
-    selected?: boolean;
-    reset?: boolean;
-}
-
-const selectionReducer = (state: CellSelection, { position, selected = true, reset = false }: SelectionReducerProps): CellSelection => {
-    if (position === undefined) {
-        return reset ? {} : state;
-    }
-    if (reset) {
-        if (!selected) {
-            return {};
-        }
-        return {
-            [getKey(position)]: selected
-        };
-    }
-    if (!selected) {
-        delete state[getKey(position)];
-        return state;
-    }
-    return {
-        ...state,
-        [getKey(position)]: selected
-    };
-}
 
 interface UseLocalPositionProps {
     clientPosition: Point;
     ref: RefObject<SVGSVGElement | null>;
 }
-
-const useSelection = () => {
-    const [selecting, setSelecting] = useState<boolean | null>(null);
-    const ref = useRef<SVGSVGElement>(null);
-    const [selection, dispatchSelect] = useReducer(selectionReducer, {});
-
-    const {
-        mouse: {
-            buttons,
-            position: clientPosition
-        },
-        mods
-    } = useMouse();
-
-    const position = useLocalPosition({ clientPosition, ref });
-
-    const mouseDown = buttons.primary;
-    const intersect = mods.ctrl || mods.alt || mods.meta || mods.shift;
-
-    useEffect(() => {
-        if (!mouseDown) {
-            return setSelecting(null);
-        }
-        if (position === null && !selecting) {
-            dispatchSelect({ reset: true });
-        }
-        if (position !== null) {
-            const positionIsSelected = selection[getKey(position)];
-            if (selecting === null) {
-                setSelecting(intersect ? !positionIsSelected : true);
-                return dispatchSelect({ position, selected: intersect ? !positionIsSelected : true, reset: !intersect });
-            }
-            if (selecting === positionIsSelected) {
-                return;
-            }
-            return dispatchSelect({ position, selected: selecting });
-        }
-    }, [mouseDown, position, selecting, setSelecting, JSON.stringify(selection), dispatchSelect]);
-
-    return {
-        selection,
-        ref
-    }
-}
-
-export default useSelection;
 
 const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionProps) => {
     const rect = ref.current?.getBoundingClientRect();
@@ -128,3 +50,51 @@ const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionPr
 
     return position;
 }
+
+
+const useSelection = () => {
+    const [selecting, setSelecting] = useState<boolean | null>(null);
+    const ref = useRef<SVGSVGElement>(null);
+    const selection = useSelectionState();
+    const dispatchSelect = useSelectionDispatch();
+
+    const {
+        mouse: {
+            buttons,
+            position: clientPosition
+        },
+        mods
+    } = useMouse();
+
+    const position = useLocalPosition({ clientPosition, ref });
+
+    const mouseDown = buttons.primary;
+    const intersect = mods.ctrl || mods.alt || mods.meta || mods.shift;
+
+    useEffect(() => {
+        if (!mouseDown) {
+            return setSelecting(null);
+        }
+        if (position === null && !selecting) {
+            dispatchSelect({ reset: true });
+        }
+        if (position !== null) {
+            const positionIsSelected = selection[getKey(position)];
+            if (selecting === null) {
+                setSelecting(intersect ? !positionIsSelected : true);
+                return dispatchSelect({ position, selected: intersect ? !positionIsSelected : true, reset: !intersect });
+            }
+            if (selecting === positionIsSelected) {
+                return;
+            }
+            return dispatchSelect({ position, selected: selecting });
+        }
+    }, [mouseDown, position, selecting, setSelecting, JSON.stringify(selection), dispatchSelect]);
+
+    return {
+        ref
+    }
+}
+
+
+export default useSelection;

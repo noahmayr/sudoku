@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { getKey } from "../../hooks/useSelection";
+import { getKey } from "../../util";
 import { PathCommand } from "../SVG/Path";
 
 export type RegionCells = Record<string, true>;

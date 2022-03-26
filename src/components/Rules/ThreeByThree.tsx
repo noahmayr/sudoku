@@ -1,9 +1,9 @@
 import classes from './ThreeByThree.module.scss';
-import { getKey } from '../../hooks/useSelection';
 import { useMemo } from 'react';
 import UniqueRegion from './UniqueRegion';
 import { RegionCells } from '../Region/useRegionPath';
 import { CellIndex } from '../Cell/useCells';
+import { getKey } from '../../util';
 
 interface ThreeByThreeProps {
     cells: CellIndex

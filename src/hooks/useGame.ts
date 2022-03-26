@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { CellValue } from "../components/Cell/useCells";
 import { GivenDigits, useInputDispatch } from "../context/Input";
-import { getKey } from "./useSelection";
+import { getKey } from "../util";
 
 export type GameGivens = (CellValue | undefined)[][];
 export type GameRegion = (true | undefined)[][];

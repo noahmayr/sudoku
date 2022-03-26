@@ -1,7 +1,7 @@
 import { createContext, PropsWithChildren, useMemo, useReducer } from "react";
 import { CellInterface } from "../../components/Cell/useCells";
 import useSafeContext from "../../hooks/useSafeContext";
-import { getKey } from "../../hooks/useSelection";
+import { getKey } from "../../util";
 import reduceInputState from "./reduceInputState";
 import { CellState, InputDispatch, InputState } from "./types";
 

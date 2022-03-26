@@ -1,5 +1,5 @@
 import classes from './Grid.module.scss';
-import useSelection, { getKey } from '../../hooks/useSelection';
+import useSelection from '../../hooks/useSelection';
 import Cell from '../Cell/Cell';
 import LinePath, { Line } from '../SVG/LinePath';
 import Region from '../Region/Region';
@@ -12,6 +12,7 @@ import useInput from '../../hooks/useInput';
 import useGame, { EXAMPLE } from '../../hooks/useGame';
 import Grid from './Grid';
 import Cells from '../Cell/Cells';
+import { useSelectionState } from '../../context/Selection';
 
 const useGridDimensions = ({ width, height }: Size) => {
     return {
@@ -45,7 +46,9 @@ const useSvgProps = ({ width, height }: Size) => {
 
 const useGrid = ({ width = 9, height = 9 }: GridProps) => {
     const dimensions = useGridDimensions({ width, height });
-    const { ref, selection } = useSelection()
+    const { ref } = useSelection();
+    const selection = useSelectionState();
+    
     useInput(selection);
 
     return {

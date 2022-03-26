@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { getKey } from "../../hooks/useSelection"
+import { getKey } from "../../util";
 import Cell from "./Cell"
 import { CellIndex } from "./useCells"
 

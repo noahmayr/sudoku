@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { getKey } from "../../hooks/useSelection";
+import { getKey } from "../../util";
 
 export type CellIndex = Record<string, CellInterface>;
 
