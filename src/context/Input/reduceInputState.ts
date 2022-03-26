@@ -1,9 +1,16 @@
 import { merge } from "../../util";
-import { AnyCellValue, CellState, InitAction, InputCenterAction, InputCornerAction, InputState, InputValueAction, ReducerAction } from "./types";
+import { CellState, InitAction, InputCenterAction, InputCornerAction, InputState, InputValueAction, InputAction, AnyCellValue, PencilMarks } from "./types";
 
 interface SelectedCell {
     key: string;
     state?: CellState;
+}
+type ActionWithSelection = Extract<InputAction, { selection: any }>;
+
+interface WithSelection<T extends ActionWithSelection> {
+    type: T['type'];
+    value: T['value'];
+    selection: SelectedCell[];
 }
 
 type Changes = InputState[];
@@ -38,13 +45,7 @@ const initAction = ({ values }: InitAction): Changes => {
     });
 }
 
-const valueAction = (selection: SelectedCell[], { type, value }: InputValueAction): Changes => {
-    // delete value from all selected cells that are not empty
-    if (value === undefined) {
-        const notEmpty = selection.filter(createFilter(type, state => state !== undefined));
-        return update(type, notEmpty, value);
-    }
-
+const valueAction = ({ type, value, selection }: WithSelection<Required<InputValueAction>>): Changes => {
     const withoutValue = selection.filter(createFilter(type, state => state !== value));
 
     // some selected cells do not have the value, assign it to them
@@ -56,13 +57,7 @@ const valueAction = (selection: SelectedCell[], { type, value }: InputValueActio
     return update(type, selection, undefined);
 }
 
-const markAction = (selection: SelectedCell[], { type, value }: InputCenterAction | InputCornerAction): InputState[] => {
-    // delete all marks of type from any cells that have any
-    if (value === undefined) {
-        const notEmpty = selection.filter(createFilter(type, state => state?.size));
-        return update(type, notEmpty, new Set());
-    }
-
+const markAction = ({ type, value, selection }: WithSelection<Required<InputCenterAction | InputCornerAction>>): Changes => {
     const withoutValue = selection.filter(createFilter(type, state => !state?.has(value)));
 
     // some selected cells do not have the mark, add it to them
@@ -82,28 +77,51 @@ const markAction = (selection: SelectedCell[], { type, value }: InputCenterActio
     });
 }
 
-const reduceInputState = (oldState: InputState, action: ReducerAction): InputState => {
+const deleteAction = ({ type, selection }: WithSelection<ActionWithSelection>): Changes => {
+    const types: ActionWithSelection['type'][] = ['value', 'center', 'corner'];
+    if (types.includes(type)) {
+        const valueNonEmpty = selection.filter(createFilter('value', state => state !== undefined));
+        if (valueNonEmpty.length > 0) {
+            return update('value', valueNonEmpty, undefined);
+        }
+        const centerNonEmpty = selection.filter(createFilter('center', state => state?.size));
+        const cornerNonEmpty = selection.filter(createFilter('corner', state => state?.size));
+        if ((type !== 'corner' && centerNonEmpty.length > 0) || cornerNonEmpty.length === 0) {
+            return update('center', centerNonEmpty, undefined);
+        }
+        return update('corner', cornerNonEmpty, undefined);
+    }
+    return [];
+}
+
+const reduceInputState = (state: InputState, action: InputAction): InputState => {
     if (action.type === 'given') {
         return merge({}, ...initAction(action));
     }
 
     const selection: SelectedCell[] = Object.keys(action.selection).map(key => {
-        return { key, state: oldState[key] }
+        return { key, state: state[key] };
     }).filter(cell => cell.state?.given === undefined || action.type === 'color');
 
     if (selection.length === 0) {
-        return oldState;
+        return state;
     }
 
-    switch (action.type) {
+    const {type, value} = action
+
+    if (value === undefined) {
+        return merge(state, ...deleteAction({type: type, value, selection}));
+    }
+
+    switch (type) {
         case 'value':
-            return merge(oldState, ...valueAction(selection, action));
+            return merge(state, ...valueAction({type, value, selection}));
         case 'center':
         case 'corner':
-            return merge(oldState, ...markAction(selection, action));
+            return merge(state, ...markAction({type, value, selection}));
     }
-    
-    return oldState;
+
+    return state;
 }
 
 export default reduceInputState;

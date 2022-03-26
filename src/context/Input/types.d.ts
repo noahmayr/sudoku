@@ -7,7 +7,7 @@ export type PencilMarks = Set<AnyCellValue>;
 
 export interface CellState {
     given?: CellValue;
-    value?: CellValue | AbstractCellValue;
+    value?: AnyCellValue;
     center?: PencilMarks;
     corner?: PencilMarks;
     color?: CellColor;
@@ -41,7 +41,7 @@ export interface InputColorAction extends AbstractInputAction {
     type: 'color';
 }
 
-export type ReducerAction = InitAction | InputValueAction | InputCenterAction | InputCornerAction | InputColorAction;
+export type InputAction = InitAction | InputValueAction | InputCenterAction | InputCornerAction | InputColorAction;
 
-export type InputDispatch = React.Dispatch<ReducerAction>
+export type InputDispatch = React.Dispatch<InputAction>
 export type InputState = Record<string, CellState | undefined>;
