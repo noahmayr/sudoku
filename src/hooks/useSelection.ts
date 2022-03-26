@@ -5,7 +5,7 @@ export const getKey = ({x, y}: Point): string => {
     return JSON.stringify({x, y});
 }
 
-export type Selection = Record<string, true>;
+export type CellSelection = Record<string, true>;
 
 interface SelectionReducerProps {
     position?: Point;
@@ -13,7 +13,7 @@ interface SelectionReducerProps {
     reset?: boolean;
 }
 
-const selectionReducer = (state: Selection, { position, selected = true, reset = false }: SelectionReducerProps): Selection => {
+const selectionReducer = (state: CellSelection, { position, selected = true, reset = false }: SelectionReducerProps): CellSelection => {
     if (position === undefined) {
         return reset ? {} : state;
     }

@@ -1,7 +1,7 @@
 import { CellValue } from "../components/Cell/useCells";
 import { useInputDispatch } from "../context/Input";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
-import { Selection } from "./useSelection"
+import { CellSelection } from "./useSelection"
 
 const CELL_VALUES: CellValue[] = [1,2,3,4,5,6,7,8,9];
 
@@ -16,7 +16,7 @@ const getCellValue = (value: number): CellValue|undefined => {
     return undefined;
 }
 
-const useInput = (selection: Selection) => {
+const useInput = (selection: CellSelection) => {
     const dispatch = useInputDispatch();
     useOnGlobalDomEvent(['keydown'], (event) => {
         const type = event.metaKey ? 'center' : 'value'
