@@ -47,7 +47,6 @@ const useGrid = ({ width = 9, height = 9 }: GridProps) => {
     const dimensions = useGridDimensions({ width, height });
     const { ref, selection } = useSelection()
     useInput(selection);
-    useGame(EXAMPLE);
 
     return {
         dimensions,
@@ -57,11 +56,12 @@ const useGrid = ({ width = 9, height = 9 }: GridProps) => {
 }
 
 const Sudoku = (props: GridProps) => {
+    const {width, height } = useGame(EXAMPLE);
     const {
         ref,
         selection,
         dimensions: { bounds, size}
-    } = useGrid(props);
+    } = useGrid({width, height});
     const cells = useCells(size);
 
     return (

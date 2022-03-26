@@ -42,7 +42,7 @@ const useInput = (selection: Selection) => {
         }
         
         
-    }, [selection]);
+    }, [selection, dispatch]);
 }
 
 export default useInput;

@@ -1,4 +1,3 @@
-import { useInputState } from '../../context/Input';
 import { useValidator } from '../../context/Validation';
 import { getKey } from '../../hooks/useSelection';
 import { CellIndex, CellInterface, CellValue } from '../Cell/useCells';

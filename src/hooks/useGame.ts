@@ -136,6 +136,7 @@ export const EXAMPLE: Game = {
 const useGame = (game: Game) => {
     const dispatch = useInputDispatch();
     useEffect(() => {
+        console.log('loading game');
         dispatch({
             type: 'given',
             values: game.cells?.map((row, y): GivenDigits[] => {
@@ -149,7 +150,7 @@ const useGame = (game: Game) => {
                 });
             }).flat(1).reduce((a, b) => Object.assign(a, b), {}) ?? {}
         })
-    })
+    }, []);
     return {
         width: game.width ?? 9,
         height: game.height ?? 9,

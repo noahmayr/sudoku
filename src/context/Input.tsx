@@ -66,27 +66,24 @@ const reduceInputState = (oldState: InputState, action: ReducerAction): InputSta
     }
     if (type === 'center' || type === 'corner') {
         if (value === undefined) {
-            const changes = cells.map(({ key, state = {} }): InputState => {
-                const { [type]: oldMarks, ...old } = state;
+            const changes = cells.map(({ key, state: { [type]: old, ...state } = {} }): InputState => {
                 const marks = new Set<AnyCellValue>();
-                return { [key]: { ...old, [type]: marks } };
+                return { [key]: { ...state, [type]: marks } };
             });
             return merge(oldState, ...changes);
         }
         if (!cells.every(({ state }) => state?.[type]?.has(value))) {
-            const changes = cells.map(({ key, state = {} }): InputState => {
-                const { [type]: oldMarks, ...old } = state;
-                const marks = new Set<AnyCellValue>(oldMarks);
+            const changes = cells.map(({ key, state: { [type]: old, ...state } = {} }): InputState => {
+                const marks = new Set<AnyCellValue>(old);
                 marks.add(value);
-                return { [key]: { ...old, [type]: marks } };
+                return { [key]: { ...state, [type]: marks } };
             });
             return merge(oldState, ...changes);
         }
-        const changes = cells.map(({ key, state = {} }): InputState => {
-            const { [type]: oldMarks, ...old } = state;
-            const marks = new Set<AnyCellValue>(oldMarks);
+        const changes = cells.map(({ key, state: { [type]: old, ...state } = {} }): InputState => {
+            const marks = new Set<AnyCellValue>(old);
             marks.delete(value);
-            return { [key]: { ...old, [type]: marks } };
+            return { [key]: { ...state, [type]: marks } };
         });
         return merge(oldState, ...changes);
     }
@@ -113,8 +110,9 @@ export const useInputState = () => {
 }
 
 export const useCellState = (cell: CellInterface): CellState => {
-    const { [getKey(cell)]: state } = useInputState();
+    const key = getKey(cell);
+    const { [key]: state } = useInputState();
     return useMemo(() => {
         return state ?? {};
-    }, [JSON.stringify(cell), JSON.stringify(state)]);
+    }, [key, state]);
 }
