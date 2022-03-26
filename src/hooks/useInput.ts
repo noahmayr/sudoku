@@ -40,8 +40,6 @@ const useInput = (selection: Selection) => {
                 selection: selection
             });
         }
-        
-        
     }, [selection, dispatch]);
 }
 

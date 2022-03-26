@@ -12,7 +12,6 @@ const Cell = ({ cell }: CellProps) => {
     return useMemo(() => {
         const value = state.given ?? state.value;
         const isGiven = state.given !== undefined;
-        console.log('rendering cell:', cell, state);
         return (
             <svg x={cell.x} y={cell.y} width={1} height={1} className={classes.cell}>
                 <rect x="0%" y="0%" width="100%" height="100%" className={classes.cellRect} />

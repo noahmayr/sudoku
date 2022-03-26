@@ -36,10 +36,28 @@ export type InputState = Record<string, CellState | undefined>;
 const InputDispatchContext = createContext<InputDispatch | undefined>(undefined);
 const InputStateContext = createContext<InputState | undefined>(undefined);
 
+interface Change {
+    key: string;
+    state?: CellState;
+}
+
+const applyChange = (state: InputState, selection: Change[], callback: (change: CellState) => CellState) => {
+    const changes = selection.map(({ key, state = {} }) => {
+        return {
+            [key]: callback(state)
+        }
+    });
+    console.log(`applying ${changes.length} changes`);
+    return changes.length > 0 ? merge(state, ...changes) : state;
+}
+
+function createFilter<K extends keyof CellState>(type: K, filterCallback: (state: CellState[K]) => unknown) {
+    return ({ state = {} }: Change) => filterCallback(state[type]);
+}
+
 const reduceInputState = (oldState: InputState, action: ReducerAction): InputState => {
     if (action.type === 'given') {
-        const { values } = action;
-        const initialCommit = Object.entries(values).map(([key, value]): InputState => {
+        const initialCommit = Object.entries(action.values).map(([key, value]): InputState => {
             return {
                 [key]: {
                     given: value
@@ -49,43 +67,60 @@ const reduceInputState = (oldState: InputState, action: ReducerAction): InputSta
         return merge(oldState, ...initialCommit);
     }
 
-    const { type, value, selection } = action;
-    const cells = Object.keys(selection).map(key => ({ key, state: oldState[key] }))
-        .filter(cell => cell.state?.given === undefined || type === 'color');
+    const { type, value } = action;
+    
+    const selection: Change[] = Object.keys(action.selection).map(key => {
+        return { key, state: oldState[key] }
+    }).filter(cell => cell.state?.given === undefined || type === 'color');
 
     if (type === 'value' || type === 'color') {
-        if (value !== undefined && !cells.every(({ state }) => state?.[type] === value)) {
-            const changes = cells.map(({ key, state }): InputState => ({ [key]: { ...state, [type]: value } }));
-            return merge(oldState, ...changes);
-        }
-        const changes = cells.map(({ key, state = {} }): InputState => {
-            const { [type]: _, ...old } = state;
-            return { [key]: { ...old } };
-        });
-        return merge(oldState, ...changes);
-    }
-    if (type === 'center' || type === 'corner') {
+        const hasAnyValue = createFilter(type, state => state !== undefined);
+        const notHasValue = createFilter(type, state => state !== value);
+
+        // delete value from all selected cells that are not empty
         if (value === undefined) {
-            const changes = cells.map(({ key, state: { [type]: old, ...state } = {} }): InputState => {
-                const marks = new Set<AnyCellValue>();
-                return { [key]: { ...state, [type]: marks } };
-            });
-            return merge(oldState, ...changes);
+            return applyChange(oldState, selection.filter(hasAnyValue), state => ({ ...state, [type]: value }))
         }
-        if (!cells.every(({ state }) => state?.[type]?.has(value))) {
-            const changes = cells.map(({ key, state: { [type]: old, ...state } = {} }): InputState => {
+
+        const withoutValue = selection.filter(notHasValue);
+
+        // some selected cells do not have the value, assign it to them
+        if (withoutValue.length > 0) {
+            return applyChange(oldState, withoutValue, state => ({ ...state, [type]: value }))
+        }
+
+        // all selected cells have the value, remove it from them
+        return applyChange(oldState, selection, ({ [type]: _, ...old }) => old);
+    }
+
+    if (type === 'center' || type === 'corner') {
+
+        // delete all marks of type from any cells that have any
+        if (value === undefined) {
+            const hasMarks = selection.filter(createFilter(type, state => state?.size));
+            return applyChange(oldState, hasMarks, ({ [type]: old, ...state }) => {
+                const marks = new Set<AnyCellValue>();
+                return ({ ...state, [type]: marks })
+            });
+        }
+
+        const withoutValue = selection.filter(createFilter(type, state => !state?.has(value)));
+
+        // some selected cells do not have the mark, add it to them
+        if (withoutValue.length > 0) {
+            return applyChange(oldState, withoutValue, ({ [type]: old, ...state }) => {
                 const marks = new Set<AnyCellValue>(old);
                 marks.add(value);
-                return { [key]: { ...state, [type]: marks } };
+                return ({ ...state, [type]: marks })
             });
-            return merge(oldState, ...changes);
         }
-        const changes = cells.map(({ key, state: { [type]: old, ...state } = {} }): InputState => {
+
+        // all selected cells have the mark, remove it from them
+        return applyChange(oldState, selection, ({ [type]: old, ...state }) => {
             const marks = new Set<AnyCellValue>(old);
             marks.delete(value);
-            return { [key]: { ...state, [type]: marks } };
+            return ({ ...state, [type]: marks })
         });
-        return merge(oldState, ...changes);
     }
     return oldState;
 }
