@@ -19,7 +19,7 @@ const getCellValue = (value: number): CellValue|undefined => {
 const useInput = (selection: CellSelection) => {
     const dispatch = useInputDispatch();
     useOnGlobalDomEvent(['keydown'], (event) => {
-        const type = event.metaKey ? 'center' : 'value'
+        const type = event.metaKey ? 'center' : event.shiftKey ? 'corner' : 'value';
         if (event.code.startsWith('Digit')) {
             event.preventDefault();
             const value = getCellValue(Number(event.code.replace('Digit', '')));
