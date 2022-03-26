@@ -24,7 +24,6 @@ interface Bounds extends Point, Size {
 interface GridProps {
     width?: number;
     height?: number;
-    scale?: number;
 }
 
 

@@ -37,7 +37,7 @@ const getMouseButtons = ({ buttons }: MouseEvent) => {
     };
 }
 
-const useMouse = (dimensions: Dimensions): MouseState => {
+const useMouse = (): MouseState => {
     const [mouseState, setMouseState] = useState<MouseState>({
         mouse: {
             buttons: {

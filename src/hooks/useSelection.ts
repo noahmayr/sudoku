@@ -1,10 +1,6 @@
 import { useState, useReducer, useCallback, useEffect, useMemo, useRef, RefObject } from "react";
 import useMouse from "./useMouse";
 
-interface SelectProps {
-    dimensions: Dimensions;
-}
-
 export const getKey = ({x, y}: Point): string => {
     return JSON.stringify({x, y});
 }
@@ -42,10 +38,9 @@ const selectionReducer = (state: Selection, { position, selected = true, reset =
 interface UseLocalPositionProps {
     clientPosition: Point;
     ref: RefObject<SVGSVGElement | null>;
-    dimensions: Dimensions
 }
 
-const useSelection = ({ dimensions }: SelectProps) => {
+const useSelection = () => {
     const [selecting, setSelecting] = useState<boolean | null>(null);
     const ref = useRef<SVGSVGElement>(null);
     const [selection, dispatchSelect] = useReducer(selectionReducer, {});
@@ -56,9 +51,9 @@ const useSelection = ({ dimensions }: SelectProps) => {
             position: clientPosition
         },
         mods
-    } = useMouse(dimensions);
+    } = useMouse();
 
-    const position = useLocalPosition({ clientPosition, ref, dimensions });
+    const position = useLocalPosition({ clientPosition, ref });
 
     const mouseDown = buttons.primary;
     const intersect = mods.ctrl || mods.alt || mods.meta || mods.shift;
@@ -91,7 +86,7 @@ const useSelection = ({ dimensions }: SelectProps) => {
 
 export default useSelection;
 
-const useLocalPosition = ({ clientPosition: clientPos, ref, dimensions }: UseLocalPositionProps) => {
+const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionProps) => {
     const rect = ref.current?.getBoundingClientRect();
     const viewBox = ref.current?.viewBox.animVal;
     

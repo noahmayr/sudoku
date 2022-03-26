@@ -1,6 +1,5 @@
-import logo from './logo.svg';
 import './App.css';
-import Grid from '../Grid/Grid';
+import Sudoku from '../Sudoku/Sudoku';
 import { ValidationProvider } from '../../context/Validation';
 import { InputProvider } from '../../context/Input';
 
@@ -11,7 +10,7 @@ function App() {
         <h1>Sudoku</h1>
         <ValidationProvider>
           <InputProvider>
-            <Grid></Grid>
+            <Sudoku></Sudoku>
           </InputProvider>
         </ValidationProvider>
       </header>
