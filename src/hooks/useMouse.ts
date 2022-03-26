@@ -37,7 +37,7 @@ const getMouseButtons = ({ buttons }: MouseEvent) => {
     };
 }
 
-const useMouseSelection = (dimensions: Dimensions): MouseState => {
+const useMouse = (dimensions: Dimensions): MouseState => {
     const [mouseState, setMouseState] = useState<MouseState>({
         mouse: {
             buttons: {
@@ -79,4 +79,4 @@ const useMouseSelection = (dimensions: Dimensions): MouseState => {
     return mouseState;
 }
 
-export default useMouseSelection;
+export default useMouse;

@@ -1,5 +1,5 @@
 import { useState, useReducer, useCallback, useEffect, useMemo, useRef, RefObject } from "react";
-import useMouseSelection from "./useMouseSelection";
+import useMouse from "./useMouse";
 
 interface SelectProps {
     dimensions: Dimensions;
@@ -56,7 +56,7 @@ const useSelection = ({ dimensions }: SelectProps) => {
             position: clientPosition
         },
         mods
-    } = useMouseSelection(dimensions);
+    } = useMouse(dimensions);
 
     const position = useLocalPosition({ clientPosition, ref, dimensions });
 
