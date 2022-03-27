@@ -1,6 +1,7 @@
 import { useSelectionState } from "../../context/Selection";
 import Region from "../Region/Region";
 import classes from "./Selection.module.scss";
+
 const SelectionRegion = () => {
     const selection = useSelectionState();
     return (

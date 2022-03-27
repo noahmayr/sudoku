@@ -1,15 +1,11 @@
-import classes from "./ThreeByThree.module.scss";
 import { useMemo } from "react";
+import classes from "./ThreeByThree.module.scss";
 import UniqueRegion from "./UniqueRegion";
 import { RegionCells } from "../Region/useRegionPath";
-import { CellIndex } from "../Cell/useCells";
+import { CellInterface } from "../Cell/useCells";
 import { getKey } from "../../util";
 
-interface ThreeByThreeProps {
-    cells: CellIndex
-}
-
-const ThreeByThree = ({cells}: ThreeByThreeProps) => {
+const ThreeByThree = () => {
     const regions = useMemo(() => {
         const topLefts: Point[] = [0, 1, 2].map(y => {
             return [0, 1, 2].map(x => {
@@ -17,20 +13,19 @@ const ThreeByThree = ({cells}: ThreeByThreeProps) => {
             });
         }).flat(1);
         return topLefts.map(({ x, y }) => {
-            const cells = [0, 1, 2].map(deltaY => {
+            const cells: CellInterface[] = [0, 1, 2].map(deltaY => {
                 return [0, 1, 2].map(deltaX => {
                     return { x: x + deltaX, y: y + deltaY };
                 });
             }).flat(1);
-            const region: RegionCells = {};
-            cells.forEach((cell) => region[getKey(cell)] = true);
-            return region;
+            return cells.map((cell): RegionCells => { return { [getKey(cell)]: true }; })
+                .reduce((a, b) => { return Object.assign(a, b); }, {});
         });
     }, []);
     return (<>
-        {regions.map((region, index) =>
-            (<UniqueRegion key={index} className={classes.root} region={region} cells={cells} />)
-        )}
+        {regions.map((region, index) => {
+            return (<UniqueRegion key={index} className={classes.root} region={region} />);
+        })}
     </>);
 };
 

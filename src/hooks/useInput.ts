@@ -1,9 +1,8 @@
-import { CellValue } from "../components/Cell/useCells";
-import { useInputDispatch } from "../context/Input";
+import { CellValue, useInputDispatch } from "../context/Input";
 import { useSelectionState } from "../context/Selection";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 
-const CELL_VALUES: CellValue[] = [1,2,3,4,5,6,7,8,9];
+const CELL_VALUES: CellValue[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 function isCellValue(value: number): value is CellValue {
     return CELL_VALUES.includes(value as CellValue);
@@ -20,6 +19,8 @@ const useInput = () => {
     const dispatch = useInputDispatch();
     const selection = useSelectionState();
     useOnGlobalDomEvent(["keydown"], (event) => {
+        // TODO: map modifier key combinations to cellstate types
+        // eslint-disable-next-line no-nested-ternary
         const type = event.metaKey ? "center" : event.shiftKey ? "corner" : "value";
         if (event.code.startsWith("Digit")) {
             event.preventDefault();
@@ -28,16 +29,16 @@ const useInput = () => {
                 return;
             }
             dispatch({
-                type: type,
-                value: value,
-                selection: selection
+                type,
+                value,
+                selection,
             });
         }
         if (event.key === "Backspace") {
             dispatch({
-                type: type,
+                type,
                 value: undefined,
-                selection: selection
+                selection,
             });
         }
     }, [selection, dispatch]);

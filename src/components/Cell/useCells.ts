@@ -1,41 +1,27 @@
 import { useMemo } from "react";
-import { getKey } from "../../util";
+import { getKey, range } from "../../util";
 
-export type CellIndex = Record<string, CellInterface>;
 
 interface UseCellsProps {
     width: number;
     height: number;
 }
 
-export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
-export enum CellColor {
-    lightgray,
-    darkgray,
-    red,
-    orange,
-    yellow,
-    green,
-    teal,
-    blue,
-    purple
-}
-
 export type CellInterface = Point;
+export type CellIndex = Record<string, CellInterface>;
 
 const useCells = ({ width, height }: UseCellsProps) => {
     return useMemo(() => {
         const cellIndex: CellIndex = {};
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
+        range(height).forEach(y => {
+            range(height).forEach(x => {
                 const cell: CellInterface = {
-                    x: x,
-                    y: y,
+                    x,
+                    y,
                 };
                 cellIndex[getKey(cell)] = cell;
-            }
-        }
+            });
+        });
         return cellIndex;
     }, [width, height]);
 };

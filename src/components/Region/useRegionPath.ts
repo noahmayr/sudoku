@@ -11,12 +11,11 @@ export interface UseRegionPathProps {
 }
 
 const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
-
     const segments = useMemo(() => {
         const paths: SimplePath[] = [];
-        for (const cell of Object.keys(region).map((key): Point => JSON.parse(key))) {
-            const x = cell.x + 0.5,
-                y = cell.y + 0.5;
+        Object.keys(region).map((key): Point => { return JSON.parse(key); }).forEach(cell => {
+            const x = cell.x + 0.5;
+            const y = cell.y + 0.5;
             const topLeft = { x: x - 0.5, y: y - 0.5 };
             const bottomLeft = { x: x - 0.5, y: y + 0.5 };
             const topRight = { x: x + 0.5, y: y - 0.5 };
@@ -33,7 +32,7 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             if (!region[getKey({ ...cell, y: cell.y + 1 })]) {
                 paths.push([bottomLeft, bottomRight]);
             }
-        }
+        });
 
         return paths;
     }, [JSON.stringify(region)]);
@@ -42,7 +41,7 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
         const index: Record<string, Point[]> = {};
         const complete: Point[][] = [];
 
-        for (const segment of segments) {
+        segments.forEach(segment => {
             const start = segment[0];
             const end = segment[1];
             const keyStart = getKey(segment[0]);
@@ -50,7 +49,7 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             if (!index[keyStart] && !index[keyEnd]) {
                 index[keyStart] = segment;
                 index[keyEnd] = segment;
-                continue;
+                return;
             }
             if (!index[keyStart]) {
                 const other = index[keyEnd];
@@ -61,7 +60,7 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
                 }
                 delete index[keyEnd];
                 index[keyStart] = other;
-                continue;
+                return;
             }
             if (!index[keyEnd]) {
                 const other = index[keyStart];
@@ -72,24 +71,24 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
                 }
                 delete index[keyStart];
                 index[keyEnd] = other;
-                continue;
+                return;
             }
             if (index[keyStart] === index[keyEnd]) {
                 const path = index[keyStart];
                 complete.push(path);
                 delete index[keyStart];
                 delete index[keyEnd];
-                continue;
+                return;
             }
 
             const a = index[keyStart];
             const b = index[keyEnd];
 
-            for (const [key, value] of Object.entries(index)) {
-                if ([a, b].includes(value)) {
+            Object.entries(index)
+                .filter(([, value]) => { return [a, b].includes(value); })
+                .forEach(([key]) => {
                     delete index[key];
-                }
-            }
+                });
 
             const aAtStart = getKey(a[0]) !== keyStart;
             const bAtEnd = getKey(b[b.length - 1]) !== keyEnd;
@@ -107,19 +106,18 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             }
             index[getKey(newPath[0])] = newPath;
             index[getKey(newPath[newPath.length - 1])] = newPath;
-        }
-
+        });
         const x: PathCommand[][] = complete.map(path => {
-            return [...path.map((point, index): PathCommand => {
-                if (index === 0) {
+            return [...path.map((point, idx): PathCommand => {
+                if (idx === 0) {
                     return {
                         type: "M",
-                        vector: point
+                        vector: point,
                     };
                 }
                 return {
                     type: "L",
-                    vector: point
+                    vector: point,
                 };
             }), { type: "Z" }];
         });

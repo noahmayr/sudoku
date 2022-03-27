@@ -1,6 +1,8 @@
 import { CellSelection } from "../../hooks/useSelection";
-import { CellValue, AbstractCellValue } from "../../components/Cell/useCells";
 
+export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
+export type CellColor = unknown;
 
 export type AnyCellValue = CellValue | AbstractCellValue;
 export type PencilMarks = Set<AnyCellValue>;
@@ -41,7 +43,9 @@ export interface InputColorAction extends AbstractInputAction {
     type: "color";
 }
 
-export type InputAction = InitAction | InputValueAction | InputCenterAction | InputCornerAction | InputColorAction;
+export type InputMarkAction = InputCenterAction | InputCornerAction;
+
+export type InputAction = InitAction | InputValueAction | InputMarkAction | InputColorAction;
 
 export type InputDispatch = React.Dispatch<InputAction>
 export type InputState = Record<string, CellState | undefined>;

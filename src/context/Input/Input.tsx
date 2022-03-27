@@ -3,7 +3,7 @@ import { CellInterface } from "../../components/Cell/useCells";
 import useSafeContext from "../../hooks/useSafeContext";
 import { getKey } from "../../util";
 import reduceInputState from "./reduceInputState";
-import { CellState, InputDispatch, InputState } from "./types";
+import { CellState, InputDispatch, InputState } from "./types.d";
 
 
 const InputDispatchContext = createContext<InputDispatch | undefined>(undefined);

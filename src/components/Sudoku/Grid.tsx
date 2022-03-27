@@ -6,15 +6,15 @@ const useGrid = ({ width, height }: Size): Line[] => {
         ...Array.from({ length: width + 1 }, (_, x): Line => {
             return {
                 start: { x, y: 0 },
-                vector: { x: 0, y: height }
+                vector: { x: 0, y: height },
             };
         }),
         ...Array.from({ length: height + 1 }, (_, y) => {
             return {
                 start: { x: 0, y },
-                vector: { x: width, y: 0 }
+                vector: { x: width, y: 0 },
             };
-        })
+        }),
     ];
 };
 

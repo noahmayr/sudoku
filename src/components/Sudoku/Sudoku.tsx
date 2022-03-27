@@ -6,16 +6,18 @@ import GridErrors from "../Error/GridErrors";
 import UniqueRows from "../Rules/UniqueRows";
 import UniqueColumns from "../Rules/UniqueColumns";
 import useInput from "../../hooks/useInput";
-import useGame, { EXAMPLE } from "../../hooks/useGame";
+import useGame, { HARD_GAME } from "../../hooks/useGame";
 import Grid from "./Grid";
 import Cells from "../Cell/Cells";
 import SelectionRegion from "../Selection/SelectionRegion";
 
 const useSvgProps = (size: Size) => {
     const { ref } = useSelection();
-    const {x,y,width,height} = {
-        x: - 0.25,
-        y: - 0.25,
+    const {
+        x, y, width, height,
+    } = {
+        x: -0.25,
+        y: -0.25,
         width: size.width + 0.5,
         height: size.height + 0.5,
     };
@@ -25,14 +27,14 @@ const useSvgProps = (size: Size) => {
         style: {
             width: width * 80,
             height: height * 80,
-            fontSize: `${1 / 32}rem`
-        }
+            fontSize: `${1 / 32}rem`,
+        },
     };
 };
 
 
 const Sudoku = () => {
-    const size = useGame(EXAMPLE);
+    const size = useGame(HARD_GAME);
 
     const svgProps = useSvgProps(size);
     const cells = useCells(size);
@@ -51,14 +53,14 @@ const Sudoku = () => {
                 <Grid {...size}></Grid>
                 <Cells cells={cells}></Cells>
                 <g id="regions">
-                    <ThreeByThree cells={cells} />
-                    <UniqueRows cells={cells} />
-                    <UniqueColumns cells={cells} />
+                    <ThreeByThree />
+                    <UniqueRows />
+                    <UniqueColumns />
                 </g>
                 <g id="errors">
                     <GridErrors cells={cells} size={size} />
                 </g>
-                <SelectionRegion/>
+                <SelectionRegion />
             </g>
         </svg>
     );

@@ -1,7 +1,6 @@
 /* eslint-disable no-sparse-arrays */
 import { useEffect } from "react";
-import { CellValue } from "../components/Cell/useCells";
-import { GivenDigits, useInputDispatch } from "../context/Input";
+import { CellValue, GivenDigits, useInputDispatch } from "../context/Input";
 import { getKey } from "../util";
 
 export type GameGivens = (CellValue | undefined)[][];
@@ -21,54 +20,43 @@ export interface Game {
 export const STANDARD_RULES: Required<Pick<GameRules, "regions"|"rows"|"columns">> = {
     regions: [
         [
-            [true,true,true],
-            [true,true,true],
-            [true,true,true]
+            [true, true, true],
+            [true, true, true],
+            [true, true, true],
         ],
         [
-            [,,,true,true,true],
-            [,,,true,true,true],
-            [,,,true,true,true]
+            [,,, true, true, true],
+            [,,, true, true, true],
+            [,,, true, true, true],
         ],
         [
-            [,,,,,,true,true,true],
-            [,,,,,,true,true,true],
-            [,,,,,,true,true,true]
-        ],
-        [
-            [],
-            [],
-            [],
-            [true,true,true],
-            [true,true,true],
-            [true,true,true]
+            [,,,,,, true, true, true],
+            [,,,,,, true, true, true],
+            [,,,,,, true, true, true],
         ],
         [
             [],
             [],
             [],
-            [,,,true,true,true],
-            [,,,true,true,true],
-            [,,,true,true,true]
+            [true, true, true],
+            [true, true, true],
+            [true, true, true],
         ],
         [
             [],
             [],
             [],
-            [,,,,,,true,true,true],
-            [,,,,,,true,true,true],
-            [,,,,,,true,true,true]
+            [,,, true, true, true],
+            [,,, true, true, true],
+            [,,, true, true, true],
         ],
         [
             [],
             [],
             [],
-            [],
-            [],
-            [],
-            [true,true,true],
-            [true,true,true],
-            [true,true,true]
+            [,,,,,, true, true, true],
+            [,,,,,, true, true, true],
+            [,,,,,, true, true, true],
         ],
         [
             [],
@@ -77,9 +65,9 @@ export const STANDARD_RULES: Required<Pick<GameRules, "regions"|"rows"|"columns"
             [],
             [],
             [],
-            [,,,true,true,true],
-            [,,,true,true,true],
-            [,,,true,true,true]
+            [true, true, true],
+            [true, true, true],
+            [true, true, true],
         ],
         [
             [],
@@ -88,36 +76,47 @@ export const STANDARD_RULES: Required<Pick<GameRules, "regions"|"rows"|"columns"
             [],
             [],
             [],
-            [,,,,,,true,true,true],
-            [,,,,,,true,true,true],
-            [,,,,,,true,true,true]
+            [,,, true, true, true],
+            [,,, true, true, true],
+            [,,, true, true, true],
+        ],
+        [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [,,,,,, true, true, true],
+            [,,,,,, true, true, true],
+            [,,,,,, true, true, true],
         ],
     ],
     rows: [
-        {x: 0, y:0},
-        {x: 0, y:1},
-        {x: 0, y:2},
-        {x: 0, y:3},
-        {x: 0, y:4},
-        {x: 0, y:5},
-        {x: 0, y:6},
-        {x: 0, y:7},
-        {x: 0, y:8},
+        { x: 0, y: 0 },
+        { x: 0, y: 1 },
+        { x: 0, y: 2 },
+        { x: 0, y: 3 },
+        { x: 0, y: 4 },
+        { x: 0, y: 5 },
+        { x: 0, y: 6 },
+        { x: 0, y: 7 },
+        { x: 0, y: 8 },
     ],
     columns: [
-        {x: 0, y:0},
-        {x: 1, y:0},
-        {x: 2, y:0},
-        {x: 3, y:0},
-        {x: 4, y:0},
-        {x: 5, y:0},
-        {x: 6, y:0},
-        {x: 7, y:0},
-        {x: 8, y:0},
-    ]
+        { x: 0, y: 0 },
+        { x: 1, y: 0 },
+        { x: 2, y: 0 },
+        { x: 3, y: 0 },
+        { x: 4, y: 0 },
+        { x: 5, y: 0 },
+        { x: 6, y: 0 },
+        { x: 7, y: 0 },
+        { x: 8, y: 0 },
+    ],
 };
 
-export const EXAMPLE: Game = {
+export const EASY_GAME: Game = {
     width: 9,
     height: 9,
     cells: [
@@ -128,10 +127,27 @@ export const EXAMPLE: Game = {
         [, 9, , , , , , 3],
         [, 7, 6, , 1, , 9, 2],
         [3, 1, , 9, 7, , 2],
-        [, , 9, 1, 8, 2, , ,3],
-        [, , , , 6, , 1]
+        [, , 9, 1, 8, 2, , , 3],
+        [, , , , 6, , 1],
     ],
-    rules: STANDARD_RULES
+    rules: STANDARD_RULES,
+};
+
+export const HARD_GAME: Game = {
+    width: 9,
+    height: 9,
+    cells: [
+        [, , , , 5,, 7,, 2],
+        [8,,,,,,, 6],
+        [,,, 1,,,, 5, 4],
+        [,,,, 3],
+        [1, 3,, 7, 6,,, 8],
+        [, 6, 4,,,, 1],
+        [3, 1, 2,, 8],
+        [, 9,,,, 5],
+        [,,,,, 3, 9],
+    ],
+    rules: STANDARD_RULES,
 };
 
 const useGame = (game: Game) => {
@@ -144,19 +160,19 @@ const useGame = (game: Game) => {
                     if (value === null) {
                         return {};
                     }
-                    return {
-                        [getKey({ x, y })]: value
-                    };
+                    return { [getKey({ x, y })]: value };
                 });
-            }).flat(1).reduce((a, b) => Object.assign(a, b), {}) ?? {}
+            }).flat(1).reduce((a, b) => { return Object.assign(a, b); }, {}) ?? {},
         });
     }, []);
     return {
         width: game.width ?? 9,
         height: game.height ?? 9,
-        // rules: {
-        //     regions: game.rules.regions?.map
-        // }
+        /*
+         * rules: {
+         *     regions: game.rules.regions?.map
+         * }
+         */
     };
 };
 
