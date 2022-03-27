@@ -40,7 +40,7 @@ const useGetLocalPosition = (element: SVGSVGElement|null) => {
         };
 
         if (local.x < 0 || local.x >= size.width || local.y < 0 || local.y >= size.height) {
-            return local;
+            return undefined;
         }
 
         return local;
