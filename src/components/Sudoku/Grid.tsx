@@ -16,15 +16,15 @@ const useGrid = ({ width, height }: Size): Line[] => {
             };
         })
     ];
-}
+};
 
 const Grid = (size: Size) => {
-    const lines = useGrid(size)
+    const lines = useGrid(size);
     return (
         <g id="grid">
             <LinePath lines={lines} className={classes.cellGrid} />
         </g>
-    )
-}
+    );
+};
 
 export default Grid;

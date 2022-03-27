@@ -7,4 +7,4 @@ export const merge = <T extends object>(main: T, ...changes: T[]): T => {
 
 export const getKey = ({ x, y }: Point): string => {
     return JSON.stringify({ x, y });
-}
+};

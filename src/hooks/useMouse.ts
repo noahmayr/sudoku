@@ -22,12 +22,12 @@ const MouseMasks = {
     primary: 0b001,
     secondary: 0b010,
     auxiliary: 0b100,
-}
+};
 type MouseMask = typeof MouseMasks[keyof typeof MouseMasks];
 
 const isPressed = (mask: MouseMask, buttons: number): boolean => {
     return (mask & buttons) === mask;
-}
+};
 
 const getMouseButtons = ({ buttons }: MouseEvent) => {
     return {
@@ -35,7 +35,7 @@ const getMouseButtons = ({ buttons }: MouseEvent) => {
         secondary: isPressed(MouseMasks.secondary, buttons),
         auxiliary: isPressed(MouseMasks.auxiliary, buttons)
     };
-}
+};
 
 const useMouse = (onDoubleClick: (state: MouseState) => void, deps: DependencyList): MouseState => {
     const doubleClickCallback = useCallback(onDoubleClick, deps);
@@ -59,7 +59,7 @@ const useMouse = (onDoubleClick: (state: MouseState) => void, deps: DependencyLi
         }
     });
 
-    useOnGlobalDomEvent(['mousedown', 'mouseup', 'mousemove', 'dblclick'], (event) => {
+    useOnGlobalDomEvent(["mousedown", "mouseup", "mousemove", "dblclick"], (event) => {
         const state = {
             mouse: {
                 buttons: getMouseButtons(event),
@@ -75,7 +75,7 @@ const useMouse = (onDoubleClick: (state: MouseState) => void, deps: DependencyLi
                 meta: event.metaKey,
             }
         };
-        if (event.type === 'dblclick') {
+        if (event.type === "dblclick") {
             doubleClickCallback(state);
         }
         setMouseState({
@@ -96,6 +96,6 @@ const useMouse = (onDoubleClick: (state: MouseState) => void, deps: DependencyLi
     }, [setMouseState, doubleClickCallback]);
 
     return mouseState;
-}
+};
 
 export default useMouse;

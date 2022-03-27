@@ -9,13 +9,13 @@ export interface SelectionReducerAction {
 }
 
 export interface DraggingSelectionAction {
-    type: 'drag';
+    type: "drag";
     position?: Point;
     intersect: boolean;
 }
 
 export interface AllWithSameValueSelectionAction {
-    type: 'samevalue';
+    type: "samevalue";
     position: Point;
     valueType: keyof CellState;
     inputState: InputState;
@@ -23,11 +23,11 @@ export interface AllWithSameValueSelectionAction {
 }
 
 export interface StopSelectionAction {
-    type: 'stop';
+    type: "stop";
 }
 
 export interface ResetSelectionAction {
-    type: 'reset';
+    type: "reset";
 }
 
 export type SelectionAction = DraggingSelectionAction | StopSelectionAction | ResetSelectionAction | AllWithSameValueSelectionAction;

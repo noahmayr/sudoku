@@ -16,7 +16,7 @@ export interface CellState {
 export type GivenDigits = Record<string, CellValue | undefined>;
 
 export interface InitAction {
-    type: 'given';
+    type: "given";
     values: GivenDigits;
 }
 
@@ -26,19 +26,19 @@ interface AbstractInputAction {
 }
 
 export interface InputValueAction extends AbstractInputAction {
-    type: 'value';
+    type: "value";
 }
 
 export interface InputCenterAction extends AbstractInputAction {
-    type: 'center';
+    type: "center";
 }
 
 export interface InputCornerAction extends AbstractInputAction {
-    type: 'corner';
+    type: "corner";
 }
 
 export interface InputColorAction extends AbstractInputAction {
-    type: 'color';
+    type: "color";
 }
 
 export type InputAction = InitAction | InputValueAction | InputCenterAction | InputCornerAction | InputColorAction;

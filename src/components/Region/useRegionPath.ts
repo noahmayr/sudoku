@@ -91,7 +91,7 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
                 }
             }
 
-            const aAtStart = getKey(a[0]) !== keyStart
+            const aAtStart = getKey(a[0]) !== keyStart;
             const bAtEnd = getKey(b[b.length - 1]) !== keyEnd;
 
             let newPath: Point[];
@@ -105,28 +105,28 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             } else {
                 newPath = [...b, ...a];
             }
-            index[getKey(newPath[0])] = newPath
+            index[getKey(newPath[0])] = newPath;
             index[getKey(newPath[newPath.length - 1])] = newPath;
         }
 
         const x: PathCommand[][] = complete.map(path => {
-            return [...path.map((point, index, points): PathCommand => {
+            return [...path.map((point, index): PathCommand => {
                 if (index === 0) {
                     return {
-                        type: 'M',
+                        type: "M",
                         vector: point
                     };
                 }
                 return {
-                    type: 'L',
+                    type: "L",
                     vector: point
                 };
-            }), { type: 'Z' }]
-        })
+            }), { type: "Z" }];
+        });
 
         return x.flat(1);
     }, [segments]);
     return commands;
-}
+};
 
 export default useRegionPath;

@@ -1,5 +1,5 @@
-import { DependencyList, useCallback, useEffect, useMemo, useReducer } from "react";
-import isDeepEqual from 'fast-deep-equal/react'
+import { DependencyList, useCallback, useEffect, useReducer } from "react";
+import isDeepEqual from "fast-deep-equal/react";
 
 export type GlobalEventMap = WindowEventMap
 
@@ -15,15 +15,10 @@ export type GlobalEventListenerMap = {
     [key in GlobalEventId]?: GlobalEventListenerForKey<key>;
 };
 
-interface UseOnGlobalDomEventProps<K extends GlobalEventId> {
-    events: K[];
-    callback: GlobalEventListenerForKey<K>
-}
-
 
 const getListener = <T extends GlobalEventId>(events: GlobalEventListenerMap, identifier: T): GlobalEventListenerForKey<T> | undefined  => {
     return events[identifier];
-} 
+};
 
 const eventReducer = (state: GlobalEventListenerMap, change: GlobalEventListenerMap): GlobalEventListenerMap => {
     const identifiers: GlobalEventId[] = [...Object.keys(state), ...Object.keys(change)] as GlobalEventId[];
@@ -43,7 +38,7 @@ const eventReducer = (state: GlobalEventListenerMap, change: GlobalEventListener
     }
 
     return change;
-}
+};
 
 const useGlobalDomEvents = (props: GlobalEventListenerMap) => {
     const [events, updateEvents] = useReducer(eventReducer, {});
@@ -58,13 +53,13 @@ const useGlobalDomEvents = (props: GlobalEventListenerMap) => {
     useEffect(() => {
         return () => {
             updateEvents({});
-        }
+        };
     }, [updateEvents]);
-}
+};
 
 const useOnGlobalDomEvent = <K extends GlobalEventId>(events: K[], listener: GlobalEventListenerForKey<K>, deps: DependencyList) => {
     const callback = useCallback(listener, deps);
     useGlobalDomEvents(events.map(key => ({[key]: callback})).reduce((a,b) => ({...a,...b}), {}));
-}
+};
 
 export default useOnGlobalDomEvent;

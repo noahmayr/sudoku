@@ -1,8 +1,8 @@
-import { useMemo } from 'react';
-import UniqueRegion from './UniqueRegion';
-import { RegionCells } from '../Region/useRegionPath';
-import { CellIndex } from '../Cell/useCells';
-import { getKey } from '../../util';
+import { useMemo } from "react";
+import UniqueRegion from "./UniqueRegion";
+import { RegionCells } from "../Region/useRegionPath";
+import { CellIndex } from "../Cell/useCells";
+import { getKey } from "../../util";
 
 interface UniqueColumnsProps {
     cells: CellIndex
@@ -18,12 +18,12 @@ const UniqueColumns = ({cells}: UniqueColumnsProps) => {
             cells.forEach((cell) => region[getKey(cell)] = true);
             return region;
         });
-    }, [])
+    }, []);
     return (<>
         {regions.map((region, index) =>
             (<UniqueRegion key={index} region={region} cells={cells} />)
         )}
-    </>)
-}
+    </>);
+};
 
 export default UniqueColumns;

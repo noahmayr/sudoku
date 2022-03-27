@@ -1,7 +1,7 @@
-import { useValidator } from '../../context/Validation';
-import { getKey } from '../../util';
-import { CellIndex, CellInterface, CellValue } from '../Cell/useCells';
-import Region, { RegionProps } from '../Region/Region';
+import { useValidator } from "../../context/Validation";
+import { getKey } from "../../util";
+import { CellIndex, CellInterface, CellValue } from "../Cell/useCells";
+import Region, { RegionProps } from "../Region/Region";
 
 interface UniqueRegionProps extends RegionProps {
     cells: CellIndex;
@@ -14,7 +14,7 @@ const UniqueRegion = ({ className, region }: UniqueRegionProps) => {
         items.forEach(({cell, state}) => {
             const {value, given} = state;
             const val = value ?? given;
-            if (typeof val !== 'number') {
+            if (typeof val !== "number") {
                 return;
             }
             seen[val]?.push(cell);
@@ -27,10 +27,10 @@ const UniqueRegion = ({ className, region }: UniqueRegionProps) => {
 
         return {
             errorCells
-        }
+        };
     }, [region]);
 
     return (<Region className={className} region={region} />);
-}
+};
 
 export default UniqueRegion;

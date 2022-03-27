@@ -1,3 +1,4 @@
+/* eslint-disable no-sparse-arrays */
 import { useEffect } from "react";
 import { CellValue } from "../components/Cell/useCells";
 import { GivenDigits, useInputDispatch } from "../context/Input";
@@ -17,7 +18,7 @@ export interface Game {
     rules?: GameRules;
 }
 
-export const STANDARD_RULES: Required<Pick<GameRules, 'regions'|'rows'|'columns'>> = {
+export const STANDARD_RULES: Required<Pick<GameRules, "regions"|"rows"|"columns">> = {
     regions: [
         [
             [true,true,true],
@@ -114,7 +115,7 @@ export const STANDARD_RULES: Required<Pick<GameRules, 'regions'|'rows'|'columns'
         {x: 7, y:0},
         {x: 8, y:0},
     ]
-}
+};
 
 export const EXAMPLE: Game = {
     width: 9,
@@ -136,9 +137,9 @@ export const EXAMPLE: Game = {
 const useGame = (game: Game) => {
     const dispatch = useInputDispatch();
     useEffect(() => {
-        console.log('loading game');
+        console.log("loading game");
         dispatch({
-            type: 'given',
+            type: "given",
             values: game.cells?.map((row, y): GivenDigits[] => {
                 return row.map((value, x): GivenDigits => {
                     if (value === null) {
@@ -149,7 +150,7 @@ const useGame = (game: Game) => {
                     };
                 });
             }).flat(1).reduce((a, b) => Object.assign(a, b), {}) ?? {}
-        })
+        });
     }, []);
     return {
         width: game.width ?? 9,
@@ -157,7 +158,7 @@ const useGame = (game: Game) => {
         // rules: {
         //     regions: game.rules.regions?.map
         // }
-    }
-}
+    };
+};
 
 export default useGame;

@@ -10,8 +10,8 @@ interface LinePathProps extends HasClassName {
 }
 
 const LinePath = ({ className, lines }: LinePathProps) => {
-    const commands = lines.map(({start, vector}): PathCommand[] => [{type: 'M', vector: start},{type: 'l', vector}]).flat();
+    const commands = lines.map(({start, vector}): PathCommand[] => [{type: "M", vector: start},{type: "l", vector}]).flat();
     return <Path className={className} commands={commands}/>;
-}
+};
 
 export default LinePath;

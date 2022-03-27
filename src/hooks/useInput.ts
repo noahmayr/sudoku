@@ -14,34 +14,33 @@ const getCellValue = (value: number): CellValue|undefined => {
         return value;
     }
     return undefined;
-}
+};
 
 const useInput = () => {
     const dispatch = useInputDispatch();
     const selection = useSelectionState();
-    useOnGlobalDomEvent(['keydown'], (event) => {
-        const type = event.metaKey ? 'center' : event.shiftKey ? 'corner' : 'value';
-        if (event.code.startsWith('Digit')) {
+    useOnGlobalDomEvent(["keydown"], (event) => {
+        const type = event.metaKey ? "center" : event.shiftKey ? "corner" : "value";
+        if (event.code.startsWith("Digit")) {
             event.preventDefault();
-            const value = getCellValue(Number(event.code.replace('Digit', '')));
+            const value = getCellValue(Number(event.code.replace("Digit", "")));
             if (value === undefined) {
                 return;
             }
             dispatch({
                 type: type,
-                value: value, 
+                value: value,
                 selection: selection
             });
         }
-        const numKey = Number(event.code);
-        if (event.key === 'Backspace') {
+        if (event.key === "Backspace") {
             dispatch({
                 type: type,
-                value: undefined, 
+                value: undefined,
                 selection: selection
             });
         }
     }, [selection, dispatch]);
-}
+};
 
 export default useInput;

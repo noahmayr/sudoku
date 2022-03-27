@@ -9,7 +9,7 @@ import { CellState, InputDispatch, InputState } from "./types";
 const InputDispatchContext = createContext<InputDispatch | undefined>(undefined);
 const InputStateContext = createContext<InputState | undefined>(undefined);
 
-export const InputProvider = ({ children }: PropsWithChildren<any>) => {
+export const InputProvider = ({ children }: PropsWithChildren<unknown>) => {
     const [state, dispatch] = useReducer(reduceInputState, {});
     return (
         <InputDispatchContext.Provider value={dispatch}>
@@ -18,20 +18,20 @@ export const InputProvider = ({ children }: PropsWithChildren<any>) => {
             </InputStateContext.Provider>
         </InputDispatchContext.Provider>
     );
-}
+};
 
 export const useInputDispatch = () => {
-    return useSafeContext(InputDispatchContext, 'useInputDispatch can only be used inside InputProvider');
-}
+    return useSafeContext(InputDispatchContext, "useInputDispatch can only be used inside InputProvider");
+};
 
 export const useInputState = () => {
-    return useSafeContext(InputStateContext, 'useInputState can only be used inside InputProvider');
-}
+    return useSafeContext(InputStateContext, "useInputState can only be used inside InputProvider");
+};
 
 export const useCellState = (cell: CellInterface): CellState => {
     const key = getKey(cell);
     const { [key]: state } = useInputState();
     return useMemo(() => {
         return state ?? {};
-    }, [key, state]);
-}
+    }, [state]);
+};

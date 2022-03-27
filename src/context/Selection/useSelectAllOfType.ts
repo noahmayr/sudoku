@@ -1,6 +1,5 @@
 import { useCallback } from "react";
-import { getKey } from "../../util";
-import { CellState, InputState, useInputState } from "../Input";
+import { CellState, useInputState } from "../Input";
 import { useSelectionDispatch } from "./SelectionProvider";
 
 export interface SelectAllOfTypeProps {
@@ -14,13 +13,13 @@ const useSelectAllOfType = () => {
     const dispatch = useSelectionDispatch();
     return useCallback(({type, position, intersect}: SelectAllOfTypeProps) => {
         dispatch({
-            type: 'samevalue',
+            type: "samevalue",
             position,
             valueType: type,
             intersect: intersect,
             inputState
-        })
-    }, [JSON.stringify(inputState), dispatch]);
-}
+        });
+    }, [inputState, dispatch]);
+};
 
 export default useSelectAllOfType;

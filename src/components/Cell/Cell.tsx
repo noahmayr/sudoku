@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { useCellState } from '../../context/Input';
-import classes from './Cell.module.scss';
-import { CellInterface } from './useCells';
+import { useMemo } from "react";
+import { useCellState } from "../../context/Input";
+import classes from "./Cell.module.scss";
+import { CellInterface } from "./useCells";
 
 interface CellProps {
     cell: CellInterface;
@@ -17,7 +17,7 @@ const cornerPositions: Point[] = [
     {x: -1, y: 0},
     {x: 1, y: 0},
     {x: 0, y: 0},
-]
+];
 
 const Cell = ({ cell }: CellProps) => {
     const state = useCellState(cell);
@@ -43,18 +43,18 @@ const Cell = ({ cell }: CellProps) => {
                                 const y = (pos.y) * 33 + 50;
                                 return (
                                     <text key={idx} width="1" height="1" x={`${x}%`} y={`${y}%`} className={classes.cornerMark}>{mark}</text>
-                                )
+                                );
                             })
                         ) : null
                     }
                 </g>
-                
+
                 <text width="1" height="1" x="50%" y="50%" className={isGiven ? classes.given : classes.cellValue}>
                     {value}
                 </text>
             </svg>
-        )
+        );
     }, [cell.x, cell.y, state]);
-}
+};
 
 export default Cell;

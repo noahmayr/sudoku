@@ -9,7 +9,7 @@ interface UseCellsProps {
 }
 
 export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-export type AbstractCellValue = 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I';
+export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
 export enum CellColor {
     lightgray,
     darkgray,
@@ -22,8 +22,7 @@ export enum CellColor {
     purple
 }
 
-export interface CellInterface extends Point {
-};
+export type CellInterface = Point;
 
 const useCells = ({ width, height }: UseCellsProps) => {
     return useMemo(() => {
@@ -39,6 +38,6 @@ const useCells = ({ width, height }: UseCellsProps) => {
         }
         return cellIndex;
     }, [width, height]);
-}
+};
 
 export default useCells;
