@@ -1,15 +1,10 @@
-import { useState, useMemo, useRef, RefObject } from "react";
-import { useSelectionState, useSelectionDispatch, useDraggingSelection } from "../context/Selection";
+import { useMemo, useRef, useCallback } from "react";
+import { useDraggingSelection } from "../context/Selection";
 import useMouse from "./useMouse";
 
-interface UseLocalPositionProps {
-    clientPosition: Point;
-    ref: RefObject<SVGSVGElement | null>;
-}
-
-const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionProps) => {
-    const rect = ref.current?.getBoundingClientRect();
-    const viewBox = ref.current?.viewBox.animVal;
+const useGetLocalPosition = (element: SVGSVGElement|null) => {
+    const rect = element?.getBoundingClientRect();
+    const viewBox = element?.viewBox.animVal;
     
     const transform = useMemo(() => {
         if (rect === undefined || viewBox === undefined) {
@@ -30,29 +25,32 @@ const useLocalPosition = ({ clientPosition: clientPos, ref }: UseLocalPositionPr
                 height: viewBox.height + viewBox.y * 2        
             }
         }
-    }, [clientPos, JSON.stringify(rect), JSON.stringify(viewBox)]);
+    }, [JSON.stringify(rect), JSON.stringify(viewBox)]);
 
-    if (transform === undefined) {
-        return;
-    }
-
-    const {scale, offset, size} = transform;
-
-    const position = {
-        x: Math.ceil(clientPos.x / scale.x + offset.x)-1,
-        y: Math.ceil(clientPos.y / scale.y + offset.y)-1,
-    }
-
-    if (position.x < 0 || position.x >= size.width|| position.y < 0 || position.y >= size.height){
-        return;
-    }
-
-    return position;
+    return useCallback((position: Point) => {
+        if (transform === undefined) {
+            return;
+        }
+    
+        const {scale, offset, size} = transform;
+    
+        const local = {
+            x: Math.ceil(position.x / scale.x + offset.x)-1,
+            y: Math.ceil(position.y / scale.y + offset.y)-1,
+        }
+    
+        if (local.x < 0 || local.x >= size.width|| local.y < 0 || local.y >= size.height){
+            return;
+        }
+    
+        return local;
+    }, [transform])
 }
 
 
 const useSelection = () => {
     const ref = useRef<SVGSVGElement>(null);
+    const getLocalPosition = useGetLocalPosition(ref.current);
 
     const {
         mouse: {
@@ -62,14 +60,13 @@ const useSelection = () => {
         mods
     } = useMouse();
 
-    const position = useLocalPosition({ clientPosition, ref });
 
     const shouldSelect = buttons.primary;
     const intersect = mods.ctrl || mods.alt || mods.meta || mods.shift;
 
     useDraggingSelection({
         shouldSelect,
-        position,
+        position: getLocalPosition(clientPosition),
         intersect
     });
 
