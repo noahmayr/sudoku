@@ -3,6 +3,10 @@ name: CI
 # Update to match your requirements
 on: push
 
+env:
+  GIT_AUTHOR_NAME: Noah Mayr
+  GIT_AUTHOR_EMAIL: dev@noahmayr.com
+
 jobs:
   Deploy:
     runs-on: ubuntu-latest
