@@ -17,17 +17,3 @@ interface Size {
     width: number,
     height: number
 }
-
-interface Bounds extends Point, Size {
-}
-
-interface GridProps {
-    width?: number;
-    height?: number;
-}
-
-
-interface Dimensions {
-    bounds: Bounds;
-    size: Size;
-}

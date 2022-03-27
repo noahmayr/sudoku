@@ -2,20 +2,3 @@
     stroke-width: 0.025em;
     stroke: #555;
 }
-
-.selection {
-    stroke: aqua;
-    fill:aqua;
-    fill-opacity: 0.25;
-    stroke-width: 0.25em;
-    opacity: 0.5;
-    stroke-linecap: square;
-}
-
-.svg {
-    user-select: none;
-    stroke-width: 0.05em;
-    fill: none;
-    max-width: max-content;
-    max-height: max-content;
-}

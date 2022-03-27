@@ -1,10 +1,7 @@
-import classes from './Grid.module.scss';
+import classes from './Sudoku.module.scss';
 import useSelection from '../../hooks/useSelection';
-import Cell from '../Cell/Cell';
-import LinePath, { Line } from '../SVG/LinePath';
-import Region from '../Region/Region';
 import ThreeByThree from '../Rules/ThreeByThree';
-import useCells, { CellInterface, CellValue } from '../Cell/useCells';
+import useCells from '../Cell/useCells';
 import GridErrors from '../Error/GridErrors';
 import UniqueRows from '../Rules/UniqueRows';
 import UniqueColumns from '../Rules/UniqueColumns';
@@ -12,60 +9,34 @@ import useInput from '../../hooks/useInput';
 import useGame, { EXAMPLE } from '../../hooks/useGame';
 import Grid from './Grid';
 import Cells from '../Cell/Cells';
-import { useSelectionState } from '../../context/Selection';
+import SelectionRegion from '../Selection/SelectionRegion';
 
-const useGridDimensions = ({ width, height }: Size) => {
-    return {
-        bounds: {
-            x: - 0.25,
-            y: - 0.25,
-            width: width + 0.5,
-            height: width + 0.5,
-        } as Bounds,
-        size: {
-            width,
-            height,
-        } as Size
-    }
-}
-
-const useSvgProps = ({ width, height }: Size) => {
-    return {
-        bounds: {
-            x: - 0.25,
-            y: - 0.25,
-            width: width + 0.5,
-            height: width + 0.5,
-        } as Bounds,
-        size: {
-            width,
-            height,
-        } as Size
-    }
-}
-
-const useGrid = ({ width = 9, height = 9 }: GridProps) => {
-    const dimensions = useGridDimensions({ width, height });
+const useSvgProps = (size: Size) => {
     const { ref } = useSelection();
-    const selection = useSelectionState();
-    
-    useInput(selection);
-
-    return {
-        dimensions,
-        selection,
-        ref
+    const {x,y,width,height} = {
+        x: - 0.25,
+        y: - 0.25,
+        width: size.width + 0.5,
+        height: size.height + 0.5,
     };
+    return {
+        ref,
+        viewBox: `${x} ${y} ${width} ${height}`,
+        style: {
+            width: width * 80,
+            height: height * 80,
+            fontSize: `${1 / 32}rem`
+        }
+    }
 }
 
-const Sudoku = (props: GridProps) => {
-    const {width, height } = useGame(EXAMPLE);
-    const {
-        ref,
-        selection,
-        dimensions: { bounds, size}
-    } = useGrid({width, height});
+
+const Sudoku = () => {
+    const size = useGame(EXAMPLE);
+
+    const svgProps = useSvgProps(size)
     const cells = useCells(size);
+    useInput();
 
     return (
         <svg
@@ -74,9 +45,7 @@ const Sudoku = (props: GridProps) => {
             xmlns="http://www.w3.org/2000/svg"
             version="1.1"
             vectorEffect="nonScalingStroke"
-            style={{width: bounds.width * 80, height: bounds.height * 80, fontSize: `${1 / 32}rem`}}
-            viewBox={`${bounds.x} ${bounds.y} ${bounds.width} ${bounds.height}`}
-            ref={ref}
+            {...svgProps}
         >
             <g id="scale" >
                 <Grid {...size}></Grid>
@@ -89,9 +58,7 @@ const Sudoku = (props: GridProps) => {
                 <g id="errors">
                     <GridErrors cells={cells} />
                 </g>
-                <g id="selection">
-                    <Region className={classes.selection} region={selection} />
-                </g>
+                <SelectionRegion/>
             </g>
         </svg>
     );

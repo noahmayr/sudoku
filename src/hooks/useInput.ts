@@ -1,6 +1,6 @@
 import { CellValue } from "../components/Cell/useCells";
 import { useInputDispatch } from "../context/Input";
-import { CellSelection } from "../context/Selection";
+import { useSelectionState } from "../context/Selection";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 
 const CELL_VALUES: CellValue[] = [1,2,3,4,5,6,7,8,9];
@@ -16,8 +16,9 @@ const getCellValue = (value: number): CellValue|undefined => {
     return undefined;
 }
 
-const useInput = (selection: CellSelection) => {
+const useInput = () => {
     const dispatch = useInputDispatch();
+    const selection = useSelectionState();
     useOnGlobalDomEvent(['keydown'], (event) => {
         const type = event.metaKey ? 'center' : event.shiftKey ? 'corner' : 'value';
         if (event.code.startsWith('Digit')) {
