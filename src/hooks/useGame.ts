@@ -137,7 +137,6 @@ export const EXAMPLE: Game = {
 const useGame = (game: Game) => {
     const dispatch = useInputDispatch();
     useEffect(() => {
-        console.log("loading game");
         dispatch({
             type: "given",
             values: game.cells?.map((row, y): GivenDigits[] => {

@@ -58,7 +58,6 @@ const reduceSelection = (state: SelectionState, action: SelectionAction): Select
         const value = cellState.given ?? cellState.value;
         if (value) {
             const keys = findCellsWhere(inputState, ({ value: val, given: actual = val }) => actual === value);
-            console.log(position,keys, inputState[key]);
             const cells = selectCells(state.cells, !(intersect && isSelected), keys);
             if (cells === state.cells) {
                 return state;
