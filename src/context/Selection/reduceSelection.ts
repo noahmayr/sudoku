@@ -1,4 +1,5 @@
-import { getKey } from "../../util";
+import { getKey, merge } from "../../util";
+import { InputState, CellState } from "../Input";
 import { CellSelection, SelectionState, SelectionAction } from "./types";
 
 interface SelectCellProps {
@@ -7,15 +8,18 @@ interface SelectCellProps {
     selecting: boolean;
 }
 
-const selectCell = ({ cells, key, selecting }: SelectCellProps): CellSelection => {
-    if (key === undefined || !!cells[key] === selecting) {
+const selectCells = (cells: CellSelection, selecting: boolean, keys: string[]): CellSelection => {
+    if (keys.length === 0 || keys.every(key => !!cells[key] === selecting)) {
         return cells;
     }
     if (selecting) {
-        return { ...cells, [key]: true };
+        return merge(cells, ...keys.map((key): CellSelection => ({ [key]: true })));
     }
-    const { [key]: _, ...filteredCells } = cells;
-    return filteredCells;
+    return Object.fromEntries(Object.entries(cells).filter(([key]) => !keys.includes(key)))
+}
+
+const findCellsWhere = (inputState: InputState, predicate: (state: CellState) => unknown): string[] => {
+    return Object.entries(inputState).filter(([key, state]) => state !== undefined && predicate(state)).map(([key]) => key);
 }
 
 const reduceSelection = (state: SelectionState, action: SelectionAction): SelectionState => {
@@ -34,19 +38,40 @@ const reduceSelection = (state: SelectionState, action: SelectionAction): Select
         const isSelected = key !== undefined ? !!state.cells[key] : undefined;
         const selecting = state.selecting ?? !(intersect && isSelected);
 
+        const keys = key === undefined ? [] : [key]
         if (state.selecting === undefined) {
-            const cells = selectCell({key, selecting, cells: intersect ? state.cells : {}});
+            const cells = selectCells(intersect ? state.cells : {}, selecting, keys);
             return { cells, selecting };
         }
 
-        const cells = selectCell({key, selecting, cells: state.cells});
+        const cells = selectCells(state.cells, selecting, keys);
 
         if (cells === state.cells && selecting === state.selecting) {
             return state;
         }
 
-        return {selecting, cells};
+        return { selecting, cells };
     }
+    if (action.type === 'samevalue') {
+        const { position, inputState, valueType: type, intersect } = action;
+        const key = getKey(position);
+        const isSelected = !!state.cells[key];
+
+        const cellState = inputState[key];
+        if (cellState === undefined) {
+            return state;
+        }
+        const value = cellState.given ?? cellState.value;
+        if (value) {
+            const keys = findCellsWhere(inputState, ({ value: val, given: actual = val }) => actual === value);
+            const cells = selectCells(state.cells, !(intersect && isSelected), keys);
+            if (cells === state.cells) {
+                return state;
+            }
+            return {cells, selecting: state.selecting};
+        }
+    }
+
     return state;
 }
 

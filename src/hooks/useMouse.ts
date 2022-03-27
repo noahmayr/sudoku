@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { DependencyList, useCallback, useState } from "react";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 
 interface MouseState {
@@ -37,7 +37,8 @@ const getMouseButtons = ({ buttons }: MouseEvent) => {
     };
 }
 
-const useMouse = (): MouseState => {
+const useMouse = (onDoubleClick: (state: MouseState) => void, deps: DependencyList): MouseState => {
+    const doubleClickCallback = useCallback(onDoubleClick, deps);
     const [mouseState, setMouseState] = useState<MouseState>({
         mouse: {
             buttons: {
@@ -58,7 +59,25 @@ const useMouse = (): MouseState => {
         }
     });
 
-    useOnGlobalDomEvent(['mousedown', 'mouseup', 'mousemove'], (event) => {
+    useOnGlobalDomEvent(['mousedown', 'mouseup', 'mousemove', 'dblclick'], (event) => {
+        const state = {
+            mouse: {
+                buttons: getMouseButtons(event),
+                position: {
+                    x: event.clientX,
+                    y: event.clientY
+                }
+            },
+            mods: {
+                alt: event.altKey,
+                ctrl: event.ctrlKey,
+                shift: event.shiftKey,
+                meta: event.metaKey,
+            }
+        };
+        if (event.type === 'dblclick') {
+            doubleClickCallback(state);
+        }
         setMouseState({
             mouse: {
                 buttons: getMouseButtons(event),
@@ -74,7 +93,7 @@ const useMouse = (): MouseState => {
                 meta: event.metaKey,
             }
         });
-    }, [setMouseState]);
+    }, [setMouseState, doubleClickCallback]);
 
     return mouseState;
 }

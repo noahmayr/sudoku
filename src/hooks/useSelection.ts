@@ -1,5 +1,5 @@
 import { useMemo, useRef, useCallback } from "react";
-import { useDraggingSelection } from "../context/Selection";
+import { useDraggingSelection, useSelectAllOfType } from "../context/Selection";
 import useMouse from "./useMouse";
 
 const useGetLocalPosition = (element: SVGSVGElement|null) => {
@@ -51,15 +51,21 @@ const useGetLocalPosition = (element: SVGSVGElement|null) => {
 const useSelection = () => {
     const ref = useRef<SVGSVGElement>(null);
     const getLocalPosition = useGetLocalPosition(ref.current);
-
+    const selectAllOfType = useSelectAllOfType();
     const {
         mouse: {
             buttons,
             position: clientPosition
         },
         mods
-    } = useMouse();
-
+    } = useMouse((state) => {        
+        const position = getLocalPosition(state.mouse.position);
+        const {mods} = state 
+        if (position === undefined) {
+            return;
+        }
+        selectAllOfType({type: 'value', position, intersect: mods.ctrl || mods.alt || mods.meta || mods.shift});
+    },[selectAllOfType, getLocalPosition]);
 
     const shouldSelect = buttons.primary;
     const intersect = mods.ctrl || mods.alt || mods.meta || mods.shift;
