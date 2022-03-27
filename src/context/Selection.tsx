@@ -1,4 +1,4 @@
-import { createContext, PropsWithChildren, useEffect, useReducer, useState } from "react";
+import { createContext, PropsWithChildren, useEffect, useReducer } from "react";
 import useSafeContext from "../hooks/useSafeContext";
 import { getKey } from "../util";
 
@@ -10,36 +10,84 @@ interface SelectionReducerAction {
     reset?: boolean;
 }
 
-type SelectionDispatch = React.Dispatch<SelectionReducerAction>;
-type SelectionState = CellSelection;
+interface DraggingSelectionAction {
+    type: 'drag';
+    position?: Point;
+    intersect: boolean;
+}
+
+interface StopSelectionAction {
+    type: 'stop';
+}
+
+interface ResetSelectionAction {
+    type: 'reset';
+}
+
+type SelectionAction = DraggingSelectionAction | StopSelectionAction | ResetSelectionAction;
+
+
+type SelectionDispatch = React.Dispatch<SelectionAction>;
+
+interface SelectionState {
+    cells: CellSelection;
+    selecting?: boolean;
+}
 
 const SelectionDispatchContext = createContext<SelectionDispatch | undefined>(undefined);
 const SelectionStateContext = createContext<SelectionState | undefined>(undefined);
 
-const selectionReducer = (state: CellSelection, { position, selected = true, reset = false }: SelectionReducerAction): CellSelection => {
-    if (position === undefined) {
-        return reset ? {} : state;
+
+interface SelectCellProps {
+    cells: CellSelection;
+    key?: string;
+    selecting: boolean;
+}
+const selectCell = ({ cells, key, selecting }: SelectCellProps): CellSelection => {
+    if (key === undefined || !!cells[key] === selecting) {
+        return cells;
     }
-    if (reset) {
-        if (!selected) {
-            return {};
+    if (selecting) {
+        return { ...cells, [key]: true };
+    }
+    const { [key]: _, ...filteredCells } = cells;
+    return filteredCells;
+}
+
+const selectionReducer = (state: SelectionState, action: SelectionAction): SelectionState => {
+    if (action.type === 'reset') {
+        return { cells: {} };
+    }
+    if (action.type === 'stop') {
+        if (state.selecting === undefined) {
+            return state;
         }
-        return {
-            [getKey(position)]: selected
-        };
+        return { cells: state.cells };
     }
-    if (!selected) {
-        delete state[getKey(position)];
-        return state;
+    if (action.type === 'drag') {
+        const { position, intersect } = action;
+        const key = position !== undefined ? getKey(position) : undefined;
+        const isSelected = key !== undefined ? !!state.cells[key] : undefined;
+        const selecting = state.selecting ?? !(intersect && isSelected);
+
+        if (state.selecting === undefined) {
+            const cells = selectCell({key, selecting, cells: intersect ? state.cells : {}});
+            return { cells, selecting };
+        }
+
+        const cells = selectCell({key, selecting, cells: state.cells});
+
+        if (cells === state.cells && selecting === state.selecting) {
+            return state;
+        }
+
+        return {selecting, cells};
     }
-    return {
-        ...state,
-        [getKey(position)]: selected
-    };
+    return state;
 }
 
 export const SelectionProvider = ({ children }: PropsWithChildren<any>) => {
-    const [state, dispatch] = useReducer(selectionReducer, {});
+    const [state, dispatch] = useReducer(selectionReducer, { cells: {} });
     return (
         <SelectionDispatchContext.Provider value={dispatch}>
             <SelectionStateContext.Provider value={state}>
@@ -55,7 +103,7 @@ export const useSelectionDispatch = () => {
 }
 
 export const useSelectionState = () => {
-    return useSafeContext(SelectionStateContext, 'useSelectionState can only be used inside SelectionProvider');
+    return useSafeContext(SelectionStateContext, 'useSelectionState can only be used inside SelectionProvider').cells;
 }
 
 interface UseDraggingSelectionProps {
@@ -65,34 +113,12 @@ interface UseDraggingSelectionProps {
 }
 
 export const useDraggingSelection = ({ shouldSelect, position, intersect }: UseDraggingSelectionProps) => {
-    const [selecting, setSelecting] = useState<boolean | null>(null);
-    const state = useSelectionState();
     const dispatch = useSelectionDispatch();
 
     useEffect(() => {
-        
         if (!shouldSelect) {
-            return setSelecting(null);
+            return dispatch({ type: 'stop' });
         }
-
-        if (position === undefined && !selecting) {
-            dispatch({ reset: true });
-        }
-
-        if (position !== undefined) {
-            const positionIsSelected = state[getKey(position)];
-
-            if (selecting === null) {
-                setSelecting(intersect ? !positionIsSelected : true);
-                return dispatch({ position, selected: intersect ? !positionIsSelected : true, reset: !intersect });
-            }
-
-            if (selecting === positionIsSelected) {
-                return;
-            }
-
-            return dispatch({ position, selected: selecting });
-        }
-
-    }, [shouldSelect, position, selecting, setSelecting, JSON.stringify(state), dispatch]);
+        dispatch({ type: 'drag', position, intersect });
+    }, [shouldSelect, JSON.stringify(position), dispatch, intersect]);
 }
