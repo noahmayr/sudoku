@@ -56,7 +56,7 @@ const Sudoku = () => {
                     <UniqueColumns cells={cells} />
                 </g>
                 <g id="errors">
-                    <GridErrors cells={cells} />
+                    <GridErrors cells={cells} size={size} />
                 </g>
                 <SelectionRegion/>
             </g>

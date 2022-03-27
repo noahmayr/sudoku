@@ -10,15 +10,15 @@ interface UniqueRegionProps extends RegionProps {
 const UniqueRegion = ({ className, region }: UniqueRegionProps) => {
     useValidator(region, ({items}) => {
         const seen: Record<CellValue, CellInterface[]> = { 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] };
-
-        items.forEach(({cell, state}) => {
+        const filled = items.map(({cell, state}) => {
             const {value, given} = state;
             const val = value ?? given;
             if (typeof val !== "number") {
-                return;
+                return false;
             }
             seen[val]?.push(cell);
-        });
+            return true;
+        }).reduce((a, b) => a && b, true);
         const errorCells: CellIndex = {};
 
         Object.values(seen).filter(cells => cells.length > 1).flat(1).forEach(cell => {
@@ -26,6 +26,7 @@ const UniqueRegion = ({ className, region }: UniqueRegionProps) => {
         });
 
         return {
+            filled,
             errorCells
         };
     }, [region]);

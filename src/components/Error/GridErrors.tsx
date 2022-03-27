@@ -3,26 +3,36 @@ import { useValidation } from "../../context/Validation";
 import { CellIndex } from "../Cell/useCells";
 import Region from "../Region/Region";
 import { RegionCells } from "../Region/useRegionPath";
+import Path from "../SVG/Path";
 import classes from "./GridErrors.module.scss";
 
 interface GridErrorsProps {
     cells: CellIndex;
+    size: Size;
 }
 
-const GridErrors = ({cells}: GridErrorsProps) => {
+interface ValidationState {
+    errors: RegionCells;
+    filled: boolean;
+}
+
+const GridErrors = ({size, cells}: GridErrorsProps) => {
     const validationResults = useValidation(cells);
-    const region = useMemo(() => {
-        return validationResults.map(({errorCells}) => {
+    const {errors, filled} = useMemo(() => {
+        return validationResults.map(({errorCells, filled = true}): ValidationState => {
             const region: RegionCells = {};
             Object.keys(errorCells).forEach(key => {
                 region[key] = true;
             });
-            return region;
-        }).reduce((a, b) => {
-            return {...a, ...b};
-        }, {});
+            return {errors: region, filled};
+        }).reduce((a: ValidationState, b: ValidationState) => {
+            return {errors: {...a.errors, ...b.errors}, filled: a.filled && b.filled};
+        }, {errors: {}, filled: true});
     }, [JSON.stringify(cells), JSON.stringify(validationResults)]);
-    return (<Region className={classes.root} region={region}/>);
+    if (filled && Object.keys(errors).length) {
+        return (<rect className={classes.filled} {...size}/>);
+    }
+    return (<Region className={classes.root} region={errors}/>);
 };
 
 export default GridErrors;
