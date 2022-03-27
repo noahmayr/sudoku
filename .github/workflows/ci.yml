@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - uses: fregante/setup-git-user@v1
+    #- uses: fregante/setup-git-user@v1
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
@@ -37,5 +37,11 @@ jobs:
       run: yarn install --prefer-offline --frozen-lockfile
 
     # Ready to run steps that rely on node_modules
-    - name: Deploy application
-      run: yarn deploy
+    - name: Build application
+      run: yarn build
+      
+    - name: Deploy 🚀
+      uses: JamesIves/github-pages-deploy-action@v4.2.5
+      with:
+        branch: gh-pages # The branch the action should deploy to.
+        folder: build # The folder the action should deploy.
