@@ -6,7 +6,7 @@ import GridErrors from "../Error/GridErrors";
 import UniqueRows from "../Rules/UniqueRows";
 import UniqueColumns from "../Rules/UniqueColumns";
 import useInput from "../../hooks/useInput";
-import useGame, { EXAMPLE } from "../../hooks/useGame";
+import useGame, { HARD_GAME } from "../../hooks/useGame";
 import Grid from "./Grid";
 import Cells from "../Cell/Cells";
 import SelectionRegion from "../Selection/SelectionRegion";
@@ -34,7 +34,7 @@ const useSvgProps = (size: Size) => {
 
 
 const Sudoku = () => {
-    const size = useGame(EXAMPLE);
+    const size = useGame(HARD_GAME);
 
     const svgProps = useSvgProps(size);
     const cells = useCells(size);

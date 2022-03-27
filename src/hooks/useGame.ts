@@ -116,7 +116,7 @@ export const STANDARD_RULES: Required<Pick<GameRules, "regions"|"rows"|"columns"
     ],
 };
 
-export const EXAMPLE: Game = {
+export const EASY_GAME: Game = {
     width: 9,
     height: 9,
     cells: [
@@ -129,6 +129,23 @@ export const EXAMPLE: Game = {
         [3, 1, , 9, 7, , 2],
         [, , 9, 1, 8, 2, , , 3],
         [, , , , 6, , 1],
+    ],
+    rules: STANDARD_RULES,
+};
+
+export const HARD_GAME: Game = {
+    width: 9,
+    height: 9,
+    cells: [
+        [, , , , 5,, 7,, 2],
+        [8,,,,,,, 6],
+        [,,, 1,,,, 5, 4],
+        [,,,, 3],
+        [1, 3,, 7, 6,,, 8],
+        [, 6, 4,,,, 1],
+        [3, 1, 2,, 8],
+        [, 9,,,, 5],
+        [,,,,, 3, 9],
     ],
     rules: STANDARD_RULES,
 };
