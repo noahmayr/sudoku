@@ -23,8 +23,8 @@ interface ValidatorProps {
 }
 
 export interface ValidationResult {
-    errorCells: CellIndex;
-    warningCells: CellIndex;
+    errors: RegionCells;
+    warnings: RegionCells;
     filled?: boolean;
     errorMessage?: string;
     errorSource?: string;
