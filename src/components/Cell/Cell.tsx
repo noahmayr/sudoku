@@ -42,7 +42,7 @@ const Cell = ({ cell }: CellProps) => {
                                 const x = (pos.x) * 33 + 50;
                                 const y = (pos.y) * 33 + 50;
                                 return (
-                                    <text width="1" height="1" x={`${x}%`} y={`${y}%`} className={classes.cornerMark}>{mark}</text>
+                                    <text key={idx} width="1" height="1" x={`${x}%`} y={`${y}%`} className={classes.cornerMark}>{mark}</text>
                                 )
                             })
                         ) : null
