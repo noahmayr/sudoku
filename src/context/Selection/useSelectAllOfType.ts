@@ -20,7 +20,7 @@ const useSelectAllOfType = () => {
             intersect: intersect,
             inputState
         })
-    }, [inputState, dispatch]);
+    }, [JSON.stringify(inputState), dispatch]);
 }
 
 export default useSelectAllOfType;
