@@ -1,13 +1,17 @@
-/*
- * TODO: split this context in the future to make it more managable
- * and reduce the complexity of this file
- */
-// eslint-disable-next-line object-curly-newline
-import { createContext, DependencyList, PropsWithChildren, useCallback, useEffect, useMemo, useReducer, useRef } from "react";
+import {
+    DependencyList,
+    PropsWithChildren,
+    createContext,
+    useCallback,
+    useEffect,
+    useMemo,
+    useReducer,
+    useRef,
+} from "react";
+import { CellState, InputState, useInputState } from "./Input";
 import { CellIndex, CellInterface } from "../components/Cell/useCells";
 import { RegionCells } from "../components/Region/useRegionPath";
 import useSafeContext from "../hooks/useSafeContext";
-import { CellState, InputState, useInputState } from "./Input";
 
 interface ValidatorItem {
     cell: CellInterface;

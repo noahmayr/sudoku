@@ -143,9 +143,7 @@ const useGame = (game: Game) => {
                     if (value === null) {
                         return {};
                     }
-                    return {
-                        [getKey({ x, y })]: value,
-                    };
+                    return { [getKey({ x, y })]: value };
                 });
             }).flat(1).reduce((a, b) => { return Object.assign(a, b); }, {}) ?? {},
         });

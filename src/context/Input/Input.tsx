@@ -1,6 +1,4 @@
-import {
-    createContext, PropsWithChildren, useMemo, useReducer,
-} from "react";
+import { createContext, PropsWithChildren, useMemo, useReducer } from "react";
 import { CellInterface } from "../../components/Cell/useCells";
 import useSafeContext from "../../hooks/useSafeContext";
 import { getKey } from "../../util";

@@ -65,12 +65,22 @@
                 "maxEOF": 0
             }
         ],
-        "no-console": "error",
+        "no-console": "warn",
         "no-restricted-exports": "off",
         "import/extensions": "off",
         "arrow-parens": "off",
         "multiline-comment-style": ["error", "starred-block"],
         "arrow-body-style": ["error", "always"],
-        "react/jsx-tag-spacing": "error"
+        "react/jsx-tag-spacing": "error",
+        "object-curly-newline": ["error", {
+            "ObjectExpression": { "multiline": true, "minProperties": 4 },
+            "ObjectPattern": { "multiline": true, "minProperties": 4 },
+            "ImportDeclaration": { "multiline": true, "minProperties": 5 },
+            "ExportDeclaration": { "multiline": true, "minProperties": 5 }
+        }],
+        "object-property-newline": ["error", {
+            "allowAllPropertiesOnSameLine": true
+        }],
+        "radix": "off"
     }
 }

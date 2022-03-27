@@ -30,9 +30,7 @@ const update = <K extends keyof CellState>(
         if (value === undefined) {
             return { [key]: other };
         }
-        return {
-            [key]: { ...other, [type]: value },
-        };
+        return { [key]: { ...other, [type]: value } };
     });
     return changes;
 };
@@ -44,11 +42,7 @@ const createFilter = <K extends keyof CellState>(type: K, filterCallback: Filter
 
 const initAction = ({ values }: InitAction): Changes => {
     return Object.entries(values).map(([key, value]): InputState => {
-        return {
-            [key]: {
-                given: value,
-            },
-        };
+        return { [key]: { given: value } };
     });
 };
 

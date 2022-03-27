@@ -79,9 +79,7 @@ const useSelection = () => {
         intersect,
     });
 
-    return {
-        ref,
-    };
+    return { ref };
 };
 
 

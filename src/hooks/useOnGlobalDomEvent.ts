@@ -1,6 +1,4 @@
-import {
-    DependencyList, useCallback, useEffect, useReducer,
-} from "react";
+import { DependencyList, useCallback, useEffect, useReducer } from "react";
 import isDeepEqual from "fast-deep-equal/react";
 
 type EventMap = WindowEventMap
