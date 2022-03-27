@@ -24,9 +24,25 @@ const UniqueRegion = ({ className, region }: RegionProps) => {
             errorCells[getKey(cell)] = cell;
         });
 
+        const takenValues = Object.entries(seen).filter(([, cells]) => { return cells.length; })
+            .map((([key]) => { return parseInt(key) as CellValue; }));
+
         return {
             filled,
             errorCells,
+            warningCells: items.filter(({
+                state: {
+                    value: v, given: val = v, center, corner,
+                },
+            }) => {
+                return takenValues.some(
+                    value => {
+                        return val === undefined && (center?.has(value) || corner?.has(value));
+                    },
+                );
+            }).map(({ cell }) => {
+                return { [getKey(cell)]: cell };
+            }).reduce((a, b) => { return Object.assign(a, b); }, {}),
         };
     }, [region]);
 

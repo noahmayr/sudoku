@@ -24,6 +24,7 @@ interface ValidatorProps {
 
 export interface ValidationResult {
     errorCells: CellIndex;
+    warningCells: CellIndex;
     filled?: boolean;
     errorMessage?: string;
     errorSource?: string;

@@ -1,4 +1,4 @@
-.root {
+.error {
     fill: red;
     fill-opacity: 0.5;
     opacity: 0.5;
@@ -6,7 +6,15 @@
     stroke-width: 0.125em;
 }
 
-.filled {
+.warning {
+    fill: orange;
+    fill-opacity: 0.5;
+    opacity: 0.5;
+    stroke: orange;
+    stroke-width: 0.125em;
+}
+
+.success {
     fill: green;
     fill-opacity: 0.5;
     opacity: 0.5;
