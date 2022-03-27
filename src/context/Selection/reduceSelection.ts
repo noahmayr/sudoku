@@ -1,19 +1,25 @@
 import { getKey, merge } from "../../util";
 import { InputState, CellState } from "../Input";
-import { CellSelection, SelectionState, SelectionAction } from "./types";
+import { CellSelection, SelectionState, SelectionAction } from "./types.d";
 
 const selectCells = (cells: CellSelection, selecting: boolean, keys: string[]): CellSelection => {
-    if (keys.length === 0 || keys.every(key => !!cells[key] === selecting)) {
+    if (keys.length === 0 || keys.every(key => { return !!cells[key] === selecting; })) {
         return cells;
     }
     if (selecting) {
-        return merge(cells, ...keys.map((key): CellSelection => ({ [key]: true })));
+        return merge(cells, ...keys.map((key): CellSelection => { return { [key]: true }; }));
     }
-    return Object.fromEntries(Object.entries(cells).filter(([key]) => !keys.includes(key)));
+    return Object.fromEntries(
+        Object.entries(cells).filter(([key]) => { return !keys.includes(key); }),
+    );
 };
 
-const findCellsWhere = (inputState: InputState, predicate: (state: CellState) => unknown): string[] => {
-    return Object.entries(inputState).filter(([, state]) => state !== undefined && predicate(state)).map(([key]) => key);
+type CellPredicate = (state: CellState) => unknown
+
+const findCellsWhere = (input: InputState, predicate: CellPredicate) => {
+    return Object.entries(input)
+        .filter(([, state]) => { return state !== undefined && predicate(state); })
+        .map(([key]) => { return key; });
 };
 
 const reduceSelection = (state: SelectionState, action: SelectionAction): SelectionState => {
@@ -57,12 +63,15 @@ const reduceSelection = (state: SelectionState, action: SelectionAction): Select
         }
         const value = cellState.given ?? cellState.value;
         if (value) {
-            const keys = findCellsWhere(inputState, ({ value: val, given: actual = val }) => actual === value);
+            const keys = findCellsWhere(
+                inputState,
+                ({ value: val, given: actual = val }) => { return actual === value; },
+            );
             const cells = selectCells(state.cells, !(intersect && isSelected), keys);
             if (cells === state.cells) {
                 return state;
             }
-            return {cells, selecting: state.selecting};
+            return { cells, selecting: state.selecting };
         }
     }
 

@@ -11,13 +11,13 @@ export interface SelectAllOfTypeProps {
 const useSelectAllOfType = () => {
     const inputState = useInputState();
     const dispatch = useSelectionDispatch();
-    return useCallback(({type, position, intersect}: SelectAllOfTypeProps) => {
+    return useCallback(({ type, position, intersect }: SelectAllOfTypeProps) => {
         dispatch({
             type: "samevalue",
             position,
             valueType: type,
-            intersect: intersect,
-            inputState
+            intersect,
+            inputState,
         });
     }, [inputState, dispatch]);
 };

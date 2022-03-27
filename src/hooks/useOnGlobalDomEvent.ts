@@ -1,33 +1,38 @@
-import { DependencyList, useCallback, useEffect, useReducer } from "react";
+import {
+    DependencyList, useCallback, useEffect, useReducer,
+} from "react";
 import isDeepEqual from "fast-deep-equal/react";
 
-export type GlobalEventMap = WindowEventMap
+type EventMap = WindowEventMap
 
-export type GlobalEventEnum = ValueOf<GlobalEventMap>;
-export type GlobalEventId = KeyOf<GlobalEventMap>;
-export type GlobalEventForId<K extends GlobalEventId> = ValueForKey<GlobalEventMap, K>;
+type AnyEvent = ValueOf<EventMap>;
+type EventKey = KeyOf<EventMap>;
+type EventFor<K extends EventKey> = ValueForKey<EventMap, K>;
 
-export type GlobalEventListener<T extends GlobalEventEnum> = (this: Window, event: T) => void
+type Listener<T extends AnyEvent> = (this: Window, event: T) => void
 
-export type GlobalEventListenerForKey<K extends GlobalEventId> = GlobalEventListener<GlobalEventForId<K>>;
+type ListenerFor<K extends EventKey> = Listener<EventFor<K>>;
 
-export type GlobalEventListenerMap = {
-    [key in GlobalEventId]?: GlobalEventListenerForKey<key>;
+type ListenerMap = {
+    [key in EventKey]?: ListenerFor<key>;
 };
 
 
-const getListener = <T extends GlobalEventId>(events: GlobalEventListenerMap, identifier: T): GlobalEventListenerForKey<T> | undefined  => {
+const getListener = <T extends EventKey>(
+    events: ListenerMap,
+    identifier: T,
+): ListenerFor<T> | undefined => {
     return events[identifier];
 };
 
-const eventReducer = (state: GlobalEventListenerMap, change: GlobalEventListenerMap): GlobalEventListenerMap => {
-    const identifiers: GlobalEventId[] = [...Object.keys(state), ...Object.keys(change)] as GlobalEventId[];
+const eventReducer = (state: ListenerMap, change: ListenerMap): ListenerMap => {
+    const identifiers: EventKey[] = [...Object.keys(state), ...Object.keys(change)] as EventKey[];
 
-    for (const identifier of identifiers) {
+    identifiers.forEach(identifier => {
         const current = getListener(state, identifier);
         const next = getListener(change, identifier);
         if (current === next) {
-            continue;
+            return;
         }
         if (current) {
             window.removeEventListener(identifier, current, false);
@@ -35,12 +40,12 @@ const eventReducer = (state: GlobalEventListenerMap, change: GlobalEventListener
         if (next) {
             window.addEventListener(identifier, next, false);
         }
-    }
+    });
 
     return change;
 };
 
-const useGlobalDomEvents = (props: GlobalEventListenerMap) => {
+const useGlobalDomEvents = (props: ListenerMap) => {
     const [events, updateEvents] = useReducer(eventReducer, {});
 
     useEffect(() => {
@@ -57,9 +62,14 @@ const useGlobalDomEvents = (props: GlobalEventListenerMap) => {
     }, [updateEvents]);
 };
 
-const useOnGlobalDomEvent = <K extends GlobalEventId>(events: K[], listener: GlobalEventListenerForKey<K>, deps: DependencyList) => {
+const useOnGlobalDomEvent = <K extends EventKey>(
+    events: K[], listener: ListenerFor<K>,
+    deps: DependencyList,
+) => {
     const callback = useCallback(listener, deps);
-    useGlobalDomEvents(events.map(key => ({[key]: callback})).reduce((a,b) => ({...a,...b}), {}));
+    useGlobalDomEvents(events.map(key => {
+        return { [key]: callback };
+    }).reduce((a, b) => { return { ...a, ...b }; }, {}));
 };
 
 export default useOnGlobalDomEvent;

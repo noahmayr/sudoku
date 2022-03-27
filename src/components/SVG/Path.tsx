@@ -39,6 +39,8 @@ const stringifyPathCommands = (commands: PathCommand[]): string => {
         case "Z":
         case "z":
             return `${command.type}`;
+        default:
+            return undefined;
         }
     }).join(" ");
 };

@@ -1,3 +1,4 @@
+import React from "react";
 import { CellState, InputState } from "../Input";
 
 export type CellSelection = Record<string, true>;
@@ -30,7 +31,12 @@ export interface ResetSelectionAction {
     type: "reset";
 }
 
-export type SelectionAction = DraggingSelectionAction | StopSelectionAction | ResetSelectionAction | AllWithSameValueSelectionAction;
+export type SelectionAction = DraggingSelectionAction
+    | StopSelectionAction
+    | ResetSelectionAction
+    | AllWithSameValueSelectionAction;
+
+export type SelectionDispach = React.Dispatch<SelectionAction>;
 
 export interface SelectionState {
     cells: CellSelection;

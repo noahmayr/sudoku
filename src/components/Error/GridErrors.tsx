@@ -3,7 +3,6 @@ import { useValidation } from "../../context/Validation";
 import { CellIndex } from "../Cell/useCells";
 import Region from "../Region/Region";
 import { RegionCells } from "../Region/useRegionPath";
-import Path from "../SVG/Path";
 import classes from "./GridErrors.module.scss";
 
 interface GridErrorsProps {
@@ -16,23 +15,33 @@ interface ValidationState {
     filled: boolean;
 }
 
-const GridErrors = ({size, cells}: GridErrorsProps) => {
-    const validationResults = useValidation(cells);
-    const {errors, filled} = useMemo(() => {
-        return validationResults.map(({errorCells, filled = true}): ValidationState => {
-            const region: RegionCells = {};
-            Object.keys(errorCells).forEach(key => {
-                region[key] = true;
-            });
-            return {errors: region, filled};
+const GridErrors = ({ size, cells }: GridErrorsProps) => {
+    const results = useValidation(cells);
+
+    const state = useMemo(() => {
+        return results.map(({ errorCells, filled = true }): ValidationState => {
+            return {
+                errors: Object.keys(errorCells)
+                    .map((key): RegionCells => { return { [key]: true }; })
+                    .reduce((a, b) => { return Object.assign(a, b); }, {}),
+                filled,
+            };
         }).reduce((a: ValidationState, b: ValidationState) => {
-            return {errors: {...a.errors, ...b.errors}, filled: a.filled && b.filled};
-        }, {errors: {}, filled: true});
-    }, [JSON.stringify(cells), JSON.stringify(validationResults)]);
-    if (filled && Object.keys(errors).length) {
-        return (<rect className={classes.filled} {...size}/>);
+            return {
+                errors: {
+                    ...a.errors,
+                    ...b.errors,
+                },
+                filled: a.filled && b.filled,
+            };
+        }, { errors: {}, filled: true });
+    }, [JSON.stringify(cells), JSON.stringify(results)]);
+
+    if (state.filled && Object.keys(state.errors).length) {
+        return (<rect className={classes.filled} {...size} />);
     }
-    return (<Region className={classes.root} region={errors}/>);
+
+    return (<Region className={classes.root} region={state.errors} />);
 };
 
 export default GridErrors;

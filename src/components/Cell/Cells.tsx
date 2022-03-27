@@ -7,7 +7,7 @@ interface CellsProps {
     cells: CellIndex;
 }
 
-const Cells = ({cells}: CellsProps) => {
+const Cells = ({ cells }: CellsProps) => {
     return (
         <g id="cells">
             {Object.values(cells).map((cell) => {

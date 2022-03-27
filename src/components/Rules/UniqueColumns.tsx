@@ -1,28 +1,24 @@
 import { useMemo } from "react";
 import UniqueRegion from "./UniqueRegion";
 import { RegionCells } from "../Region/useRegionPath";
-import { CellIndex } from "../Cell/useCells";
-import { getKey } from "../../util";
+import { getKey, range } from "../../util";
+import { CellInterface } from "../Cell/useCells";
 
-interface UniqueColumnsProps {
-    cells: CellIndex
-}
 
-const UniqueColumns = ({cells}: UniqueColumnsProps) => {
+const UniqueColumns = () => {
     const regions = useMemo(() => {
         return Array.from(Array(9).keys()).map(x => {
-            const cells = Array.from(Array(9).keys()).map(y => {
+            const cells: CellInterface[] = range(9).map(y => {
                 return { x, y };
             });
-            const region: RegionCells = {};
-            cells.forEach((cell) => region[getKey(cell)] = true);
-            return region;
+            return cells.map((cell): RegionCells => { return { [getKey(cell)]: true }; })
+                .reduce((a, b) => { return Object.assign(a, b); }, {});
         });
     }, []);
     return (<>
-        {regions.map((region, index) =>
-            (<UniqueRegion key={index} region={region} cells={cells} />)
-        )}
+        {regions.map((region, index) => {
+            return (<UniqueRegion key={index} region={region} />);
+        })}
     </>);
 };
 

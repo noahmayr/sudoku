@@ -13,9 +13,11 @@ import SelectionRegion from "../Selection/SelectionRegion";
 
 const useSvgProps = (size: Size) => {
     const { ref } = useSelection();
-    const {x,y,width,height} = {
-        x: - 0.25,
-        y: - 0.25,
+    const {
+        x, y, width, height,
+    } = {
+        x: -0.25,
+        y: -0.25,
         width: size.width + 0.5,
         height: size.height + 0.5,
     };
@@ -25,8 +27,8 @@ const useSvgProps = (size: Size) => {
         style: {
             width: width * 80,
             height: height * 80,
-            fontSize: `${1 / 32}rem`
-        }
+            fontSize: `${1 / 32}rem`,
+        },
     };
 };
 
@@ -51,14 +53,14 @@ const Sudoku = () => {
                 <Grid {...size}></Grid>
                 <Cells cells={cells}></Cells>
                 <g id="regions">
-                    <ThreeByThree cells={cells} />
-                    <UniqueRows cells={cells} />
-                    <UniqueColumns cells={cells} />
+                    <ThreeByThree />
+                    <UniqueRows />
+                    <UniqueColumns />
                 </g>
                 <g id="errors">
                     <GridErrors cells={cells} size={size} />
                 </g>
-                <SelectionRegion/>
+                <SelectionRegion />
             </g>
         </svg>
     );
