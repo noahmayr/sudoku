@@ -3,10 +3,6 @@ name: CI
 # Update to match your requirements
 on: push
 
-env:
-  GIT_AUTHOR_NAME: Noah Mayr
-  GIT_AUTHOR_EMAIL: dev@noahmayr.com
-
 jobs:
   Deploy:
     runs-on: ubuntu-latest
@@ -17,6 +13,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: fregante/setup-git-user@v1
 
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v2
