@@ -1,7 +1,10 @@
 name: CI
 
 # Update to match your requirements
-on: push
+on:
+  push:
+    branches: 
+      - master
 
 jobs:
   Deploy:
