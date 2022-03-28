@@ -1,8 +1,9 @@
 import { CellValue } from "../../context/Input";
 import { useValidator } from "../../context/Validation";
 import { getKey } from "../../util";
-import { CellIndex, CellInterface } from "../Cell/useCells";
+import { CellInterface } from "../Cell/useCells";
 import Region, { RegionProps } from "../Region/Region";
+import { RegionCells } from "../Region/useRegionPath";
 
 const UniqueRegion = ({ className, region }: RegionProps) => {
     useValidator(region, ({ items }) => {
@@ -18,10 +19,10 @@ const UniqueRegion = ({ className, region }: RegionProps) => {
             seen[val]?.push(cell);
             return true;
         }).reduce((a, b) => { return a && b; }, true);
-        const errorCells: CellIndex = {};
+        const errors: RegionCells = {};
 
         Object.values(seen).filter(cells => { return cells.length > 1; }).flat(1).forEach(cell => {
-            errorCells[getKey(cell)] = cell;
+            errors[getKey(cell)] = true;
         });
 
         const takenValues = Object.entries(seen).filter(([, cells]) => { return cells.length; })
@@ -29,8 +30,8 @@ const UniqueRegion = ({ className, region }: RegionProps) => {
 
         return {
             filled,
-            errorCells,
-            warningCells: items.filter(({
+            errors,
+            warnings: items.filter(({
                 state: {
                     value: v, given: val = v, center, corner,
                 },
@@ -40,8 +41,8 @@ const UniqueRegion = ({ className, region }: RegionProps) => {
                         return val === undefined && (center?.has(value) || corner?.has(value));
                     },
                 );
-            }).map(({ cell }) => {
-                return { [getKey(cell)]: cell };
+            }).map(({ cell }): RegionCells => {
+                return { [getKey(cell)]: true };
             }).reduce((a, b) => { return Object.assign(a, b); }, {}),
         };
     }, [region]);

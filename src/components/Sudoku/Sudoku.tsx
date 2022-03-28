@@ -2,7 +2,7 @@ import classes from "./Sudoku.module.scss";
 import useSelection from "../../hooks/useSelection";
 import ThreeByThree from "../Rules/ThreeByThree";
 import useCells from "../Cell/useCells";
-import GridErrors from "../Error/GridErrors";
+import Validation from "../Validation/Validation";
 import UniqueRows from "../Rules/UniqueRows";
 import UniqueColumns from "../Rules/UniqueColumns";
 import useInput from "../../hooks/useInput";
@@ -38,7 +38,7 @@ const Sudoku = () => {
 
     const svgProps = useSvgProps(size);
     const cells = useCells(size);
-    useInput();
+    useInput(cells);
 
     return (
         <svg
@@ -58,7 +58,7 @@ const Sudoku = () => {
                     <UniqueColumns />
                 </g>
                 <g id="errors">
-                    <GridErrors cells={cells} size={size} />
+                    <Validation cells={cells} size={size} />
                 </g>
                 <SelectionRegion />
             </g>

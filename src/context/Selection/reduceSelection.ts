@@ -58,9 +58,11 @@ const reduceSelection = (state: SelectionState, action: SelectionAction): Select
         const isSelected = !!state.cells[key];
 
         const cellState = inputState[key];
+
         if (cellState === undefined) {
             return state;
         }
+
         const value = cellState.given ?? cellState.value;
         if (value) {
             const keys = findCellsWhere(
@@ -73,8 +75,16 @@ const reduceSelection = (state: SelectionState, action: SelectionAction): Select
             }
             return { cells, selecting: state.selecting };
         }
+        return state;
     }
 
+    if (action.type === "all") {
+        const cells = selectCells(state.cells, true, Object.keys(action.cells));
+        if (cells === state.cells) {
+            return state;
+        }
+        return { cells, selecting: state.selecting };
+    }
     return state;
 };
 
