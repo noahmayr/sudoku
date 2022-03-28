@@ -21,9 +21,10 @@ const useInput = (cells: CellIndex) => {
     const selection = useSelectionState();
     const selectionDispatch = useSelectionDispatch();
     useOnGlobalDomEvent(["keydown"], (event) => {
+        const meta = event.metaKey || event.ctrlKey;
         // TODO: map modifier key combinations to cellstate types
         // eslint-disable-next-line no-nested-ternary
-        const type = event.metaKey ? "center" : event.shiftKey ? "corner" : "value";
+        const type = meta ? "center" : event.shiftKey ? "corner" : "value";
         if (event.code.startsWith("Digit")) {
             event.preventDefault();
             const value = getCellValue(Number(event.code.replace("Digit", "")));
@@ -51,7 +52,7 @@ const useInput = (cells: CellIndex) => {
             selectionDispatch({ type: "reset" });
         }
 
-        if (event.key === "a" && event.metaKey) {
+        if (event.key === "a" && meta) {
             event.preventDefault();
             selectionDispatch({ type: "all", cells });
         }
