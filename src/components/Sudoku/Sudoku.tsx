@@ -38,7 +38,7 @@ const Sudoku = () => {
 
     const svgProps = useSvgProps(size);
     const cells = useCells(size);
-    useInput();
+    useInput(cells);
 
     return (
         <svg

@@ -1,13 +1,8 @@
 import React from "react";
+import { CellIndex } from "../../components/Cell/useCells";
 import { CellState, InputState } from "../Input";
 
 export type CellSelection = Record<string, true>;
-
-export interface SelectionReducerAction {
-    position?: Point;
-    selected?: boolean;
-    reset?: boolean;
-}
 
 export interface DraggingSelectionAction {
     type: "drag";
@@ -23,6 +18,11 @@ export interface AllWithSameValueSelectionAction {
     intersect: boolean;
 }
 
+export interface SelectAllAction {
+    type: "all";
+    cells: CellIndex;
+}
+
 export interface StopSelectionAction {
     type: "stop";
 }
@@ -34,7 +34,8 @@ export interface ResetSelectionAction {
 export type SelectionAction = DraggingSelectionAction
     | StopSelectionAction
     | ResetSelectionAction
-    | AllWithSameValueSelectionAction;
+    | AllWithSameValueSelectionAction
+    | SelectAllAction;
 
 export type SelectionDispach = React.Dispatch<SelectionAction>;
 
