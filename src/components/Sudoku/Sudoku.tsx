@@ -25,7 +25,6 @@ const useSvgProps = (size: Size) => {
         ref,
         viewBox: `${x} ${y} ${width} ${height}`,
         style: {
-            width: width * 80,
             height: height * 80,
             fontSize: `${1 / 32}rem`,
         },
