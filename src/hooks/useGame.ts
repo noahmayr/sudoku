@@ -155,14 +155,12 @@ const useGame = (game: Game) => {
     useEffect(() => {
         dispatch({
             type: "given",
-            values: game.cells?.map((row, y): GivenDigits[] => {
-                return row.map((value, x): GivenDigits => {
-                    if (value === null) {
-                        return {};
-                    }
-                    return { [getKey({ x, y })]: value };
-                });
-            }).flat(1).reduce((a, b) => { return Object.assign(a, b); }, {}) ?? {},
+            values: game.cells?.map((row, y): GivenDigits[] => row.map((value, x): GivenDigits => {
+                if (value === null) {
+                    return {};
+                }
+                return { [getKey({ x, y })]: value };
+            })).flat(1).reduce((a, b) => Object.assign(a, b), {}) ?? {},
         });
     }, []);
     return {

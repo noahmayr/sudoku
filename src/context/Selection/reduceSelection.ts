@@ -3,24 +3,24 @@ import { InputState, CellState } from "../Input";
 import { CellSelection, SelectionState, SelectionAction } from "./types.d";
 
 const selectCells = (cells: CellSelection, selecting: boolean, keys: string[]): CellSelection => {
-    if (keys.length === 0 || keys.every(key => { return !!cells[key] === selecting; })) {
+    if (keys.length === 0 || keys.every(key => !!cells[key] === selecting)) {
         return cells;
     }
     if (selecting) {
-        return merge(cells, ...keys.map((key): CellSelection => { return { [key]: true }; }));
+        return merge(cells, ...keys.map((key): CellSelection => {
+            return { [key]: true };
+        }));
     }
     return Object.fromEntries(
-        Object.entries(cells).filter(([key]) => { return !keys.includes(key); }),
+        Object.entries(cells).filter(([key]) => !keys.includes(key)),
     );
 };
 
 type CellPredicate = (state: CellState) => unknown
 
-const findCellsWhere = (input: InputState, predicate: CellPredicate) => {
-    return Object.entries(input)
-        .filter(([, state]) => { return state !== undefined && predicate(state); })
-        .map(([key]) => { return key; });
-};
+const findCellsWhere = (input: InputState, predicate: CellPredicate) => Object.entries(input)
+    .filter(([, state]) => state !== undefined && predicate(state))
+    .map(([key]) => key);
 
 const reduceSelection = (state: SelectionState, action: SelectionAction): SelectionState => {
     if (action.type === "reset") {
@@ -67,7 +67,7 @@ const reduceSelection = (state: SelectionState, action: SelectionAction): Select
         if (value) {
             const keys = findCellsWhere(
                 inputState,
-                ({ value: val, given: actual = val }) => { return actual === value; },
+                ({ value: val, given: actual = val }) => actual === value,
             );
             const cells = selectCells(state.cells, !(intersect && isSelected), keys);
             if (cells === state.cells) {

@@ -47,11 +47,7 @@ const useGetLocalPosition = (element: SVGSVGElement|null) => {
     }, [transform]);
 };
 
-const shouldIntersect = ({
-    ctrl, alt, meta, shift,
-}: ModifierKeys) => {
-    return ctrl || alt || meta || shift;
-};
+const shouldIntersect = ({ ctrl, alt, meta, shift }: ModifierKeys) => ctrl || alt || meta || shift;
 
 const useSelection = () => {
     const ref = useRef<SVGSVGElement>(null);
@@ -62,7 +58,9 @@ const useSelection = () => {
         if (position === undefined) {
             return;
         }
-        selectAllOfType({ type: "value", position, intersect: shouldIntersect(mods) });
+        selectAllOfType({
+            type: "value", position, intersect: shouldIntersect(mods),
+        });
     }, [selectAllOfType, getLocalPosition]);
 
     const {

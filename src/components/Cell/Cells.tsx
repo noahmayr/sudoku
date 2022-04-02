@@ -7,16 +7,12 @@ interface CellsProps {
     cells: CellIndex;
 }
 
-const Cells = ({ cells }: CellsProps) => {
-    return (
-        <g id="cells">
-            {Object.values(cells).map((cell) => {
-                return (
-                    <Cell key={getKey(cell)} cell={cell}></Cell>
-                );
-            })}
-        </g>
-    );
-};
+const Cells = ({ cells }: CellsProps) => (
+    <g id="cells">
+        {Object.values(cells).map((cell) => (
+            <Cell key={getKey(cell)} cell={cell}></Cell>
+        ))}
+    </g>
+);
 
 export default memo(Cells);

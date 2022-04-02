@@ -46,16 +46,22 @@ type ValidationState = ValidatorRef[];
 const ValidationDispatchContext = createContext<ValidationDispatch | undefined>(undefined);
 const ValidationStateContext = createContext<ValidationState | undefined>(undefined);
 
-const useValidationDispatch = () => { return useSafeContext(ValidationDispatchContext, "useValidationDispatch can only be used inside ValidationProvider"); };
+const useValidationDispatch = () => useSafeContext(
+    ValidationDispatchContext,
+    "useValidationDispatch can only be used inside ValidationProvider",
+);
 
-const useValidationState = () => { return useSafeContext(ValidationStateContext, "useValidationState can only be used inside ValidationProvider"); };
+const useValidationState = () => useSafeContext(
+    ValidationStateContext,
+    "useValidationState can only be used inside ValidationProvider",
+);
 
 const reduceValidatorList = (state: ValidatorRef[], { type, ref }: ValidatorReducerAction) => {
     if (type === "add") {
         return [...state, ref];
     }
     if (type === "remove") {
-        return state.filter(item => { return item !== ref; });
+        return state.filter(item => item !== ref);
     }
     return state;
 };
@@ -105,7 +111,7 @@ export const useValidation = (cells: CellIndex): ValidationResult[] => {
     const input = useInputState();
     const state = useValidationState();
     return useMemo(
-        () => { return state.map(validatorRef => { return validatorRef.current(cells, input); }); },
+        () => state.map(validatorRef => validatorRef.current(cells, input)),
         [input, state, JSON.stringify(cells)],
     );
 };

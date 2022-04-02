@@ -10,8 +10,8 @@ interface UseCellsProps {
 export type CellInterface = Point;
 export type CellIndex = Record<string, CellInterface>;
 
-const useCells = ({ width, height }: UseCellsProps) => {
-    return useMemo(() => {
+const useCells = ({ width, height }: UseCellsProps) => useMemo(
+    () => {
         const cellIndex: CellIndex = {};
         range(height).forEach(y => {
             range(height).forEach(x => {
@@ -23,7 +23,8 @@ const useCells = ({ width, height }: UseCellsProps) => {
             });
         });
         return cellIndex;
-    }, [width, height]);
-};
+    },
+    [width, height],
+);
 
 export default useCells;

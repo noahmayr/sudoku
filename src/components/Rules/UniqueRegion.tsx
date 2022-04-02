@@ -18,32 +18,35 @@ const UniqueRegion = ({ className, region }: RegionProps) => {
             }
             seen[val]?.push(cell);
             return true;
-        }).reduce((a, b) => { return a && b; }, true);
+        }).reduce((a, b) => a && b, true);
         const errors: RegionCells = {};
 
-        Object.values(seen).filter(cells => { return cells.length > 1; }).flat(1).forEach(cell => {
+        Object.values(seen).filter(cells => cells.length > 1).flat(1).forEach(cell => {
             errors[getKey(cell)] = true;
         });
 
-        const takenValues = Object.entries(seen).filter(([, cells]) => { return cells.length; })
-            .map((([key]) => { return parseInt(key) as CellValue; }));
+        const takenValues = Object.entries(seen).filter(([, cells]) => cells.length)
+            .map((([key]) => parseInt(key) as CellValue));
+
+        const warnings = items.filter(
+            ({
+                state: {
+                    value: v,
+                    given: val = v,
+                    center,
+                    corner,
+                },
+            }) => takenValues.some(
+                value => val === undefined && (center?.has(value) || corner?.has(value)),
+            ),
+        ).map(({ cell }): RegionCells => {
+            return { [getKey(cell)]: true };
+        }).reduce((a, b) => Object.assign(a, b), {});
 
         return {
             filled,
             errors,
-            warnings: items.filter(({
-                state: {
-                    value: v, given: val = v, center, corner,
-                },
-            }) => {
-                return takenValues.some(
-                    value => {
-                        return val === undefined && (center?.has(value) || corner?.has(value));
-                    },
-                );
-            }).map(({ cell }): RegionCells => {
-                return { [getKey(cell)]: true };
-            }).reduce((a, b) => { return Object.assign(a, b); }, {}),
+            warnings,
         };
     }, [region]);
 

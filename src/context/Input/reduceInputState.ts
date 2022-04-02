@@ -36,20 +36,20 @@ const update = <K extends keyof CellState>(
 };
 
 type Filter<K extends keyof CellState> = (state: CellState[K]) => unknown;
-const createFilter = <K extends keyof CellState>(type: K, filterCallback: Filter<K>) => {
-    return ({ state = {} }: SelectedCell) => { return filterCallback(state[type]); };
-};
+const createFilter = <K extends keyof CellState>(type: K, filterCallback: Filter<K>) => (
+    ({ state = {} }: SelectedCell) => filterCallback(state[type])
+);
 
-const initAction = ({ values }: InitAction): Changes => {
-    return Object.entries(values).map(([key, value]): InputState => {
+const initAction = ({ values }: InitAction): Changes => Object.entries(values).map(
+    ([key, value]): InputState => {
         return { [key]: { given: value } };
-    });
-};
+    },
+);
 
 const valueAction = (
     { type, value, selection }: WithSelection<Required<InputValueAction>>,
 ): Changes => {
-    const withoutValue = selection.filter(createFilter(type, state => { return state !== value; }));
+    const withoutValue = selection.filter(createFilter(type, state => state !== value));
 
     // some selected cells do not have the value, assign it to them
     if (withoutValue.length > 0) {
@@ -64,7 +64,7 @@ const markAction = (
     { type, value, selection }: WithSelection<Required<InputMarkAction>>,
 ): Changes => {
     const withoutValue = selection.filter(
-        createFilter(type, state => { return !state?.has(value); }),
+        createFilter(type, state => !state?.has(value)),
     );
 
     // some selected cells do not have the mark, add it to them
@@ -87,12 +87,12 @@ const markAction = (
 const deleteAction = ({ type, selection }: WithSelection<ActionWithSelection>): Changes => {
     const types: ActionWithSelection["type"][] = ["value", "center", "corner"];
     if (types.includes(type)) {
-        const valueNonEmpty = selection.filter(createFilter("value", state => { return state !== undefined; }));
+        const valueNonEmpty = selection.filter(createFilter("value", state => state !== undefined));
         if (valueNonEmpty.length > 0) {
             return update("value", valueNonEmpty, undefined);
         }
-        const centerNonEmpty = selection.filter(createFilter("center", state => { return state?.size; }));
-        const cornerNonEmpty = selection.filter(createFilter("corner", state => { return state?.size; }));
+        const centerNonEmpty = selection.filter(createFilter("center", state => state?.size));
+        const cornerNonEmpty = selection.filter(createFilter("corner", state => state?.size));
         if ((type !== "corner" && centerNonEmpty.length > 0) || cornerNonEmpty.length === 0) {
             return update("center", centerNonEmpty, undefined);
         }
@@ -108,7 +108,7 @@ const reduceInputState = (state: InputState, action: InputAction): InputState =>
 
     const selection: SelectedCell[] = Object.keys(action.selection).map(key => {
         return { key, state: state[key] };
-    }).filter(cell => { return cell.state?.given === undefined || action.type === "color"; });
+    }).filter(cell => cell.state?.given === undefined || action.type === "color");
 
     if (selection.length === 0) {
         return state;
@@ -117,15 +117,21 @@ const reduceInputState = (state: InputState, action: InputAction): InputState =>
     const { type, value } = action;
 
     if (value === undefined) {
-        return merge(state, ...deleteAction({ type, value, selection }));
+        return merge(state, ...deleteAction({
+            type, value, selection,
+        }));
     }
 
     switch (type) {
     case "value":
-        return merge(state, ...valueAction({ type, value, selection }));
+        return merge(state, ...valueAction({
+            type, value, selection,
+        }));
     case "center":
     case "corner":
-        return merge(state, ...markAction({ type, value, selection }));
+        return merge(state, ...markAction({
+            type, value, selection,
+        }));
     default:
         return state;
     }

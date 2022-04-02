@@ -13,9 +13,7 @@ import SelectionRegion from "../Selection/SelectionRegion";
 
 const useSvgProps = (size: Size) => {
     const { ref } = useSelection();
-    const {
-        x, y, width, height,
-    } = {
+    const { x, y, width, height } = {
         x: -0.25,
         y: -0.25,
         width: size.width + 0.5,

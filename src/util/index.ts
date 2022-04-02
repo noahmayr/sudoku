@@ -5,6 +5,6 @@ export const merge = <T extends object>(main: T, ...changes: T[]): T => {
     return Object.assign({ ...main }, ...changes);
 };
 
-export const getKey = ({ x, y }: Point): string => { return JSON.stringify({ x, y }); };
+export const getKey = ({ x, y }: Point): string => JSON.stringify({ x, y });
 
-export const range = (length: number) => { return Array.from(Array(length).keys()); };
+export const range = (length: number) => Array.from(Array(length).keys());

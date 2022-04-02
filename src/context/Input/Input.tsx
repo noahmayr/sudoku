@@ -20,18 +20,18 @@ export const InputProvider = ({ children }: PropsWithChildren<unknown>) => {
     );
 };
 
-export const useInputDispatch = () => {
-    return useSafeContext(InputDispatchContext, "useInputDispatch can only be used inside InputProvider");
-};
+export const useInputDispatch = () => useSafeContext(
+    InputDispatchContext,
+    "useInputDispatch can only be used inside InputProvider",
+);
 
-export const useInputState = () => {
-    return useSafeContext(InputStateContext, "useInputState can only be used inside InputProvider");
-};
+export const useInputState = () => useSafeContext(
+    InputStateContext,
+    "useInputState can only be used inside InputProvider",
+);
 
 export const useCellState = (cell: CellInterface): CellState => {
     const key = getKey(cell);
     const { [key]: state } = useInputState();
-    return useMemo(() => {
-        return state ?? {};
-    }, [state]);
+    return useMemo(() => state ?? {}, [state]);
 };

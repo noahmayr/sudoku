@@ -13,7 +13,7 @@ export interface UseRegionPathProps {
 const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
     const segments = useMemo(() => {
         const paths: SimplePath[] = [];
-        Object.keys(region).map((key): Point => { return JSON.parse(key); }).forEach(cell => {
+        Object.keys(region).map((key): Point => JSON.parse(key)).forEach(cell => {
             const x = cell.x + 0.5;
             const y = cell.y + 0.5;
             const topLeft = { x: x - 0.5, y: y - 0.5 };
@@ -85,7 +85,7 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             const b = index[keyEnd];
 
             Object.entries(index)
-                .filter(([, value]) => { return [a, b].includes(value); })
+                .filter(([, value]) => [a, b].includes(value))
                 .forEach(([key]) => {
                     delete index[key];
                 });
@@ -107,20 +107,18 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             index[getKey(newPath[0])] = newPath;
             index[getKey(newPath[newPath.length - 1])] = newPath;
         });
-        const x: PathCommand[][] = complete.map(path => {
-            return [...path.map((point, idx): PathCommand => {
-                if (idx === 0) {
-                    return {
-                        type: "M",
-                        vector: point,
-                    };
-                }
+        const x: PathCommand[][] = complete.map(path => [...path.map((point, idx): PathCommand => {
+            if (idx === 0) {
                 return {
-                    type: "L",
+                    type: "M",
                     vector: point,
                 };
-            }), { type: "Z" }];
-        });
+            }
+            return {
+                type: "L",
+                vector: point,
+            };
+        }), { type: "Z" }]);
 
         return x.flat(1);
     }, [segments]);

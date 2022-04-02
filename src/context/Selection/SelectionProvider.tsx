@@ -4,10 +4,16 @@ import reduceSelection from "./reduceSelection";
 import { SelectionDispach, SelectionState } from "./types.d";
 
 const SelectionDispatchContext = createContext<SelectionDispach | undefined>(undefined);
-export const useSelectionDispatch = () => { return useSafeContext(SelectionDispatchContext, "useSelectionDispatch can only be used inside SelectionProvider"); };
+export const useSelectionDispatch = () => useSafeContext(
+    SelectionDispatchContext,
+    "useSelectionDispatch can only be used inside SelectionProvider",
+);
 
 const SelectionStateContext = createContext<SelectionState | undefined>(undefined);
-export const useSelectionState = () => { return useSafeContext(SelectionStateContext, "useSelectionState can only be used inside SelectionProvider").cells; };
+export const useSelectionState = () => useSafeContext(
+    SelectionStateContext,
+    "useSelectionState can only be used inside SelectionProvider",
+).cells;
 
 const SelectionProvider = ({ children }: PropsWithChildren<unknown>) => {
     const [state, dispatch] = useReducer(reduceSelection, { cells: {} });

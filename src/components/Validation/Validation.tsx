@@ -19,16 +19,26 @@ interface ValidationState {
 const Validation = ({ size, cells }: GridErrorsProps) => {
     const results = useValidation(cells);
 
-    const state = useMemo(() => {
-        return results.map(({ errors, warnings, filled = true }): ValidationState => {
-            return { errors, warnings, filled };
-        }).reduce((acc: ValidationState, next: ValidationState) => {
-            Object.assign(acc.errors, next.errors);
-            Object.assign(acc.warnings, next.warnings);
-            acc.filled &&= next.filled;
-            return acc;
-        }, { errors: {}, warnings: {}, filled: true });
-    }, [JSON.stringify(cells), JSON.stringify(results)]);
+    const state = useMemo(
+        () => results.map(
+            ({ errors, warnings, filled = true }): ValidationState => {
+                return {
+                    errors, warnings, filled,
+                };
+            },
+        ).reduce(
+            (acc: ValidationState, next: ValidationState) => {
+                Object.assign(acc.errors, next.errors);
+                Object.assign(acc.warnings, next.warnings);
+                acc.filled &&= next.filled;
+                return acc;
+            },
+            {
+                errors: {}, warnings: {}, filled: true,
+            },
+        ),
+        [JSON.stringify(cells), JSON.stringify(results)],
+    );
 
     if (state.filled && Object.keys(state.errors).length === 0) {
         return (<rect className={classes.success} {...size} />);

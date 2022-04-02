@@ -15,7 +15,9 @@ const useDraggingSelection = ({ shouldSelect, position, intersect }: UseDragging
             dispatch({ type: "stop" });
             return;
         }
-        dispatch({ type: "drag", position, intersect });
+        dispatch({
+            type: "drag", position, intersect,
+        });
     }, [shouldSelect, JSON.stringify(position), dispatch, intersect]);
 };
 
