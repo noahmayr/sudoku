@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { CellIndex } from "../components/Cell/useCells";
 import { CellValue, useInputDispatch } from "../context/Input";
 import { useSelectionDispatch, useSelectionState } from "../context/Selection";
-import { input } from "../state/game/gameSlice";
+import { input, remove } from "../state/game/gameSlice";
 import { Region } from "../state/types.d";
 import getKey from "../state/util/getKey";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
@@ -48,8 +48,8 @@ const useInput = (cells: CellIndex) => {
             });
             dispatch(input({
                 type,
-                value,
                 region,
+                value,
             }));
             return;
         }
@@ -60,9 +60,8 @@ const useInput = (cells: CellIndex) => {
                 value: undefined,
                 selection,
             });
-            dispatch(input({
+            dispatch(remove({
                 type,
-                value: undefined,
                 region,
             }));
             return;

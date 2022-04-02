@@ -46,16 +46,14 @@ export interface InitPayload {
     givens: PositionMap<CellState["value"]>
 }
 
-export interface InputPayload {
+export interface RemovePayload {
     type: CellValueKeys;
     region: Region;
-    value?: CellState["value"];
 }
 
-export interface DeletePayload {
-    type: CellValueKeys;
+export interface InputPayload extends RemovePayload {
+    value: Required<CellState>["value"];
 }
-
 
 export const gameSlice = createSlice({
     name: "game",
@@ -89,16 +87,6 @@ export const gameSlice = createSlice({
             const selection = Array.from(draft.cells)
                 .filter(([key, state]) => region.has(key) && !state.isGiven)
                 .map(([, state]) => state);
-            if (value === undefined) {
-                selection.forEach(state => {
-                    if (type === "corner" || type === "center") {
-                        state[type].clear();
-                        return;
-                    }
-                    delete state[type];
-                });
-                return;
-            }
             const allHaveValue = selection.every(state => {
                 if (type === "corner" || type === "center") {
                     return state[type].has(value);
@@ -123,10 +111,31 @@ export const gameSlice = createSlice({
                 state[type] = value;
             });
         },
+        remove: (draft, action: PayloadAction<RemovePayload>) => {
+            if (draft === null) {
+                return;
+            }
+            const { region, type } = action.payload;
+            const selection = Array.from(draft.cells)
+                .filter(([key, state]) => region.has(key) && !state.isGiven)
+                .map(([, state]) => state);
+            const valueNonEmpty = selection.filter(state => state.value !== undefined);
+            if (valueNonEmpty.length) {
+                valueNonEmpty.forEach(state => delete state[type]);
+                return;
+            }
+            const cornerNonEmpty = selection.filter(state => state.corner.size);
+            const centerNonEmpty = selection.filter(state => state.center.size);
+            if ((type !== "corner" && centerNonEmpty.length > 0) || cornerNonEmpty.length === 0) {
+                centerNonEmpty.forEach(state => state.center.clear());
+                return;
+            }
+            cornerNonEmpty.forEach(state => state.corner.clear());
+        },
     },
 });
 
 // Action creators are generated for each case reducer function
-export const { loadGame, input } = gameSlice.actions;
+export const { loadGame, input, remove } = gameSlice.actions;
 
 export default gameSlice.reducer;

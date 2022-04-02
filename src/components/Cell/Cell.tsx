@@ -1,9 +1,6 @@
-import { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { useCellState } from "../../context/Input";
-import { selectCellByKey } from "../../state/game/gameSelector";
+import { selectCellByPosition } from "../../state/game/gameSelector";
 import { RootState } from "../../state/store";
-import getKey from "../../state/util/getKey";
 import classes from "./Cell.module.scss";
 import { CellInterface } from "./useCells";
 
@@ -24,7 +21,7 @@ const cornerPositions: Point[] = [
 ];
 
 const Cell = ({ cell }: CellProps) => {
-    const newState = useSelector((s: RootState) => selectCellByKey(s, getKey(cell)));
+    const newState = useSelector((s: RootState) => selectCellByPosition(s, cell));
     if (newState === undefined) {
         return null;
     }
