@@ -1,4 +1,4 @@
-import { PositionKey } from "../types.d";
+import { PositionKey } from "../slice/game";
 
 const getKey = ({ x, y }: Point): PositionKey => `${x}|${y}`;
 

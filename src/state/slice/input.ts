@@ -1,9 +1,8 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { shallowEqual } from "react-redux";
 import { RootState } from "../store";
-import {
-    Region, Row, Column, PositionMap, PositionKey,
-} from "../types.d";
 import getKey from "../util/getKey";
+import { PositionKey, PositionMap, Region } from "./game";
 
 export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 // export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
@@ -11,15 +10,16 @@ export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 export type CellColor = unknown;
 
 export interface CellState {
-    isGiven: boolean;
     value?: CellValue;
     center: Set<CellValue>;
     corner: Set<CellValue>;
 }
 
-type CellValueKeys = Exclude<keyof CellState, "isGiven">
+export interface CellStateWithGiven extends CellState {
+    isGiven?: boolean;
+}
 
-export type InputState = PositionMap<CellState>;
+export type InputState = PositionMap<CellStateWithGiven>;
 
 export interface GivenPayload {
     grid: Region;
@@ -27,7 +27,7 @@ export interface GivenPayload {
 }
 
 export interface RemovePayload {
-    type: CellValueKeys;
+    type: keyof CellState;
     region: Region;
 }
 
@@ -39,7 +39,7 @@ type InputReducer<T extends RemovePayload> =
     (draft: InputState|null, action: PayloadAction<T>) => void;
 
 type WithSelection<T extends RemovePayload> = T & {
-    selection: CellState[];
+    selection: CellStateWithGiven[];
 }
 
 const selectRegionCells = <T extends RemovePayload>(
@@ -65,7 +65,7 @@ export const inputSlice = createSlice({
             const { givens, grid } = action.payload;
             return new Map(Array.from(grid).map(
                 (key) => {
-                    const state: CellState = {
+                    const state: CellStateWithGiven = {
                         isGiven: givens.has(key),
                         center: new Set<CellValue>(),
                         corner: new Set<CellValue>(),
@@ -131,8 +131,40 @@ const cellByKeySelector = (key: PositionKey) => (state: RootState) => (
     cellsSelector(state)?.get(key)
 );
 
+const isDefined = <T>(value: T|undefined): value is T => value !== undefined;
+const isTupleValueDefined = <K, V>(tuple: [K, V|undefined]): tuple is [K, V] => {
+    const [, value] = tuple;
+    return isDefined(value);
+};
+
+type RegionTuple<T> = [PositionKey, T];
+
+const mapRegion = <T>(region: Region, callback: (key: PositionKey) => T|undefined) => {
+    const tuples: RegionTuple<T>[] = Array.from(
+        region,
+        (key): RegionTuple<T|undefined> => [key, callback(key)],
+    ).filter(isTupleValueDefined);
+    return new Map(tuples);
+};
+
+const cellsByRegion = (region: Region) => createSelector(
+    cellsSelector,
+    (cells): PositionMap<CellState> => mapRegion(region, key => cells?.get(key)),
+    {
+        memoizeOptions: {
+            resultEqualityCheck: (left: PositionMap<CellState>, right: PositionMap<CellState>) => (
+                shallowEqual(
+                    Object.fromEntries(left.entries()),
+                    Object.fromEntries(right.entries()),
+                )
+            ),
+        },
+    },
+);
+
 export const selectCell = {
     all: cellsSelector,
     byPosition: (position: Point) => cellByKeySelector(getKey(position)),
     byKey: cellByKeySelector,
+    byRegion: cellsByRegion,
 };

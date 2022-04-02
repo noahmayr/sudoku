@@ -1,4 +1,6 @@
 import { useMemo } from "react";
+import { PositionKey, Region } from "../../state/slice/game";
+import { CellValue } from "../../state/slice/input";
 import { getKey } from "../../util";
 import { PathCommand } from "../SVG/Path";
 
@@ -7,10 +9,31 @@ export type RegionCells = Record<string, true>;
 type SimplePath = [Point, Point];
 
 export interface UseRegionPathProps {
-    region: RegionCells;
+    region: RegionCells|Region;
 }
 
-const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
+const decodeKey = (key: PositionKey): Point => {
+    const values = key.split("|").map((val) => parseInt(val)) as [CellValue, CellValue];
+    return {
+        x: values[0],
+        y: values[1],
+    };
+};
+
+const convert = (region: Region): RegionCells => (
+    Array.from(
+        region,
+        (key): RegionCells => {
+            return { [JSON.stringify(decodeKey(key))]: true };
+        },
+    ).reduce(
+        (acc, cell) => Object.assign(acc, cell),
+        {},
+    )
+);
+
+const useRegionPath = ({ region: newRegion }: UseRegionPathProps): PathCommand[] => {
+    const region = newRegion instanceof Set ? convert(newRegion) : newRegion;
     const segments = useMemo(() => {
         const paths: SimplePath[] = [];
         Object.keys(region).map((key): Point => JSON.parse(key)).forEach(cell => {

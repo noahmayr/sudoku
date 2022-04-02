@@ -1,5 +1,5 @@
+import { CellState, InputState } from "../../state/slice/input";
 import { getKey, merge } from "../../util";
-import { InputState, CellState } from "../Input";
 import { CellSelection, SelectionState, SelectionAction } from "./types.d";
 
 const selectCells = (cells: CellSelection, selecting: boolean, keys: string[]): CellSelection => {
@@ -18,7 +18,7 @@ const selectCells = (cells: CellSelection, selecting: boolean, keys: string[]): 
 
 type CellPredicate = (state: CellState) => unknown
 
-const findCellsWhere = (input: InputState, predicate: CellPredicate) => Object.entries(input)
+const findCellsWhere = (input: InputState, predicate: CellPredicate) => Array.from(input)
     .filter(([, state]) => state !== undefined && predicate(state))
     .map(([key]) => key);
 
@@ -63,12 +63,8 @@ const reduceSelection = (state: SelectionState, action: SelectionAction): Select
             return state;
         }
 
-        const value = cellState.given ?? cellState.value;
-        if (value) {
-            const keys = findCellsWhere(
-                inputState,
-                ({ value: val, given: actual = val }) => actual === value,
-            );
+        if (cellState.value) {
+            const keys = findCellsWhere(inputState, ({ value }) => value === cellState.value);
             const cells = selectCells(state.cells, !(intersect && isSelected), keys);
             if (cells === state.cells) {
                 return state;

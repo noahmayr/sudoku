@@ -1,12 +1,10 @@
 /* eslint-disable no-sparse-arrays */
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { CellValue, GivenDigits, useInputDispatch } from "../context/Input";
-import { game } from "../state/slice/game";
-import { PositionMap, Region } from "../state/types.d";
-import { getKey, range } from "../util";
+import { game, PositionMap, Region } from "../state/slice/game";
+import { range } from "../util";
 import newGetKey from "../state/util/getKey";
-import { input } from "../state/slice/input";
+import { CellValue, input } from "../state/slice/input";
 import { AppDispatch } from "../state/store";
 
 export type GameGivens = (CellValue | undefined)[][];
@@ -202,22 +200,10 @@ const loadGameThunk = (minified: MinifiedGame) => async (dispatch: AppDispatch) 
 };
 
 const useGame = (minified: MinifiedGame) => {
-    const inputDispatch = useInputDispatch();
     const dispatch = useDispatch();
 
     useEffect(() => {
         dispatch(loadGameThunk(minified));
-        inputDispatch({
-            type: "given",
-            values: minified.cells?.map(
-                (row, y): GivenDigits[] => row.map((value, x): GivenDigits => {
-                    if (value === null) {
-                        return {};
-                    }
-                    return { [getKey({ x, y })]: value };
-                }),
-            ).flat(1).reduce((a, b) => Object.assign(a, b), {}) ?? {},
-        });
     }, []);
     return {
         width: minified.width ?? 9,

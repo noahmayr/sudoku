@@ -55,7 +55,7 @@ const Sudoku = () => {
                     <UniqueColumns />
                 </g>
                 <g id="errors">
-                    <Validation cells={cells} size={size} />
+                    <Validation />
                 </g>
                 <SelectionRegion />
             </g>

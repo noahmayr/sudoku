@@ -1,47 +1,43 @@
-import { CellValue } from "../../context/Input";
+import { memo, useMemo } from "react";
 import { useValidator } from "../../context/Validation";
-import { getKey } from "../../util";
-import { CellInterface } from "../Cell/useCells";
-import Region, { RegionProps } from "../Region/Region";
-import { RegionCells } from "../Region/useRegionPath";
+import { PositionKey, Region } from "../../state/slice/game";
+import { CellValue } from "../../state/slice/input";
+import getKey from "../../state/util/getKey";
+import RegionPath, { RegionProps } from "../Region/RegionPath";
 
-const UniqueRegion = ({ className, region }: RegionProps) => {
+const UniqueRegion = ({ className, region: oldRegion }: RegionProps) => {
+    const region: Region = useMemo(
+        () => {
+            const keys = Object.keys(oldRegion).map(oldKey => getKey(JSON.parse(oldKey) as Point));
+            return new Set(keys);
+        },
+        [oldRegion],
+    );
+
     useValidator(region, ({ items }) => {
-        const seen: Record<CellValue, CellInterface[]> = {
+        // console.log("validating");
+        const seen: Record<CellValue, PositionKey[]> = {
             1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [],
         };
-        const filled = items.map(({ cell, state }) => {
-            const { value, given } = state;
-            const val = value ?? given;
-            if (typeof val !== "number") {
+        const filled = items.map(({ key, state }) => {
+            const { value } = state;
+            if (typeof value !== "number") {
                 return false;
             }
-            seen[val]?.push(cell);
+            seen[value]?.push(key);
             return true;
         }).reduce((a, b) => a && b, true);
-        const errors: RegionCells = {};
-
-        Object.values(seen).filter(cells => cells.length > 1).flat(1).forEach(cell => {
-            errors[getKey(cell)] = true;
-        });
+        const errors = Object.values(seen).filter(keys => keys.length > 1).flat(1)
+            .reduce<Region>((set, key) => set.add(key), new Set());
 
         const takenValues = Object.entries(seen).filter(([, cells]) => cells.length)
             .map((([key]) => parseInt(key) as CellValue));
 
         const warnings = items.filter(
-            ({
-                state: {
-                    value: v,
-                    given: val = v,
-                    center,
-                    corner,
-                },
-            }) => takenValues.some(
-                value => val === undefined && (center?.has(value) || corner?.has(value)),
+            ({ state: { value, center, corner } }) => takenValues.some(
+                taken => value === undefined && (center.has(taken) || corner.has(taken)),
             ),
-        ).map(({ cell }): RegionCells => {
-            return { [getKey(cell)]: true };
-        }).reduce((a, b) => Object.assign(a, b), {});
+        ).reduce<Region>((set, { key }) => set.add(key), new Set());
 
         return {
             filled,
@@ -50,7 +46,7 @@ const UniqueRegion = ({ className, region }: RegionProps) => {
         };
     }, [region]);
 
-    return (<Region className={className} region={region} />);
+    return (<RegionPath className={className} region={oldRegion} />);
 };
 
-export default UniqueRegion;
+export default memo(UniqueRegion);
