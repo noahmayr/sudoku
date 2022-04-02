@@ -1,12 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { CellInterface } from "../../components/Cell/useCells";
-import { Region, Row, Column, PositionMap } from "../types.d";
+import { RootState } from "../store";
+import {
+    Region, Row, Column, PositionMap, PositionKey,
+} from "../types.d";
+import getKey from "../util/getKey";
 
 export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
-/*
- * export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
- * export type AnyCellValue = CellValue | AbstractCellValue;
- */
+// export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
+// export type AnyCellValue = CellValue | AbstractCellValue;
 export type CellColor = unknown;
 
 export interface CellState {
@@ -18,31 +19,10 @@ export interface CellState {
 
 type CellValueKeys = Exclude<keyof CellState, "isGiven">
 
-interface HistoricState<T> {
-    past: T[];
-    current: T;
-    future: T[];
-}
+export type InputState = PositionMap<CellState>;
 
-export interface Rules {
-    regions?: Region[];
-    rows?: Row[];
-    columns?: Column[];
-}
-
-export interface GameSettings {
-    dimensions: Size;
-    grid: PositionMap<Point>;
-    rules: Rules;
-}
-
-export interface GameState {
-    settings: GameSettings;
-    cells: PositionMap<CellState>;
-}
-
-export interface InitPayload {
-    settings: GameSettings;
+export interface GivenPayload {
+    grid: Region;
     givens: PositionMap<CellState["value"]>
 }
 
@@ -55,14 +35,36 @@ export interface InputPayload extends RemovePayload {
     value: Required<CellState>["value"];
 }
 
-export const gameSlice = createSlice({
-    name: "game",
-    initialState: null as GameState|null,
+type InputReducer<T extends RemovePayload> =
+    (draft: InputState|null, action: PayloadAction<T>) => void;
+
+type WithSelection<T extends RemovePayload> = T & {
+    selection: CellState[];
+}
+
+const selectRegionCells = <T extends RemovePayload>(
+    reducer: InputReducer<WithSelection<T>>,
+): InputReducer<T> => (
+        (draft, action): ReturnType<typeof reducer>|void => {
+            if (draft === null) {
+                return;
+            }
+            const selection = Array.from(draft)
+                .filter(([key, state]) => action.payload.region.has(key) && !state.isGiven)
+                .map(([, state]) => state);
+            // eslint-disable-next-line consistent-return
+            return reducer(draft, { ...action, payload: { ...action.payload, selection } });
+        }
+    );
+
+export const inputSlice = createSlice({
+    name: "input",
+    initialState: null as InputState|null,
     reducers: {
-        loadGame: (draft, action: PayloadAction<InitPayload>) => {
-            const { settings, givens } = action.payload;
-            const cells = new Map(Array.from(settings.grid.keys()).map(
-                key => {
+        givens: (draft, action: PayloadAction<GivenPayload>) => {
+            const { givens, grid } = action.payload;
+            return new Map(Array.from(grid).map(
+                (key) => {
                     const state: CellState = {
                         isGiven: givens.has(key),
                         center: new Set<CellValue>(),
@@ -74,19 +76,10 @@ export const gameSlice = createSlice({
                     return [key, state];
                 },
             ));
-            return {
-                settings,
-                cells,
-            };
         },
-        input: (draft, action: PayloadAction<InputPayload>) => {
-            if (draft === null) {
-                return;
-            }
-            const { region, type, value } = action.payload;
-            const selection = Array.from(draft.cells)
-                .filter(([key, state]) => region.has(key) && !state.isGiven)
-                .map(([, state]) => state);
+        value: selectRegionCells((draft, action: PayloadAction<WithSelection<InputPayload>>) => {
+            const { selection, type, value } = action.payload;
+
             const allHaveValue = selection.every(state => {
                 if (type === "corner" || type === "center") {
                     return state[type].has(value);
@@ -110,15 +103,10 @@ export const gameSlice = createSlice({
                 }
                 state[type] = value;
             });
-        },
-        remove: (draft, action: PayloadAction<RemovePayload>) => {
-            if (draft === null) {
-                return;
-            }
-            const { region, type } = action.payload;
-            const selection = Array.from(draft.cells)
-                .filter(([key, state]) => region.has(key) && !state.isGiven)
-                .map(([, state]) => state);
+        }),
+        delete: selectRegionCells((draft, action: PayloadAction<WithSelection<RemovePayload>>) => {
+            const { type, selection } = action.payload;
+
             const valueNonEmpty = selection.filter(state => state.value !== undefined);
             if (valueNonEmpty.length) {
                 valueNonEmpty.forEach(state => delete state[type]);
@@ -131,11 +119,20 @@ export const gameSlice = createSlice({
                 return;
             }
             cornerNonEmpty.forEach(state => state.corner.clear());
-        },
+        }),
     },
 });
 
-// Action creators are generated for each case reducer function
-export const { loadGame, input, remove } = gameSlice.actions;
+export const input = inputSlice.actions;
+export default inputSlice.reducer;
 
-export default gameSlice.reducer;
+const cellsSelector = (state: RootState) => state.input;
+const cellByKeySelector = (key: PositionKey) => (state: RootState) => (
+    cellsSelector(state)?.get(key)
+);
+
+export const selectCell = {
+    all: cellsSelector,
+    byPosition: (position: Point) => cellByKeySelector(getKey(position)),
+    byKey: cellByKeySelector,
+};

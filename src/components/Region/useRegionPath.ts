@@ -107,18 +107,21 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             index[getKey(newPath[0])] = newPath;
             index[getKey(newPath[newPath.length - 1])] = newPath;
         });
-        const x: PathCommand[][] = complete.map(path => [...path.map((point, idx): PathCommand => {
-            if (idx === 0) {
+        const x: PathCommand[][] = complete.map(path => [
+            ...path.map((point, idx): PathCommand => {
+                if (idx === 0) {
+                    return {
+                        type: "M",
+                        vector: point,
+                    };
+                }
                 return {
-                    type: "M",
+                    type: "L",
                     vector: point,
                 };
-            }
-            return {
-                type: "L",
-                vector: point,
-            };
-        }), { type: "Z" }]);
+            }),
+            { type: "Z" },
+        ]);
 
         return x.flat(1);
     }, [segments]);

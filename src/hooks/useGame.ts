@@ -2,10 +2,12 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { CellValue, GivenDigits, useInputDispatch } from "../context/Input";
-import { InitPayload, loadGame } from "../state/game/gameSlice";
+import { game } from "../state/slice/game";
 import { PositionMap, Region } from "../state/types.d";
 import { getKey, range } from "../util";
 import newGetKey from "../state/util/getKey";
+import { input } from "../state/slice/input";
+import { AppDispatch } from "../state/store";
 
 export type GameGivens = (CellValue | undefined)[][];
 export type GameRegion = (true | undefined)[][];
@@ -14,7 +16,7 @@ interface GameRules {
     rows?: Point[];
     columns?: Point[];
 }
-export interface Game {
+export interface MinifiedGame {
     width?: number;
     height?: number;
     cells?: GameGivens;
@@ -120,7 +122,7 @@ export const STANDARD_RULES: Required<Pick<GameRules, "regions"|"rows"|"columns"
     ],
 };
 
-export const EASY_GAME: Game = {
+export const EASY_GAME: MinifiedGame = {
     width: 9,
     height: 9,
     cells: [
@@ -137,7 +139,7 @@ export const EASY_GAME: Game = {
     rules: STANDARD_RULES,
 };
 
-export const HARD_GAME: Game = {
+export const HARD_GAME: MinifiedGame = {
     width: 9,
     height: 9,
     cells: [
@@ -154,8 +156,8 @@ export const HARD_GAME: Game = {
     rules: STANDARD_RULES,
 };
 
-const transformGame = (raw: Game): InitPayload => {
-    const { width = 9, height = 9, cells } = raw;
+const loadGameThunk = (minified: MinifiedGame) => async (dispatch: AppDispatch) => {
+    const { width = 9, height = 9, cells } = minified;
     const grid: PositionMap<Point> = new Map();
     const givens: PositionMap<CellValue> = new Map();
     range(height).map((y): Point[] => range(width).map(
@@ -176,55 +178,53 @@ const transformGame = (raw: Game): InitPayload => {
             }
         },
     );
-    return {
-        settings: {
-            dimensions: {
-                width,
-                height,
-            },
-            grid,
-            rules: {
-                regions: raw.rules?.regions?.map((region) => {
-                    const result: Region = new Set();
-                    region.forEach((rows, y) => {
-                        rows.forEach((included, x) => {
-                            if (included) {
-                                result.add(newGetKey({ x, y }));
-                            }
-                        });
-                    });
-                    return result;
-                }),
-            },
+    dispatch(game.load({
+        dimensions: {
+            width,
+            height,
         },
-        givens,
-    };
+        grid,
+        rules: {
+            regions: minified.rules?.regions?.map((region) => {
+                const result: Region = new Set();
+                region.forEach((rows, y) => {
+                    rows.forEach((included, x) => {
+                        if (included) {
+                            result.add(newGetKey({ x, y }));
+                        }
+                    });
+                });
+                return result;
+            }),
+        },
+    }));
+    dispatch(input.givens({ givens, grid: new Set(grid.keys()) }));
 };
 
-const useGame = (game: Game) => {
+const useGame = (minified: MinifiedGame) => {
     const inputDispatch = useInputDispatch();
     const dispatch = useDispatch();
 
     useEffect(() => {
-        dispatch(loadGame(transformGame(game)));
+        dispatch(loadGameThunk(minified));
         inputDispatch({
             type: "given",
-            values: game.cells?.map((row, y): GivenDigits[] => row.map((value, x): GivenDigits => {
-                if (value === null) {
-                    return {};
-                }
-                return { [getKey({ x, y })]: value };
-            })).flat(1).reduce((a, b) => Object.assign(a, b), {}) ?? {},
+            values: minified.cells?.map(
+                (row, y): GivenDigits[] => row.map((value, x): GivenDigits => {
+                    if (value === null) {
+                        return {};
+                    }
+                    return { [getKey({ x, y })]: value };
+                }),
+            ).flat(1).reduce((a, b) => Object.assign(a, b), {}) ?? {},
         });
     }, []);
     return {
-        width: game.width ?? 9,
-        height: game.height ?? 9,
-        /*
-         * rules: {
-         *     regions: game.rules.regions?.map
-         * }
-         */
+        width: minified.width ?? 9,
+        height: minified.height ?? 9,
+        // rules: {
+        //     regions: game.rules.regions?.map
+        // }
     };
 };
 

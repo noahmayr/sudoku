@@ -1,6 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectCellByPosition } from "../../state/game/gameSelector";
-import { RootState } from "../../state/store";
+import { selectCell } from "../../state/slice/input";
 import classes from "./Cell.module.scss";
 import { CellInterface } from "./useCells";
 
@@ -21,11 +20,11 @@ const cornerPositions: Point[] = [
 ];
 
 const Cell = ({ cell }: CellProps) => {
-    const newState = useSelector((s: RootState) => selectCellByPosition(s, cell));
-    if (newState === undefined) {
+    const state = useSelector(selectCell.byPosition(cell));
+    if (state === undefined) {
         return null;
     }
-    const { isGiven, value, center, corner } = newState;
+    const { isGiven, value, center, corner } = state;
     return (
         <svg x={cell.x} y={cell.y} width={1} height={1} className={classes.cell}>
             <rect x="0%" y="0%" width="100%" height="100%" className={classes.cellRect} />

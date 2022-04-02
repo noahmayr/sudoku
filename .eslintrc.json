@@ -69,7 +69,7 @@
         "no-restricted-exports": "off",
         "import/extensions": "off",
         "arrow-parens": "off",
-        "multiline-comment-style": ["error", "starred-block"],
+        "multiline-comment-style": ["error", "separate-lines"],
         "arrow-body-style": ["error", "as-needed", { "requireReturnForObjectLiteral": true }],
         "react/jsx-tag-spacing": "error",
         "object-curly-newline": ["error", {
@@ -81,6 +81,8 @@
         "object-property-newline": ["error", {
             "allowAllPropertiesOnSameLine": true
         }],
+        "array-bracket-newline": ["error", {"multiline": true}],
+        "array-element-newline": ["error", "consistent"],
         "radix": "off",
         "no-param-reassign": ["error", {"ignorePropertyModificationsFor": ["draft"]}],
         "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
