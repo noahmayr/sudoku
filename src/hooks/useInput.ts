@@ -1,6 +1,11 @@
+import { useMemo } from "react";
+import { useDispatch } from "react-redux";
 import { CellIndex } from "../components/Cell/useCells";
 import { CellValue, useInputDispatch } from "../context/Input";
 import { useSelectionDispatch, useSelectionState } from "../context/Selection";
+import { input } from "../state/game/gameSlice";
+import { Region } from "../state/types.d";
+import getKey from "../state/util/getKey";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 
 const CELL_VALUES: CellValue[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -17,9 +22,14 @@ const getCellValue = (value: number): CellValue|undefined => {
 };
 
 const useInput = (cells: CellIndex) => {
-    const dispatch = useInputDispatch();
+    const inputDispatch = useInputDispatch();
     const selection = useSelectionState();
+    const region: Region = useMemo(
+        () => new Set(Object.keys(selection).map(oldKey => getKey(JSON.parse(oldKey) as Point))),
+        [selection],
+    );
     const selectionDispatch = useSelectionDispatch();
+    const dispatch = useDispatch();
     useOnGlobalDomEvent(["keydown"], (event) => {
         const meta = event.metaKey || event.ctrlKey;
         // TODO: map modifier key combinations to cellstate types
@@ -31,20 +41,30 @@ const useInput = (cells: CellIndex) => {
             if (value === undefined) {
                 return;
             }
-            dispatch({
+            inputDispatch({
                 type,
                 value,
                 selection,
             });
+            dispatch(input({
+                type,
+                value,
+                region,
+            }));
             return;
         }
         if (event.key === "Backspace") {
             event.preventDefault();
-            dispatch({
+            inputDispatch({
                 type,
                 value: undefined,
                 selection,
             });
+            dispatch(input({
+                type,
+                value: undefined,
+                region,
+            }));
             return;
         }
         if (event.key === "Escape") {
@@ -56,7 +76,7 @@ const useInput = (cells: CellIndex) => {
             event.preventDefault();
             selectionDispatch({ type: "all", cells });
         }
-    }, [selection, dispatch, JSON.stringify(cells)]);
+    }, [selection, inputDispatch, JSON.stringify(cells)]);
 };
 
 export default useInput;

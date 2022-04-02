@@ -1,7 +1,11 @@
 /* eslint-disable no-sparse-arrays */
 import { useEffect } from "react";
+import { useDispatch } from "react-redux";
 import { CellValue, GivenDigits, useInputDispatch } from "../context/Input";
-import { getKey } from "../util";
+import { InitPayload, loadGame } from "../state/game/gameSlice";
+import { PositionMap, Region } from "../state/types.d";
+import { getKey, range } from "../util";
+import newGetKey from "../state/util/getKey";
 
 export type GameGivens = (CellValue | undefined)[][];
 export type GameRegion = (true | undefined)[][];
@@ -150,10 +154,60 @@ export const HARD_GAME: Game = {
     rules: STANDARD_RULES,
 };
 
+const transformGame = (raw: Game): InitPayload => {
+    const { width = 9, height = 9, cells } = raw;
+    const grid: PositionMap<Point> = new Map();
+    const givens: PositionMap<CellValue> = new Map();
+    range(height).map((y): Point[] => range(width).map(
+        (x): Point => {
+            return {
+                x,
+                y,
+            };
+        },
+    )).flat(1).forEach(
+        (cell) => {
+            const key = newGetKey(cell);
+            grid.set(key, cell);
+
+            const given = cells?.[cell.y]?.[cell.x];
+            if (given !== undefined) {
+                givens.set(key, given);
+            }
+        },
+    );
+    return {
+        settings: {
+            dimensions: {
+                width,
+                height,
+            },
+            grid,
+            rules: {
+                regions: raw.rules?.regions?.map((region) => {
+                    const result: Region = new Set();
+                    region.forEach((rows, y) => {
+                        rows.forEach((included, x) => {
+                            if (included) {
+                                result.add(newGetKey({ x, y }));
+                            }
+                        });
+                    });
+                    return result;
+                }),
+            },
+        },
+        givens,
+    };
+};
+
 const useGame = (game: Game) => {
-    const dispatch = useInputDispatch();
+    const inputDispatch = useInputDispatch();
+    const dispatch = useDispatch();
+
     useEffect(() => {
-        dispatch({
+        dispatch(loadGame(transformGame(game)));
+        inputDispatch({
             type: "given",
             values: game.cells?.map((row, y): GivenDigits[] => row.map((value, x): GivenDigits => {
                 if (value === null) {
