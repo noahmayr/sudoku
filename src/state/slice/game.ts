@@ -4,8 +4,8 @@ import { RootState } from "../store";
 export type PositionKey =`${number}|${number}`;
 export type PositionMap<T> = Map<PositionKey, T>;
 export type Region = Set<PositionKey>;
-export type Row = unknown;
-export type Column = unknown;
+export type Row = Set<PositionKey>;
+export type Column = Set<PositionKey>;
 
 export interface Rules {
     regions?: Region[];
@@ -40,4 +40,5 @@ export default gameSlice.reducer;
 export const selectGame = {
     grid: (state: RootState) => state.game?.grid,
     dimensions: (state: RootState) => state.game?.dimensions,
+    rules: (state: RootState) => state.game?.rules,
 };

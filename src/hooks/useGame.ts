@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { game, PositionMap, Region } from "../state/slice/game";
 import { range } from "../util";
-import newGetKey from "../state/util/getKey";
+import getKey from "../state/util/getKey";
 import { CellValue, input } from "../state/slice/input";
 import { AppDispatch } from "../state/store";
 
@@ -167,7 +167,7 @@ const loadGameThunk = (minified: MinifiedGame) => async (dispatch: AppDispatch) 
         },
     )).flat(1).forEach(
         (cell) => {
-            const key = newGetKey(cell);
+            const key = getKey(cell);
             grid.set(key, cell);
 
             const given = cells?.[cell.y]?.[cell.x];
@@ -188,12 +188,18 @@ const loadGameThunk = (minified: MinifiedGame) => async (dispatch: AppDispatch) 
                 region.forEach((rows, y) => {
                     rows.forEach((included, x) => {
                         if (included) {
-                            result.add(newGetKey({ x, y }));
+                            result.add(getKey({ x, y }));
                         }
                     });
                 });
                 return result;
             }),
+            rows: minified.rules?.rows?.map(
+                ({ x, y }) => new Set(range(9).map(offset => getKey({ x: x + offset, y }))),
+            ),
+            columns: minified.rules?.columns?.map(
+                ({ x, y }) => new Set(range(9).map(offset => getKey({ x, y: y + offset }))),
+            ),
         },
     }));
     dispatch(input.givens({ givens, grid: new Set(grid.keys()) }));

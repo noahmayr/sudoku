@@ -2,7 +2,7 @@ import { memo } from "react";
 import { useValidator, ValidatorItem } from "../../context/Validation";
 import { Region } from "../../state/slice/game";
 import { CellValue } from "../../state/slice/input";
-import RegionPath, { RegionProps } from "../Region/RegionPath";
+import RegionPath, { RegionProps } from "./RegionPath";
 
 const filterItems = (
     items: ValidatorItem[],

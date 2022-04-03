@@ -1,10 +1,10 @@
 import classes from "./Sudoku.module.scss";
 import useSelection from "../../hooks/useSelection";
-import ThreeByThree from "../Rules/ThreeByThree";
+import Regions from "../Rules/Regions";
 import useCells from "../Cell/useCells";
 import Validation from "../Validation/Validation";
-import UniqueRows from "../Rules/UniqueRows";
-import UniqueColumns from "../Rules/UniqueColumns";
+import Rows from "../Rules/Rows";
+import Columns from "../Rules/Columns";
 import useInput from "../../hooks/useInput";
 import useGame, { HARD_GAME } from "../../hooks/useGame";
 import Grid from "./Grid";
@@ -29,10 +29,8 @@ const useSvgProps = (size: Size) => {
     };
 };
 
-
 const Sudoku = () => {
     const size = useGame(HARD_GAME);
-
     const svgProps = useSvgProps(size);
     const cells = useCells(size);
     useInput(cells);
@@ -49,10 +47,10 @@ const Sudoku = () => {
             <g id="scale" >
                 <Grid {...size}></Grid>
                 <Cells></Cells>
-                <g id="regions">
-                    <ThreeByThree />
-                    <UniqueRows />
-                    <UniqueColumns />
+                <g id="rules">
+                    <Regions />
+                    <Rows />
+                    <Columns />
                 </g>
                 <g id="errors">
                     <Validation />
