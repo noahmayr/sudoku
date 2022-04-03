@@ -74,7 +74,7 @@ const reduceValidatorList = (state: ValidationRef[], action: ValidationReducerAc
 };
 
 export const ValidationProvider = ({ children }: PropsWithChildren<unknown>) => {
-    const [state, dispatch] = useReducer(reduceValidatorList, []);
+    const [state, dispatch] = useReducer(reduceValidatorList, [] as ValidationState);
     return (
         <ValidationDispatchContext.Provider value={dispatch}>
             <ValidationStateContext.Provider value={state}>
@@ -119,8 +119,4 @@ export const useValidator = (region: Region, validator: Validator, deps: Depende
     }, []);
 };
 
-export const useValidation = (): ValidationResult[] => {
-    const state = useValidationState();
-    // const input = useSelector(selectCell.all);
-    return state.map(validatorRef => validatorRef.current);
-};
+export const useValidation = (): ValidationResult[] => useValidationState().map(ref => ref.current);

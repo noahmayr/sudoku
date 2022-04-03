@@ -1,5 +1,6 @@
 import { useMemo, useRef, useCallback } from "react";
 import { useDraggingSelection, useSelectAllOfType } from "../context/Selection";
+import { getType } from "./useInput";
 import useMouse, { ModifierKeys } from "./useMouse";
 
 const useGetLocalPosition = (element: SVGSVGElement|null) => {
@@ -59,7 +60,7 @@ const useSelection = () => {
             return;
         }
         selectAllOfType({
-            type: "value", position, intersect: shouldIntersect(mods),
+            type: getType(mods), position, intersect: shouldIntersect(mods),
         });
     }, [selectAllOfType, getLocalPosition]);
 

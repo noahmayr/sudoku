@@ -37,4 +37,7 @@ export const game = gameSlice.actions;
 
 export default gameSlice.reducer;
 
-export const selectGame = { grid: (state: RootState) => state.game?.grid };
+export const selectGame = {
+    grid: (state: RootState) => state.game?.grid,
+    dimensions: (state: RootState) => state.game?.dimensions,
+};

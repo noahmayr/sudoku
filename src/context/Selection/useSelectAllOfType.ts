@@ -1,7 +1,10 @@
 import { useCallback } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { CellState, selectCell } from "../../state/slice/input";
+import { useDispatch } from "react-redux";
+import { PositionKey, Region } from "../../state/slice/game";
+import { CellState, InputState } from "../../state/slice/input";
 import { selection } from "../../state/slice/selection";
+import { AppDispatch, AppGetState } from "../../state/store";
+import getKey from "../../state/util/getKey";
 
 export interface SelectAllOfTypeProps {
     type: keyof CellState;
@@ -9,21 +12,79 @@ export interface SelectAllOfTypeProps {
     intersect: boolean;
 }
 
+interface CellPredicateProps {
+    key: PositionKey;
+    state: CellState;
+}
+
+type CellPredicate = ({ key, state }: CellPredicateProps) => unknown
+
+const findCellsWhere = (input: InputState, predicate: CellPredicate) => Array.from(input)
+    .filter(([key, state]) => predicate({ key, state }))
+    .reduce((set, [key]) => set.add(key), new Set() as Region);
+
+const determineType = (cell: CellState, originalType: keyof CellState): keyof CellState => {
+    if (cell.value !== undefined) {
+        return "value";
+    }
+    if (originalType !== "corner" && cell.center.size) {
+        return "center";
+    }
+    return "corner";
+};
+
+const samevalueThunk = ({ type: originalType, position }: SelectAllOfTypeProps) => (
+    (dispatch: AppDispatch, getState: AppGetState) => {
+        const { input } = getState();
+
+        const cell = input?.get(getKey(position));
+
+        if (input === null || cell === undefined) {
+            return;
+        }
+
+        const type = determineType(cell, originalType);
+
+
+        if (type === "value") {
+            const active = cell[type];
+            if (active === undefined) {
+                return;
+            }
+            const region = findCellsWhere(
+                input,
+                ({ state: { [type]: current } }) => current === active,
+            );
+            dispatch(selection.region({ region }));
+            return;
+        }
+
+        const active = cell[type];
+        if (!active.size) {
+            return;
+        }
+
+        const region = findCellsWhere(
+            input,
+            ({ state: { [type]: current } }) => {
+                if (current === undefined || !current.size) {
+                    return false;
+                }
+                return Array.from(active).every((value) => current.has(value));
+            },
+        );
+        dispatch(selection.region({ region }));
+    }
+);
+
 const useSelectAllOfType = () => {
-    const inputState = useSelector(selectCell.all);
     const dispatch = useDispatch();
 
     return useCallback(({ type, position, intersect }: SelectAllOfTypeProps) => {
-        if (inputState === null) {
-            return;
-        }
-        dispatch(selection.samevalue({
-            position,
-            type,
-            intersect,
-            inputState,
+        dispatch(samevalueThunk({
+            type, position, intersect,
         }));
-    }, [inputState, dispatch]);
+    }, [dispatch]);
 };
 
 export default useSelectAllOfType;

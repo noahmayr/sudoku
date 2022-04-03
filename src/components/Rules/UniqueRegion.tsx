@@ -35,7 +35,6 @@ const UniqueRegion = ({ className, region }: RegionProps) => {
                     (value) => state.center.has(value) || state.corner.has(value),
                 ),
             );
-
             return {
                 filled, errors, warnings,
             };

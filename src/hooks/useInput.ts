@@ -1,8 +1,9 @@
 import { useDispatch, useSelector } from "react-redux";
 import { CellIndex } from "../components/Cell/useCells";
 import { selectGame } from "../state/slice/game";
-import { CellValue, input } from "../state/slice/input";
+import { CellState, CellValue, input } from "../state/slice/input";
 import { selection, useSelectionState } from "../state/slice/selection";
+import { ModifierKeys } from "./useMouse";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 
 const CELL_VALUES: CellValue[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -18,15 +19,29 @@ const getCellValue = (value: number): CellValue|undefined => {
     return undefined;
 };
 
+export const getModifiers = (
+    { metaKey: meta, ctrlKey: ctrl, shiftKey: shift, altKey: alt }: KeyboardEvent|MouseEvent,
+): ModifierKeys => {
+    return {
+        meta, ctrl, shift, alt,
+    };
+};
+
+// TODO: map modifier key combinations to cellstate types
+export const getType = (mods: ModifierKeys): keyof CellState => {
+    const meta = mods.meta || mods.ctrl;
+    // eslint-disable-next-line no-nested-ternary
+    return meta ? "center" : mods.shift ? "corner" : "value";
+};
+
 const useInput = (cells: CellIndex) => {
     const region = useSelectionState();
     const grid = useSelector(selectGame.grid);
     const dispatch = useDispatch();
     useOnGlobalDomEvent(["keydown"], (event) => {
-        const meta = event.metaKey || event.ctrlKey;
-        // TODO: map modifier key combinations to cellstate types
-        // eslint-disable-next-line no-nested-ternary
-        const type = meta ? "center" : event.shiftKey ? "corner" : "value";
+        const mods = getModifiers(event);
+        const type = getType(mods);
+
         if (event.code.startsWith("Digit")) {
             event.preventDefault();
             const value = getCellValue(Number(event.code.replace("Digit", "")));
@@ -53,9 +68,9 @@ const useInput = (cells: CellIndex) => {
             dispatch(selection.reset());
         }
 
-        if (event.key === "a" && meta) {
+        if (event.key === "a" && mods.meta) {
             event.preventDefault();
-            dispatch(selection.all({ region: new Set(grid?.keys()) }));
+            dispatch(selection.region({ region: new Set(grid?.keys()) }));
         }
     }, [region, dispatch, JSON.stringify(cells)]);
 };

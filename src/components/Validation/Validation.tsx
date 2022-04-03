@@ -1,6 +1,7 @@
 import { memo } from "react";
+import { useSelector } from "react-redux";
 import { useValidation } from "../../context/Validation";
-import { Region } from "../../state/slice/game";
+import { Region, selectGame } from "../../state/slice/game";
 import RegionPath from "../Region/RegionPath";
 import classes from "./Validation.module.scss";
 
@@ -12,6 +13,7 @@ interface ValidationState {
 
 const Validation = () => {
     const results = useValidation();
+    const dimensions = useSelector(selectGame.dimensions);
 
     const state = results.map(
         ({ errors, warnings, filled = true }): ValidationState => {
@@ -31,10 +33,9 @@ const Validation = () => {
         },
     );
 
-    // TODO: use size from store game
-    // if (state.filled && Object.keys(state.errors).length === 0) {
-    //     return (<rect className={classes.success} {...size} />);
-    // }
+    if (dimensions !== undefined && state.filled && Object.keys(state.errors).length === 0) {
+        return (<rect className={classes.success} {...dimensions} />);
+    }
 
     return (
         <>
