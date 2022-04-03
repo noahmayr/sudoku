@@ -1,15 +1,13 @@
 import { useMemo } from "react";
 import { PositionKey, Region } from "../../state/slice/game";
 import { CellValue } from "../../state/slice/input";
-import { getKey } from "../../util";
+import getKey from "../../state/util/getKey";
 import { PathCommand } from "../SVG/Path";
-
-export type RegionCells = Record<string, true>;
 
 type SimplePath = [Point, Point];
 
 export interface UseRegionPathProps {
-    region: RegionCells|Region;
+    region: Region;
 }
 
 const decodeKey = (key: PositionKey): Point => {
@@ -20,45 +18,32 @@ const decodeKey = (key: PositionKey): Point => {
     };
 };
 
-const convert = (region: Region): RegionCells => (
-    Array.from(
-        region,
-        (key): RegionCells => {
-            return { [JSON.stringify(decodeKey(key))]: true };
-        },
-    ).reduce(
-        (acc, cell) => Object.assign(acc, cell),
-        {},
-    )
-);
-
-const useRegionPath = ({ region: newRegion }: UseRegionPathProps): PathCommand[] => {
-    const region = newRegion instanceof Set ? convert(newRegion) : newRegion;
+const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
     const segments = useMemo(() => {
         const paths: SimplePath[] = [];
-        Object.keys(region).map((key): Point => JSON.parse(key)).forEach(cell => {
+        Array.from(region, (key): Point => decodeKey(key)).forEach(cell => {
             const x = cell.x + 0.5;
             const y = cell.y + 0.5;
             const topLeft = { x: x - 0.5, y: y - 0.5 };
             const bottomLeft = { x: x - 0.5, y: y + 0.5 };
             const topRight = { x: x + 0.5, y: y - 0.5 };
             const bottomRight = { x: x + 0.5, y: y + 0.5 };
-            if (!region[getKey({ ...cell, x: cell.x - 1 })]) {
+            if (!region.has(getKey({ ...cell, x: cell.x - 1 }))) {
                 paths.push([topLeft, bottomLeft]);
             }
-            if (!region[getKey({ ...cell, x: cell.x + 1 })]) {
+            if (!region.has(getKey({ ...cell, x: cell.x + 1 }))) {
                 paths.push([bottomRight, topRight]);
             }
-            if (!region[getKey({ ...cell, y: cell.y - 1 })]) {
+            if (!region.has(getKey({ ...cell, y: cell.y - 1 }))) {
                 paths.push([topRight, topLeft]);
             }
-            if (!region[getKey({ ...cell, y: cell.y + 1 })]) {
+            if (!region.has(getKey({ ...cell, y: cell.y + 1 }))) {
                 paths.push([bottomLeft, bottomRight]);
             }
         });
 
         return paths;
-    }, [JSON.stringify(region)]);
+    }, [JSON.stringify(Array.from(region))]);
 
     const commands: PathCommand[] = useMemo(() => {
         const index: Record<string, Point[]> = {};

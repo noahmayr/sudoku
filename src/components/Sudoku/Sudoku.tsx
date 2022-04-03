@@ -48,7 +48,7 @@ const Sudoku = () => {
         >
             <g id="scale" >
                 <Grid {...size}></Grid>
-                <Cells cells={cells}></Cells>
+                <Cells></Cells>
                 <g id="regions">
                     <ThreeByThree />
                     <UniqueRows />

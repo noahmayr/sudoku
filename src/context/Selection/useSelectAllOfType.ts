@@ -13,6 +13,9 @@ const useSelectAllOfType = () => {
     const inputState = useSelector(selectCell.all);
     const dispatch = useSelectionDispatch();
     return useCallback(({ type, position, intersect }: SelectAllOfTypeProps) => {
+        if (inputState === null) {
+            return;
+        }
         dispatch({
             type: "samevalue",
             position,

@@ -1,19 +1,14 @@
+import { PositionKey, Region } from "../../state/slice/game";
 import { CellState, InputState } from "../../state/slice/input";
-import { getKey, merge } from "../../util";
-import { CellSelection, SelectionState, SelectionAction } from "./types.d";
+import getKey from "../../state/util/getKey";
+import { SelectionState, SelectionAction } from "./types.d";
 
-const selectCells = (cells: CellSelection, selecting: boolean, keys: string[]): CellSelection => {
-    if (keys.length === 0 || keys.every(key => !!cells[key] === selecting)) {
-        return cells;
-    }
+const selectCells = (cells: Region, selecting: boolean, keys: PositionKey[]) => {
     if (selecting) {
-        return merge(cells, ...keys.map((key): CellSelection => {
-            return { [key]: true };
-        }));
+        keys.forEach(key => cells.add(key));
+        return;
     }
-    return Object.fromEntries(
-        Object.entries(cells).filter(([key]) => !keys.includes(key)),
-    );
+    keys.forEach(key => cells.delete(key));
 };
 
 type CellPredicate = (state: CellState) => unknown
@@ -22,66 +17,59 @@ const findCellsWhere = (input: InputState, predicate: CellPredicate) => Array.fr
     .filter(([, state]) => state !== undefined && predicate(state))
     .map(([key]) => key);
 
-const reduceSelection = (state: SelectionState, action: SelectionAction): SelectionState => {
+const reduceSelection = (draft: SelectionState, action: SelectionAction) => {
     if (action.type === "reset") {
-        return { cells: {} };
+        draft.cells.clear();
+        delete draft.selecting;
+        return;
     }
+
     if (action.type === "stop") {
-        if (state.selecting === undefined) {
-            return state;
+        if (draft.selecting === undefined) {
+            return;
         }
-        return { cells: state.cells };
+        delete draft.selecting;
     }
+
     if (action.type === "drag") {
         const { position, intersect } = action;
-        const key = position !== undefined ? getKey(position) : undefined;
-        const isSelected = key !== undefined ? !!state.cells[key] : undefined;
-        const selecting = state.selecting ?? !(intersect && isSelected);
-
-        const keys = key === undefined ? [] : [key];
-        if (state.selecting === undefined) {
-            const cells = selectCells(intersect ? state.cells : {}, selecting, keys);
-            return { cells, selecting };
+        if (draft.selecting === undefined && !intersect) {
+            draft.cells.clear();
         }
-
-        const cells = selectCells(state.cells, selecting, keys);
-
-        if (cells === state.cells && selecting === state.selecting) {
-            return state;
+        if (position === undefined) {
+            return;
         }
+        const key = getKey(position);
+        const isSelected = draft.cells.has(key);
+        const selecting = draft.selecting ?? !(intersect && isSelected);
 
-        return { selecting, cells };
+        selectCells(draft.cells, selecting, [key]);
+        draft.selecting = selecting;
+        return;
     }
+
     if (action.type === "samevalue") {
         const { position, inputState, intersect } = action;
         const key = getKey(position);
-        const isSelected = !!state.cells[key];
+        const isSelected = draft.cells.has(key);
 
-        const cellState = inputState[key];
+        const cellState = inputState.get(key);
 
         if (cellState === undefined) {
-            return state;
+            return;
         }
 
         if (cellState.value) {
             const keys = findCellsWhere(inputState, ({ value }) => value === cellState.value);
-            const cells = selectCells(state.cells, !(intersect && isSelected), keys);
-            if (cells === state.cells) {
-                return state;
-            }
-            return { cells, selecting: state.selecting };
+            selectCells(draft.cells, !(intersect && isSelected), keys);
+            return;
         }
-        return state;
+        return;
     }
 
     if (action.type === "all") {
-        const cells = selectCells(state.cells, true, Object.keys(action.cells));
-        if (cells === state.cells) {
-            return state;
-        }
-        return { cells, selecting: state.selecting };
+        selectCells(draft.cells, true, Object.keys(action.cells) as PositionKey[]);
     }
-    return state;
 };
 
 export default reduceSelection;

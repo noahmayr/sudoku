@@ -1,12 +1,8 @@
-import { memo, useMemo } from "react";
+import { memo } from "react";
 import { useValidation } from "../../context/Validation";
 import { Region } from "../../state/slice/game";
 import RegionPath from "../Region/RegionPath";
 import classes from "./Validation.module.scss";
-
-interface GridErrorsProps {
-    size: Size;
-}
 
 interface ValidationState {
     errors: Region;
@@ -35,10 +31,10 @@ const Validation = () => {
         },
     );
 
+    // TODO: use size from store game
     // if (state.filled && Object.keys(state.errors).length === 0) {
     //     return (<rect className={classes.success} {...size} />);
     // }
-    console.log(state.errors, state.warnings);
 
     return (
         <>

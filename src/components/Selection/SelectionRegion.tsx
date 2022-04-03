@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useSelectionState } from "../../context/Selection";
 import RegionPath from "../Region/RegionPath";
 import classes from "./Selection.module.scss";
@@ -11,4 +12,4 @@ const SelectionRegion = () => {
     );
 };
 
-export default SelectionRegion;
+export default memo(SelectionRegion);

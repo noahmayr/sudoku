@@ -1,5 +1,6 @@
 import { useMemo } from "react";
-import { getKey, range } from "../../util";
+import getKey from "../../state/util/getKey";
+import { range } from "../../util";
 
 
 interface UseCellsProps {

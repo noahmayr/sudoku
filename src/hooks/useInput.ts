@@ -1,10 +1,7 @@
-import { useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { CellIndex } from "../components/Cell/useCells";
 import { useSelectionDispatch, useSelectionState } from "../context/Selection";
-import { Region } from "../state/slice/game";
 import { CellValue, input } from "../state/slice/input";
-import getKey from "../state/util/getKey";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 
 const CELL_VALUES: CellValue[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -22,10 +19,7 @@ const getCellValue = (value: number): CellValue|undefined => {
 
 const useInput = (cells: CellIndex) => {
     const selection = useSelectionState();
-    const region: Region = useMemo(
-        () => new Set(Object.keys(selection).map(oldKey => getKey(JSON.parse(oldKey) as Point))),
-        [selection],
-    );
+
     const selectionDispatch = useSelectionDispatch();
     const dispatch = useDispatch();
     useOnGlobalDomEvent(["keydown"], (event) => {
@@ -41,7 +35,7 @@ const useInput = (cells: CellIndex) => {
             }
             dispatch(input.value({
                 type,
-                region,
+                region: selection,
                 value,
             }));
             return;
@@ -50,7 +44,7 @@ const useInput = (cells: CellIndex) => {
             event.preventDefault();
             dispatch(input.delete({
                 type,
-                region,
+                region: selection,
             }));
             return;
         }

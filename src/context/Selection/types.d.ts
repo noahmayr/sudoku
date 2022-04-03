@@ -1,6 +1,7 @@
 import React from "react";
 import { CellIndex } from "../../components/Cell/useCells";
-import { CellState, InputState } from "../Input";
+import { Region } from "../../state/slice/game";
+import { CellState, InputState } from "../../state/slice/input";
 
 export type CellSelection = Record<string, true>;
 
@@ -40,6 +41,6 @@ export type SelectionAction = DraggingSelectionAction
 export type SelectionDispach = React.Dispatch<SelectionAction>;
 
 export interface SelectionState {
-    cells: CellSelection;
+    cells: Region;
     selecting?: boolean;
 }

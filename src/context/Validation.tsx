@@ -30,7 +30,6 @@ export interface ValidationResult {
 }
 
 export type Validator = (props: ValidatorProps) => ValidationResult;
-type ValidatorCallback = () => ValidationResult;
 
 type ValidationRef = React.MutableRefObject<ValidationResult>;
 
