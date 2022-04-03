@@ -1,7 +1,7 @@
 import { useCallback } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CellState, selectCell } from "../../state/slice/input";
-import { useSelectionDispatch } from "./SelectionProvider";
+import { selection } from "../../state/slice/selection";
 
 export interface SelectAllOfTypeProps {
     type: keyof CellState;
@@ -11,18 +11,18 @@ export interface SelectAllOfTypeProps {
 
 const useSelectAllOfType = () => {
     const inputState = useSelector(selectCell.all);
-    const dispatch = useSelectionDispatch();
+    const dispatch = useDispatch();
+
     return useCallback(({ type, position, intersect }: SelectAllOfTypeProps) => {
         if (inputState === null) {
             return;
         }
-        dispatch({
-            type: "samevalue",
+        dispatch(selection.samevalue({
             position,
-            valueType: type,
+            type,
             intersect,
             inputState,
-        });
+        }));
     }, [inputState, dispatch]);
 };
 

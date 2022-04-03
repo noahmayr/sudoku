@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { useSelectionState } from "../../context/Selection";
+import { useSelectionState } from "../../state/slice/selection";
 import RegionPath from "../Region/RegionPath";
 import classes from "./Selection.module.scss";
 

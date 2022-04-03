@@ -1,10 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import game from "./slice/game";
 import input from "./slice/input";
+import selection from "./slice/selection";
 import { serializableMiddleware, serialize } from "./util/serialize";
 
 const store = configureStore({
-    reducer: { game, input },
+    reducer: {
+        game, input, selection,
+    },
     middleware: (getDefaultMiddleWare) => [
         ...getDefaultMiddleWare({ serializableCheck: false }),
         serializableMiddleware,

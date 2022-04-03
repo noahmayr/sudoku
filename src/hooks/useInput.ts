@@ -1,7 +1,8 @@
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { CellIndex } from "../components/Cell/useCells";
-import { useSelectionDispatch, useSelectionState } from "../context/Selection";
+import { selectGame } from "../state/slice/game";
 import { CellValue, input } from "../state/slice/input";
+import { selection, useSelectionState } from "../state/slice/selection";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 
 const CELL_VALUES: CellValue[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -18,9 +19,8 @@ const getCellValue = (value: number): CellValue|undefined => {
 };
 
 const useInput = (cells: CellIndex) => {
-    const selection = useSelectionState();
-
-    const selectionDispatch = useSelectionDispatch();
+    const region = useSelectionState();
+    const grid = useSelector(selectGame.grid);
     const dispatch = useDispatch();
     useOnGlobalDomEvent(["keydown"], (event) => {
         const meta = event.metaKey || event.ctrlKey;
@@ -35,7 +35,7 @@ const useInput = (cells: CellIndex) => {
             }
             dispatch(input.value({
                 type,
-                region: selection,
+                region,
                 value,
             }));
             return;
@@ -44,20 +44,20 @@ const useInput = (cells: CellIndex) => {
             event.preventDefault();
             dispatch(input.delete({
                 type,
-                region: selection,
+                region,
             }));
             return;
         }
         if (event.key === "Escape") {
             event.preventDefault();
-            selectionDispatch({ type: "reset" });
+            dispatch(selection.reset());
         }
 
         if (event.key === "a" && meta) {
             event.preventDefault();
-            selectionDispatch({ type: "all", cells });
+            dispatch(selection.all({ region: new Set(grid?.keys()) }));
         }
-    }, [selection, dispatch, JSON.stringify(cells)]);
+    }, [region, dispatch, JSON.stringify(cells)]);
 };
 
 export default useInput;

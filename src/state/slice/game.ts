@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { RootState } from "../store";
 
 export type PositionKey =`${number}|${number}`;
 export type PositionMap<T> = Map<PositionKey, T>;
@@ -35,3 +36,5 @@ export const gameSlice = createSlice({
 export const game = gameSlice.actions;
 
 export default gameSlice.reducer;
+
+export const selectGame = { grid: (state: RootState) => state.game?.grid };
