@@ -1,40 +1,46 @@
 import { memo } from "react";
-import { useValidator } from "../../context/Validation";
-import { PositionKey, Region } from "../../state/slice/game";
+import { useValidator, ValidatorItem } from "../../context/Validation";
+import { Region } from "../../state/slice/game";
 import { CellValue } from "../../state/slice/input";
 import RegionPath, { RegionProps } from "../Region/RegionPath";
 
+const filterItems = (
+    items: ValidatorItem[],
+    predicate: (item: ValidatorItem) => unknown,
+): Region => (
+    items.filter(predicate).reduce<Region>((set, { key }) => set.add(key), new Set())
+);
+
 const UniqueRegion = ({ className, region }: RegionProps) => {
-    useValidator(region, ({ items }) => {
-        const seen: Record<CellValue, PositionKey[]> = {
-            1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [],
-        };
-        const filled = items.map(({ key, state }) => {
-            const { value } = state;
-            if (typeof value !== "number") {
-                return false;
-            }
-            seen[value]?.push(key);
-            return true;
-        }).reduce((a, b) => a && b, true);
-        const errors = Object.values(seen).filter(keys => keys.length > 1).flat(1)
-            .reduce<Region>((set, key) => set.add(key), new Set());
+    useValidator(
+        region,
+        items => {
+            const seen: Map<CellValue, number> = new Map();
+            const filled = items.map(({ state: { value } }) => {
+                if (value === undefined) {
+                    return false;
+                }
+                seen.set(value, (seen.get(value) ?? 0) + 1);
+                return true;
+            }).reduce((a, b) => a && b, true);
 
-        const takenValues = Object.entries(seen).filter(([, cells]) => cells.length)
-            .map((([key]) => parseInt(key) as CellValue));
+            const errors = filterItems(
+                items,
+                ({ state }) => state.value !== undefined && (seen.get(state.value) ?? 0) > 1,
+            );
 
-        const warnings = items.filter(
-            ({ state: { value, center, corner } }) => takenValues.some(
-                taken => value === undefined && (center.has(taken) || corner.has(taken)),
-            ),
-        ).reduce<Region>((set, { key }) => set.add(key), new Set());
+            const warnings = filterItems(
+                items,
+                ({ state }) => state.value === undefined && Array.from(seen.keys()).some(
+                    (value) => state.center.has(value) || state.corner.has(value),
+                ),
+            );
 
-        return {
-            filled,
-            errors,
-            warnings,
-        };
-    }, [region]);
+            return {
+                filled, errors, warnings,
+            };
+        },
+    );
 
     return (<RegionPath className={className} region={region} />);
 };

@@ -12,13 +12,9 @@ import useSafeContext from "../hooks/useSafeContext";
 import { PositionKey, Region } from "../state/slice/game";
 import { CellState, selectCell } from "../state/slice/input";
 
-interface ValidatorItem {
+export interface ValidatorItem {
     key: PositionKey;
     state: CellState;
-}
-
-interface ValidatorProps {
-    items: ValidatorItem[]
 }
 
 export interface ValidationResult {
@@ -29,7 +25,7 @@ export interface ValidationResult {
     errorSource?: string;
 }
 
-export type Validator = (props: ValidatorProps) => ValidationResult;
+export type Validator = (items: ValidatorItem[]) => ValidationResult;
 
 type ValidationRef = React.MutableRefObject<ValidationResult>;
 
@@ -88,7 +84,7 @@ export const ValidationProvider = ({ children }: PropsWithChildren<unknown>) => 
     );
 };
 
-export const useValidator = (region: Region, validator: Validator, deps: DependencyList) => {
+export const useValidator = (region: Region, validator: Validator, deps: DependencyList = []) => {
     const dispatch = useValidationDispatch();
     const selection = useSelector(selectCell.byRegion(region));
 
@@ -96,7 +92,7 @@ export const useValidator = (region: Region, validator: Validator, deps: Depende
         const items = Array.from(selection, ([key, state]) => {
             return { key, state };
         });
-        return validator({ items });
+        return validator(items);
     }, [selection, ...deps]);
 
     const ref: ValidationRef = useRef<ValidationResult>(result);
