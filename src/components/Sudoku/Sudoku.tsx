@@ -16,8 +16,9 @@ const Sudoku = () => {
     useInput(cells);
 
     return (
-        <Svg size={size} padding={0.25}>
+        <Svg size={size} padding={1}>
             <g id="scale" >
+                <rect x={0} y={0} {...size} fill={"#282c34"} />
                 <Grid {...size}></Grid>
                 <Cells></Cells>
                 <g id="rules">
