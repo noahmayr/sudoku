@@ -19,8 +19,8 @@
     pointer-events: none;
     user-select: none;
     text {
-        fill: #fff;
-        stroke: #fff;
+        fill: currentColor;
+        stroke: currentColor;
         stroke-width: 0.05em;
         width: 100%;
     }
@@ -57,7 +57,6 @@
     }
     
     .given {
-        --given-color: rgb(128, 128, 128);
-        fill: var(--given-color);
+        fill: var(--given-fill);
     }
 }

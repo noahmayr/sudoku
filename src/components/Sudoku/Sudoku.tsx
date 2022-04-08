@@ -11,6 +11,7 @@ import SelectionRegion from "../Selection/SelectionRegion";
 import Svg from "../SVG/Svg";
 import { SAMURAI_SUDOKU } from "../../hooks/samuraiGame";
 import ColoredRegions from "../Extras/ColoredRegions";
+import classes from "./Sudoku.module.scss";
 
 
 const Sudoku = () => {
@@ -20,21 +21,19 @@ const Sudoku = () => {
 
     return (
         <Svg size={size} padding={1}>
-            <g id="scale" >
-                <rect x={0} y={0} {...size} fill={"#282c34"} />
-                <ColoredRegions />
-                <Grid {...size}></Grid>
-                <Cells></Cells>
-                <g id="rules">
-                    <Regions />
-                    <Rows />
-                    <Columns />
-                </g>
-                <g id="errors">
-                    <Validation />
-                </g>
-                <SelectionRegion />
+            <rect x={0} y={0} {...size} className={classes.background} />
+            <ColoredRegions />
+            <Grid {...size}></Grid>
+            <Cells></Cells>
+            <g id="rules">
+                <Regions />
+                <Rows />
+                <Columns />
             </g>
+            <g id="errors">
+                <Validation />
+            </g>
+            <SelectionRegion />
         </Svg>
     );
 };

@@ -1,8 +1,9 @@
 import { PropsWithChildren } from "react";
+import cls from "classnames";
 import useSelection from "../../hooks/useSelection";
 import classes from "./Svg.module.scss";
 
-interface SvgProps {
+interface SvgProps extends HasClassName {
     size: Size;
     padding: number;
 }
@@ -25,13 +26,13 @@ const useSvg = ({ size, padding = 0.25 }: SvgProps) => {
     };
 };
 
-const Svg = ({ children, ...props }: PropsWithChildren<SvgProps>) => {
+const Svg = ({ children, className, ...props }: PropsWithChildren<SvgProps>) => {
     const svgProps = useSvg(props);
     return (
         <svg
             id="svgrenderer"
-            className={classes.svg}
             xmlns="http://www.w3.org/2000/svg"
+            className={cls(classes.svg, className)}
             version="1.1"
             vectorEffect="nonScalingStroke"
             {...svgProps}
