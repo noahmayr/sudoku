@@ -26,7 +26,7 @@ const Cell = ({ cell }: CellProps) => {
     }
     const { isGiven, value, center, corner } = state;
     return (
-        <svg x={cell.x} y={cell.y} width={1} height={1} className={classes.cell}>
+        <svg x={cell.x - 1} y={cell.y - 1} width={1} height={1} className={classes.cell}>
             <rect x="0%" y="0%" width="100%" height="100%" className={classes.cellRect} />
             {
                 (value === undefined) ? (

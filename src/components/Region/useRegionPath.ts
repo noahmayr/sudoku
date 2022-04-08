@@ -18,26 +18,28 @@ const decodeKey = (key: PositionKey): Point => {
     };
 };
 
+const START = -1;
+const END = 0;
+
 const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
     const segments = useMemo(() => {
         const paths: SimplePath[] = [];
-        Array.from(region, (key): Point => decodeKey(key)).forEach(cell => {
-            const x = cell.x + 0.5;
-            const y = cell.y + 0.5;
-            const topLeft = { x: x - 0.5, y: y - 0.5 };
-            const bottomLeft = { x: x - 0.5, y: y + 0.5 };
-            const topRight = { x: x + 0.5, y: y - 0.5 };
-            const bottomRight = { x: x + 0.5, y: y + 0.5 };
-            if (!region.has(getKey({ ...cell, x: cell.x - 1 }))) {
+        Array.from(region, (key): Point => decodeKey(key)).forEach(({ x, y }) => {
+            const topLeft = { x: x + START, y: y + START };
+            const bottomLeft = { x: x + START, y: y + END };
+            const topRight = { x: x + END, y: y + START };
+            const bottomRight = { x: x + END, y: y + END };
+
+            if (!region.has(getKey({ x: x - 1, y }))) {
                 paths.push([topLeft, bottomLeft]);
             }
-            if (!region.has(getKey({ ...cell, x: cell.x + 1 }))) {
+            if (!region.has(getKey({ x: x + 1, y }))) {
                 paths.push([bottomRight, topRight]);
             }
-            if (!region.has(getKey({ ...cell, y: cell.y - 1 }))) {
+            if (!region.has(getKey({ x, y: y - 1 }))) {
                 paths.push([topRight, topLeft]);
             }
-            if (!region.has(getKey({ ...cell, y: cell.y + 1 }))) {
+            if (!region.has(getKey({ x, y: y + 1 }))) {
                 paths.push([bottomLeft, bottomRight]);
             }
         });

@@ -3,9 +3,17 @@ import { useDraggingSelection, useSelectAllOfType } from "../context/Selection";
 import { getType } from "./useInput";
 import useMouse, { ModifierKeys } from "./useMouse";
 
-const useGetLocalPosition = (element: SVGSVGElement|null) => {
+const getViewBoxSize = (element: SVGSVGElement|null): Size|undefined => {
+    if (element === null) {
+        return undefined;
+    }
+    const { width, height } = element.viewBox.baseVal;
+    return { width, height };
+};
+
+const useGetLocalPosition = (element: SVGSVGElement|null, padding: number) => {
     const rect = element?.getBoundingClientRect();
-    const viewBox = element?.viewBox.animVal;
+    const viewBox = getViewBoxSize(element);
 
     const transform = useMemo(() => {
         if (rect === undefined || viewBox === undefined) {
@@ -18,15 +26,15 @@ const useGetLocalPosition = (element: SVGSVGElement|null) => {
         return {
             scale,
             offset: {
-                x: -rect.left / scale.x + viewBox.x,
-                y: -rect.top / scale.y + viewBox.y,
+                x: -rect.left / scale.x - padding,
+                y: -rect.top / scale.y - padding,
             },
             size: {
-                width: viewBox.width + viewBox.x * 2,
-                height: viewBox.height + viewBox.y * 2,
+                width: viewBox.width - padding * 2,
+                height: viewBox.height - padding * 2,
             },
         };
-    }, [JSON.stringify(rect), JSON.stringify(viewBox)]);
+    }, [JSON.stringify(rect), JSON.stringify(viewBox), padding]);
 
     return useCallback((position: Point) => {
         if (transform === undefined) {
@@ -36,11 +44,11 @@ const useGetLocalPosition = (element: SVGSVGElement|null) => {
         const { scale, offset, size } = transform;
 
         const local = {
-            x: Math.ceil(position.x / scale.x + offset.x) - 1,
-            y: Math.ceil(position.y / scale.y + offset.y) - 1,
+            x: Math.ceil(position.x / scale.x + offset.x),
+            y: Math.ceil(position.y / scale.y + offset.y),
         };
 
-        if (local.x < 0 || local.x >= size.width || local.y < 0 || local.y >= size.height) {
+        if (local.x < 1 || local.x > size.width || local.y < 1 || local.y > size.height) {
             return undefined;
         }
 
@@ -50,9 +58,9 @@ const useGetLocalPosition = (element: SVGSVGElement|null) => {
 
 const shouldIntersect = ({ ctrl, alt, meta, shift }: ModifierKeys) => ctrl || alt || meta || shift;
 
-const useSelection = () => {
+const useSelection = (padding: number) => {
     const ref = useRef<SVGSVGElement>(null);
-    const getLocalPosition = useGetLocalPosition(ref.current);
+    const getLocalPosition = useGetLocalPosition(ref.current, padding);
     const selectAllOfType = useSelectAllOfType();
     const mouse = useMouse(({ state, mods }) => {
         const position = getLocalPosition(state.position);

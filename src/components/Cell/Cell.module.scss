@@ -50,7 +50,6 @@
     }
 
     .cellValue {
-        stroke: transparent;
     }
     
     .cellValue, .given {
@@ -58,7 +57,7 @@
     }
     
     .given {
-        stroke: #fff;
-        fill: #333;
+        --given-color: rgb(128, 128, 128);
+        fill: var(--given-color);
     }
 }

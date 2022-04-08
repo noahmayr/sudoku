@@ -158,7 +158,7 @@ const loadGameThunk = (minified: MinifiedGame) => async (dispatch: AppDispatch) 
     const { width = 9, height = 9, cells } = minified;
     const grid: PositionMap<Point> = new Map();
     const givens: PositionMap<CellValue> = new Map();
-    range(height).map((y): Point[] => range(width).map(
+    range(height, 1).map((y): Point[] => range(width, 1).map(
         (x): Point => {
             return {
                 x,
@@ -170,7 +170,7 @@ const loadGameThunk = (minified: MinifiedGame) => async (dispatch: AppDispatch) 
             const key = getKey(cell);
             grid.set(key, cell);
 
-            const given = cells?.[cell.y]?.[cell.x];
+            const given = cells?.[cell.y - 1]?.[cell.x - 1];
             if (given !== undefined) {
                 givens.set(key, given);
             }
@@ -188,17 +188,21 @@ const loadGameThunk = (minified: MinifiedGame) => async (dispatch: AppDispatch) 
                 region.forEach((rows, y) => {
                     rows.forEach((included, x) => {
                         if (included) {
-                            result.add(getKey({ x, y }));
+                            result.add(getKey({ x: x + 1, y: y + 1 }));
                         }
                     });
                 });
                 return result;
             }),
             rows: minified.rules?.rows?.map(
-                ({ x, y }) => new Set(range(9).map(offset => getKey({ x: x + offset, y }))),
+                ({ x, y }) => new Set(range(9, 1).map(
+                    offset => getKey({ x: x + offset, y: y + 1 }),
+                )),
             ),
             columns: minified.rules?.columns?.map(
-                ({ x, y }) => new Set(range(9).map(offset => getKey({ x, y: y + offset }))),
+                ({ x, y }) => new Set(range(9, 1).map(
+                    offset => getKey({ x: x + 1, y: y + offset }),
+                )),
             ),
         },
     }));
