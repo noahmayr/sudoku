@@ -1,14 +1,14 @@
-import Path from "../SVG/Path";
+import Path, { PathProps } from "../SVG/Path";
 import useRegionPath, { UseRegionPathProps } from "./useRegionPath";
 
 
-export interface RegionProps extends UseRegionPathProps, HasClassName {
+export interface RegionProps extends UseRegionPathProps, Omit<PathProps, "commands"> {
 }
 
-const RegionPath = ({ className, ...props }: RegionProps) => {
+const RegionPath = ({ className, style, ...props }: RegionProps) => {
     const commands = useRegionPath(props);
     return (
-        <Path commands={commands} className={className} />
+        <Path commands={commands} className={className} style={style} />
     );
 };
 
