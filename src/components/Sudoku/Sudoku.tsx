@@ -14,7 +14,7 @@ import ColoredRegions from "../Extras/ColoredRegions";
 
 
 const Sudoku = () => {
-    const size = useGame(EASY_GAME);
+    const size = useGame(SAMURAI_SUDOKU);
     const cells = useCells(size);
     useInput(cells);
 

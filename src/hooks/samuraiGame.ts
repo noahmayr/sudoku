@@ -1,6 +1,5 @@
 /* eslint-disable no-sparse-arrays */
-import { range } from "../util";
-import { GameRules, MinifiedGame, STANDARD_RULES } from "./useGame";
+import { MinifiedGame } from "./useGame";
 
 // eslint-disable-next-line import/prefer-default-export
 export const SAMURAI_SUDOKU: MinifiedGame = {

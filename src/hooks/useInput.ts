@@ -5,6 +5,7 @@ import { CellState, CellValue, input } from "../state/slice/input";
 import { selection, useSelectionState } from "../state/slice/selection";
 import { ModifierKeys } from "./useMouse";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
+import { shouldIntersect } from "./useSelection";
 
 const CELL_VALUES: CellValue[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -37,10 +38,12 @@ export const getType = (mods: ModifierKeys): keyof CellState => {
 const useInput = (cells: CellIndex) => {
     const region = useSelectionState();
     const grid = useSelector(selectGame.grid);
+    const size = useSelector(selectGame.dimensions);
     const dispatch = useDispatch();
     useOnGlobalDomEvent(["keydown"], (event) => {
         const mods = getModifiers(event);
         const type = getType(mods);
+        const intersect = shouldIntersect(mods);
 
         if (event.code.startsWith("Digit")) {
             event.preventDefault();
@@ -71,6 +74,32 @@ const useInput = (cells: CellIndex) => {
         if (event.key === "a" && mods.meta) {
             event.preventDefault();
             dispatch(selection.region({ region: new Set(grid?.keys()) }));
+        }
+        if (size !== undefined) {
+            if (event.key.toLocaleLowerCase() === "w" || event.key === "ArrowUp") {
+                event.preventDefault();
+                dispatch(selection.move({
+                    intersect, direction: "up", size,
+                }));
+            }
+            if (event.key.toLocaleLowerCase() === "s" || event.key === "ArrowDown") {
+                event.preventDefault();
+                dispatch(selection.move({
+                    intersect, direction: "down", size,
+                }));
+            }
+            if (event.key.toLocaleLowerCase() === "a" || event.key === "ArrowLeft") {
+                event.preventDefault();
+                dispatch(selection.move({
+                    intersect, direction: "left", size,
+                }));
+            }
+            if (event.key.toLocaleLowerCase() === "d" || event.key === "ArrowRight") {
+                event.preventDefault();
+                dispatch(selection.move({
+                    intersect, direction: "right", size,
+                }));
+            }
         }
     }, [region, dispatch, JSON.stringify(cells)]);
 };

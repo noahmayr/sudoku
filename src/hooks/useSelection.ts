@@ -56,7 +56,9 @@ const useGetLocalPosition = (element: SVGSVGElement|null, padding: number) => {
     }, [transform]);
 };
 
-const shouldIntersect = ({ ctrl, alt, meta, shift }: ModifierKeys) => ctrl || alt || meta || shift;
+export const shouldIntersect = (
+    { ctrl, alt, meta, shift }: ModifierKeys,
+) => ctrl || alt || meta || shift;
 
 const useSelection = (padding: number) => {
     const ref = useRef<SVGSVGElement>(null);

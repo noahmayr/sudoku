@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { PositionKey, Region } from "../../state/slice/game";
 import { CellValue } from "../../state/slice/input";
-import getKey from "../../state/util/getKey";
+import getKey, { decodeKey } from "../../state/util/getKey";
 import { PathCommand } from "../SVG/Path";
 
 type SimplePath = [Point, Point];
@@ -10,13 +10,6 @@ export interface UseRegionPathProps {
     region: Region;
 }
 
-const decodeKey = (key: PositionKey): Point => {
-    const values = key.split("|").map((val) => parseInt(val)) as [CellValue, CellValue];
-    return {
-        x: values[0],
-        y: values[1],
-    };
-};
 
 const START = -1;
 const END = 0;

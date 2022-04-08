@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
-import getKey from "../util/getKey";
+import getKey, { decodeKey } from "../util/getKey";
 import { PositionKey, Region } from "./game";
 
 interface SelectionState {
@@ -15,6 +15,12 @@ interface RegionPayload {
 
 interface DragPayload {
     position?: Point;
+    intersect: boolean;
+}
+
+interface MovePayload {
+    direction: "left"|"right"|"up"|"down";
+    size: Size;
     intersect: boolean;
 }
 
@@ -52,6 +58,46 @@ export const selectionSlice = createSlice({
 
             selectCells(draft.region, selecting, key);
             draft.selecting = selecting;
+        },
+        move: (draft, action: PayloadAction<MovePayload>) => {
+            const { direction, intersect, size } = action.payload;
+            const last = Array.from(draft.region).pop();
+            if (last === undefined) {
+                draft.region.add(getKey({ x: 1, y: 1 }));
+                return;
+            }
+
+            const { x, y } = decodeKey(last);
+
+            let key: PositionKey;
+
+            switch (direction) {
+            case "left":
+                key = getKey({ x: x > 1 ? x - 1 : size.width, y });
+                break;
+            case "right":
+                key = getKey({ x: x < size.width ? x + 1 : 1, y });
+                break;
+            case "up":
+                key = getKey({ x, y: y > 1 ? y - 1 : size.height });
+                break;
+            case "down":
+                key = getKey({ x, y: y < size.height ? y + 1 : 1 });
+                break;
+            default:
+                return;
+            }
+
+            if (!intersect) {
+                draft.region.clear();
+            }
+
+            // since we can't add a key to the set twice,
+            // we remove it and readd it to move the cursor when it's in the selection
+            if (draft.region.has(key)) {
+                draft.region.delete(key);
+            }
+            draft.region.add(key);
         },
         stop: (draft) => {
             delete draft.selecting;
