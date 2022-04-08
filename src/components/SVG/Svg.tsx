@@ -20,7 +20,7 @@ const useSvg = ({ size, padding = 0.25 }: SvgProps) => {
         ref,
         viewBox: `${x} ${y} ${width} ${height}`,
         style: {
-            height: height * 80,
+            maxHeight: `min(max-content, ${height * 80}px)`,
             fontSize: `${1 / 32}rem`,
         },
     };
