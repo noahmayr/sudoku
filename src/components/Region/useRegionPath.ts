@@ -1,6 +1,5 @@
 import { useMemo } from "react";
-import { PositionKey, Region } from "../../state/slice/game";
-import { CellValue } from "../../state/slice/input";
+import { Region } from "../../state/slice/game";
 import getKey, { decodeKey } from "../../state/util/getKey";
 import { PathCommand } from "../SVG/Path";
 
