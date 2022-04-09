@@ -5,18 +5,18 @@ import classes from "./Regions.module.scss";
 
 
 const Rows = () => {
-    const regions = useSelector(selectGame.rules)?.rows;
+    const { rows } = useSelector(selectGame.rules);
 
-    if (regions === undefined) {
+    if (rows === undefined) {
         return null;
     }
 
     return (<>
-        {regions.map(
-            (region, index) => (
+        {rows.map(
+            (row, index) => (
                 <ValidatedRegion
                     key={index}
-                    region={region}
+                    region={row}
                     validationClasses={{ error: classes.error, warning: classes.warning }}
                 />
             ),

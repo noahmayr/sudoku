@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { ColorNames } from "../state/slice/game";
+import { ColorNames, EMPTY_GAME } from "../state/slice/game";
 import { CellValue } from "../state/slice/input";
-import { decompress, EMPTY_GAME, loadGameThunk } from "../state/global/load";
+import { decompress, loadGameThunk } from "../state/global/load";
 
 export type GameGivens = (CellValue | undefined)[][];
 export type GameRegion = (true | undefined)[][];
@@ -38,7 +38,7 @@ const useGame = (fallback: string) => {
         const data = url.searchParams.get("game") ?? fallback;
         const game = decompress(data);
         if (game === undefined) {
-            dispatch(loadGameThunk({ settings: EMPTY_GAME }));
+            dispatch(loadGameThunk({ board: EMPTY_GAME }));
             return;
         }
         dispatch(loadGameThunk(game));

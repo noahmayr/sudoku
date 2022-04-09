@@ -20,9 +20,6 @@ const Sudoku = () => {
     useInput();
 
     const size = useAppSelector(selectGame.dimensions);
-    if (size === undefined) {
-        return null;
-    }
 
     return (
         <Svg size={size} padding={1}>

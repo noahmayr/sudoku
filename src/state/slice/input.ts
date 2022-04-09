@@ -75,7 +75,7 @@ const selectRegionCells = <T extends RemovePayload>(
 
 export const inputSlice = createSlice({
     name: "input",
-    initialState: null as InputState|null,
+    initialState: new Map() as InputState,
     reducers: {
         givens: (draft, action: PayloadAction<GivenPayload>) => {
             const { givens, grid } = action.payload;
@@ -178,9 +178,7 @@ export const inputActions = inputSlice.actions;
 export default inputSlice.reducer;
 
 const cellsSelector = (state: RootState) => state.input;
-const cellByKeySelector = (key: PositionKey) => (state: RootState) => (
-    cellsSelector(state)?.get(key)
-);
+const cellByKeySelector = (key: PositionKey) => (state: RootState) => state.input.get(key);
 
 const isDefined = <T>(value: T|undefined): value is T => value !== undefined;
 const isTupleValueDefined = <K, V>(tuple: [K, V|undefined]): tuple is [K, V] => {

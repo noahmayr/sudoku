@@ -33,7 +33,7 @@ const Validation = () => {
         },
     );
 
-    if (dimensions !== undefined && results.length && state.filled && state.errors.size === 0) {
+    if (results.length && state.filled && state.errors.size === 0) {
         return (<rect className={classes.success} {...dimensions} />);
     }
 

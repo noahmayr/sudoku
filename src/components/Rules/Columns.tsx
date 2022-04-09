@@ -4,18 +4,18 @@ import { selectGame } from "../../state/slice/game";
 import classes from "./Regions.module.scss";
 
 const Columns = () => {
-    const regions = useSelector(selectGame.rules)?.columns;
+    const { columns } = useSelector(selectGame.rules);
 
-    if (regions === undefined) {
+    if (columns === undefined) {
         return null;
     }
 
     return (<>
-        {regions.map(
-            (region, index) => (
+        {columns.map(
+            (column, index) => (
                 <ValidatedRegion
                     key={index}
-                    region={region}
+                    region={column}
                     validationClasses={{ error: classes.error, warning: classes.warning }}
                 />
             ),

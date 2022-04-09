@@ -57,7 +57,7 @@ export const convertGame = (minified: MinifiedGame): PortableGame => {
     );
 
     return {
-        settings: {
+        board: {
             dimensions: {
                 width,
                 height,

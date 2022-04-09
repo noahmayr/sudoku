@@ -4,7 +4,7 @@ import ValidatedRegion from "../Region/ValidatedRegion";
 import { selectGame } from "../../state/slice/game";
 
 const Regions = () => {
-    const regions = useSelector(selectGame.rules)?.regions;
+    const { regions } = useSelector(selectGame.rules);
 
     if (regions === undefined) {
         return null;
