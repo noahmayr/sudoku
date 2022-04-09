@@ -13,12 +13,6 @@ export interface Rules {
     columns?: Column[];
 }
 
-export interface GameSettings {
-    dimensions: Size;
-    grid: PositionMap<Point>;
-    rules: Rules;
-}
-
 export const COLORS = {
     blue: "#1976D2",
     teal: "#009688",
@@ -37,22 +31,22 @@ export interface GameExtras {
     coloredRegions?: Map<ColorNames, Region>;
 }
 
-export interface GameState {
+export interface GameSettings {
     dimensions: Size;
     grid: PositionMap<Point>;
     rules: Rules;
     extras?: GameExtras
 }
 
-export type LoadPayload = GameState;
+export type LoadPayload = GameSettings;
 
 export const gameSlice = createSlice({
     name: "game",
-    initialState: null as GameState|null,
+    initialState: null as GameSettings|null,
     reducers: { load: (draft, { payload: game }: PayloadAction<LoadPayload>) => game },
 });
 
-export const game = gameSlice.actions;
+export const gameActions = gameSlice.actions;
 
 export default gameSlice.reducer;
 

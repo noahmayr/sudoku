@@ -1,8 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
-import { CellIndex } from "../components/Cell/useCells";
 import { selectGame } from "../state/slice/game";
-import { CellState, CellValue, input } from "../state/slice/input";
-import { selection, useSelectionState } from "../state/slice/selection";
+import { CellState, CellValue, inputActions } from "../state/slice/input";
+import { selectionActions, useSelectionState } from "../state/slice/selection";
 import { ModifierKeys } from "./useMouse";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
 import { shouldIntersect } from "./useSelection";
@@ -44,7 +43,7 @@ export const getType = (mods: ModifierKeys): keyof CellState => {
     return "value";
 };
 
-const useInput = (cells: CellIndex) => {
+const useInput = () => {
     const region = useSelectionState();
     const grid = useSelector(selectGame.grid);
     const size = useSelector(selectGame.dimensions);
@@ -60,7 +59,7 @@ const useInput = (cells: CellIndex) => {
             if (value === undefined) {
                 return;
             }
-            dispatch(input.value({
+            dispatch(inputActions.value({
                 type,
                 region,
                 value,
@@ -69,7 +68,7 @@ const useInput = (cells: CellIndex) => {
         }
         if (event.key === "Backspace") {
             event.preventDefault();
-            dispatch(input.delete({
+            dispatch(inputActions.delete({
                 type,
                 region,
             }));
@@ -77,40 +76,40 @@ const useInput = (cells: CellIndex) => {
         }
         if (event.key === "Escape") {
             event.preventDefault();
-            dispatch(selection.reset());
+            dispatch(selectionActions.reset());
         }
 
         if (event.key === "a" && mods.meta) {
             event.preventDefault();
-            dispatch(selection.region({ region: new Set(grid?.keys()) }));
+            dispatch(selectionActions.region({ region: new Set(grid?.keys()) }));
         }
         if (size !== undefined) {
             if (event.key.toLocaleLowerCase() === "w" || event.key === "ArrowUp") {
                 event.preventDefault();
-                dispatch(selection.move({
+                dispatch(selectionActions.move({
                     intersect, direction: "up", size,
                 }));
             }
             if (event.key.toLocaleLowerCase() === "s" || event.key === "ArrowDown") {
                 event.preventDefault();
-                dispatch(selection.move({
+                dispatch(selectionActions.move({
                     intersect, direction: "down", size,
                 }));
             }
             if (event.key.toLocaleLowerCase() === "a" || event.key === "ArrowLeft") {
                 event.preventDefault();
-                dispatch(selection.move({
+                dispatch(selectionActions.move({
                     intersect, direction: "left", size,
                 }));
             }
             if (event.key.toLocaleLowerCase() === "d" || event.key === "ArrowRight") {
                 event.preventDefault();
-                dispatch(selection.move({
+                dispatch(selectionActions.move({
                     intersect, direction: "right", size,
                 }));
             }
         }
-    }, [region, dispatch, JSON.stringify(cells)]);
+    }, [region, dispatch]);
 };
 
 export default useInput;

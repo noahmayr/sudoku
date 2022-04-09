@@ -105,7 +105,7 @@ export const selectionSlice = createSlice({
     },
 });
 
-export const selection = selectionSlice.actions;
+export const selectionActions = selectionSlice.actions;
 export default selectionSlice.reducer;
 
 export const selectSelection = (state: RootState) => state.selection.region;

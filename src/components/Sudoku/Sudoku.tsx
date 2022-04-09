@@ -1,22 +1,28 @@
 import Regions from "../Rules/Regions";
-import useCells from "../Cell/useCells";
 import Validation from "../Validation/Validation";
 import Rows from "../Rules/Rows";
 import Columns from "../Rules/Columns";
 import useInput from "../../hooks/useInput";
-import useGame, { HARD_GAME } from "../../hooks/useGame";
+import useGame from "../../hooks/useGame";
 import Grid from "./Grid";
 import Cells from "../Cell/Cells";
 import SelectionRegion from "../Selection/SelectionRegion";
 import Svg from "../SVG/Svg";
 import ColoredRegions from "../Extras/ColoredRegions";
 import classes from "./Sudoku.module.scss";
+import { selectGame } from "../../state/slice/game";
+import { useAppSelector } from "../../state/store";
+import games from "../../state/global/games";
 
 
 const Sudoku = () => {
-    const size = useGame(HARD_GAME);
-    const cells = useCells(size);
-    useInput(cells);
+    useGame(games.easy);
+    useInput();
+
+    const size = useAppSelector(selectGame.dimensions);
+    if (size === undefined) {
+        return null;
+    }
 
     return (
         <Svg size={size} padding={1}>
