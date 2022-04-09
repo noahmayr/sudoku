@@ -3,7 +3,7 @@ import { Region } from "../../state/slice/game";
 import getKey, { decodeKey } from "../../state/util/getKey";
 import { PathCommand } from "../SVG/Path";
 
-type SimplePath = [Point, Point];
+type SimplePath = [Position, Position];
 
 export interface UseRegionPathProps {
     region: Region;
@@ -16,7 +16,7 @@ const END = 0;
 const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
     const segments = useMemo(() => {
         const paths: SimplePath[] = [];
-        Array.from(region, (key): Point => decodeKey(key)).forEach(({ x, y }) => {
+        Array.from(region, (key): Position => decodeKey(key)).forEach(({ x, y }) => {
             const topLeft = { x: x + START, y: y + START };
             const bottomLeft = { x: x + START, y: y + END };
             const topRight = { x: x + END, y: y + START };
@@ -40,8 +40,8 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
     }, [JSON.stringify(Array.from(region))]);
 
     const commands: PathCommand[] = useMemo(() => {
-        const index: Record<string, Point[]> = {};
-        const complete: Point[][] = [];
+        const index: Record<string, Position[]> = {};
+        const complete: Position[][] = [];
 
         segments.forEach(segment => {
             const start = segment[0];
@@ -95,7 +95,7 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             const aAtStart = getKey(a[0]) !== keyStart;
             const bAtEnd = getKey(b[b.length - 1]) !== keyEnd;
 
-            let newPath: Point[];
+            let newPath: Position[];
 
             if (aAtStart && bAtEnd) {
                 newPath = [...a, ...b];

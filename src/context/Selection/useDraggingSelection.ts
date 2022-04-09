@@ -4,7 +4,7 @@ import { selectionActions } from "../../state/slice/selection";
 
 interface UseDraggingSelectionProps {
     shouldSelect: boolean;
-    position?: Point;
+    position?: Position;
     intersect: boolean;
 }
 

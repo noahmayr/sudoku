@@ -1,7 +1,6 @@
 import { memo } from "react";
 import { useSelector } from "react-redux";
 import { selectGame } from "../../state/slice/game";
-import { RootState } from "../../state/store";
 import Cell from "./Cell";
 
 const Cells = () => {

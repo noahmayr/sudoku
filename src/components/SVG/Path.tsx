@@ -5,7 +5,7 @@ export type PathCommandType = SimplePathCommandType | ScalarPathCommandType | Ve
 
 export interface VectorPathCommand {
     type: VectorPathCommandType;
-    vector: Vector | Point
+    vector: Vector | Position
 }
 
 export interface ScalarPathCommand {

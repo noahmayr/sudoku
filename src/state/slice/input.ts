@@ -213,7 +213,7 @@ const cellsByRegion = (region: Region) => createSelector(
 
 export const selectCell = {
     all: cellsSelector,
-    byPosition: (position: Point) => cellByKeySelector(getKey(position)),
+    byPosition: (position: Position) => cellByKeySelector(getKey(position)),
     byKey: cellByKeySelector,
     byRegion: cellsByRegion,
 };

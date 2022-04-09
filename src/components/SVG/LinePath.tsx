@@ -1,7 +1,7 @@
 import Path, { PathCommand } from "./Path";
 
 export interface Line {
-    start: Point;
+    start: Position;
     vector: Vector;
 }
 

@@ -8,7 +8,7 @@ import getKey from "../../state/util/getKey";
 
 export interface SelectAllOfTypeProps {
     type: keyof CellState;
-    position: Point;
+    position: Position;
     intersect: boolean;
 }
 

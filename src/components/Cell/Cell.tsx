@@ -1,13 +1,12 @@
 import { useSelector } from "react-redux";
 import { CellColors, selectCell } from "../../state/slice/input";
 import classes from "./Cell.module.scss";
-import { CellInterface } from "./useCells";
 
 interface CellProps {
-    cell: CellInterface;
+    cell: Position;
 }
 
-const cornerPositions: Point[] = [
+const cornerPositions: Position[] = [
     { x: -1, y: -1 },
     { x: 1, y: -1 },
     { x: -1, y: 1 },

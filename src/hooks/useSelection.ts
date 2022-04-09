@@ -36,7 +36,7 @@ const useGetLocalPosition = (element: SVGSVGElement|null, padding: number) => {
         };
     }, [JSON.stringify(rect), JSON.stringify(viewBox), padding]);
 
-    return useCallback((position: Point) => {
+    return useCallback((position: Position) => {
         if (transform === undefined) {
             return undefined;
         }

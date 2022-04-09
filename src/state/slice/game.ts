@@ -37,7 +37,7 @@ export interface GameExtras {
 
 export interface GameBoard {
     dimensions: Size;
-    grid: PositionMap<Point>;
+    grid: PositionMap<Position>;
     rules: Rules;
     extras?: GameExtras
 }

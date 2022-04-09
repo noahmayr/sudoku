@@ -14,7 +14,7 @@ interface RegionPayload {
 }
 
 interface DragPayload {
-    position?: Point;
+    position?: Position;
     intersect: boolean;
 }
 

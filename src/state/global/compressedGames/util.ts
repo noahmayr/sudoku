@@ -35,10 +35,10 @@ export const convertRules = (rules: GameRules|undefined): Rules => {
 
 export const convertGame = (minified: MinifiedGame): PortableGame => {
     const { width = 9, height = 9, cells } = minified;
-    const grid: PositionMap<Point> = new Map();
+    const grid: PositionMap<Position> = new Map();
     const givens: PositionMap<CellValue> = new Map();
-    range(height, 1).map((y): Point[] => range(width, 1).map(
-        (x): Point => {
+    range(height, 1).map((y): Position[] => range(width, 1).map(
+        (x): Position => {
             return {
                 x,
                 y,

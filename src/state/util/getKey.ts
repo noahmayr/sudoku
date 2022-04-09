@@ -1,7 +1,7 @@
 import { PositionKey } from "../slice/game";
 import { CellValue } from "../slice/input";
 
-export const decodeKey = (key: PositionKey): Point => {
+export const decodeKey = (key: PositionKey): Position => {
     const values = key.split("|").map((val) => parseInt(val)) as [CellValue, CellValue];
     return {
         x: values[0],
@@ -9,6 +9,6 @@ export const decodeKey = (key: PositionKey): Point => {
     };
 };
 
-const getKey = ({ x, y }: Point): PositionKey => `${x}|${y}`;
+const getKey = ({ x, y }: Position): PositionKey => `${x}|${y}`;
 
 export default getKey;

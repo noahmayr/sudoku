@@ -11,7 +11,7 @@ interface Vector {
     y: number;
 }
 
-type Point = Vector;
+type Position = Vector;
 
 interface Size {
     width: number,

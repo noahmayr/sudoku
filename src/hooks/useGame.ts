@@ -13,8 +13,8 @@ type ColoredRegions = {
 
 export interface GameRules {
     regions?: GameRegion[];
-    rows?: Point[];
-    columns?: Point[];
+    rows?: Position[];
+    columns?: Position[];
 }
 
 export interface GameExtras {
