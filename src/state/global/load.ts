@@ -12,7 +12,7 @@ export interface PortableGame {
 export const loadGameThunk = ({ board, givens = new Map() }: PortableGame) => (
     (dispatch: AppDispatch) => {
         dispatch(gameActions.load(board));
-        dispatch(inputActions.givens({ givens, grid: new Set(board.grid.keys()) }));
+        dispatch(inputActions.givens(givens));
     }
 );
 

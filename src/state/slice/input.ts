@@ -2,7 +2,9 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { shallowEqual } from "react-redux";
 import { RootState } from "../store";
 import getKey from "../util/getKey";
-import { COLORS, PositionKey, PositionMap, Region } from "./game";
+import {
+    COLORS, gameActions, PositionKey, PositionMap, Region,
+} from "./game";
 
 export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 // export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
@@ -36,10 +38,7 @@ export interface CellStateWithGiven extends CellState {
 export type InputState = PositionMap<CellStateWithGiven>;
 export type GivenMap = PositionMap<CellState["value"]>;
 
-export interface GivenPayload {
-    grid: Region;
-    givens: GivenMap;
-}
+export type GivenPayload = GivenMap;
 
 export interface RemovePayload {
     type: keyof CellState;
@@ -77,22 +76,15 @@ export const inputSlice = createSlice({
     name: "input",
     initialState: new Map() as InputState,
     reducers: {
-        givens: (draft, action: PayloadAction<GivenPayload>) => {
-            const { givens, grid } = action.payload;
-            return new Map(Array.from(grid).map(
-                (key) => {
-                    const state: CellStateWithGiven = {
-                        isGiven: givens.has(key),
-                        center: new Set(),
-                        corner: new Set(),
-                        color: new Set(),
-                    };
-                    if (state.isGiven) {
-                        state.value = givens.get(key);
-                    }
-                    return [key, state];
-                },
-            ));
+        givens: (draft, { payload }: PayloadAction<GivenPayload>) => {
+            payload.forEach((value, key) => {
+                const cell = draft.get(key);
+                if (cell === undefined) {
+                    return;
+                }
+                cell.isGiven = true;
+                cell.value = value;
+            });
         },
         value: selectRegionCells((draft, action: PayloadAction<WithSelection<InputPayload>>) => {
             const { selection, type, value } = action.payload;
@@ -171,6 +163,22 @@ export const inputSlice = createSlice({
                 nonEmpty.color.forEach(state => state.color.clear());
             }
         }),
+    },
+    extraReducers: (builder) => {
+        builder.addCase(gameActions.load, (draft, action) => {
+            const { grid } = action.payload;
+            return new Map(Array.from(grid.keys()).map(
+                (key) => {
+                    const state: CellStateWithGiven = {
+                        isGiven: false,
+                        center: new Set(),
+                        corner: new Set(),
+                        color: new Set(),
+                    };
+                    return [key, state];
+                },
+            ));
+        });
     },
 });
 
