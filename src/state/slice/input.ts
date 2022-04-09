@@ -2,17 +2,31 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { shallowEqual } from "react-redux";
 import { RootState } from "../store";
 import getKey from "../util/getKey";
-import { PositionKey, PositionMap, Region } from "./game";
+import { COLORS, PositionKey, PositionMap, Region } from "./game";
 
 export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 // export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
 // export type AnyCellValue = CellValue | AbstractCellValue;
-export type CellColor = unknown;
+
+export const CellColors: Record<CellValue, ValueOf<typeof COLORS>> = {
+    1: COLORS.blue,
+    2: COLORS.teal,
+    3: COLORS.green,
+    4: COLORS.amber,
+    5: COLORS.orange,
+    6: COLORS.red,
+    7: COLORS.purple,
+    8: COLORS.brown,
+    9: COLORS.grey,
+};
+
+export type CellColor = ValueOf<typeof CellColors>;
 
 export interface CellState {
     value?: CellValue;
     center: Set<CellValue>;
     corner: Set<CellValue>;
+    color: Set<CellValue>
 }
 
 export interface CellStateWithGiven extends CellState {
@@ -46,11 +60,12 @@ const selectRegionCells = <T extends RemovePayload>(
     reducer: InputReducer<WithSelection<T>>,
 ): InputReducer<T> => (
         (draft, action): ReturnType<typeof reducer>|void => {
+            const { region } = action.payload;
             if (draft === null) {
                 return;
             }
             const selection = Array.from(draft)
-                .filter(([key, state]) => action.payload.region.has(key) && !state.isGiven)
+                .filter(([key]) => region.has(key))
                 .map(([, state]) => state);
             // eslint-disable-next-line consistent-return
             return reducer(draft, { ...action, payload: { ...action.payload, selection } });
@@ -67,8 +82,9 @@ export const inputSlice = createSlice({
                 (key) => {
                     const state: CellStateWithGiven = {
                         isGiven: givens.has(key),
-                        center: new Set<CellValue>(),
-                        corner: new Set<CellValue>(),
+                        center: new Set(),
+                        corner: new Set(),
+                        color: new Set(),
                     };
                     if (state.isGiven) {
                         state.value = givens.get(key);
@@ -79,46 +95,70 @@ export const inputSlice = createSlice({
         },
         value: selectRegionCells((draft, action: PayloadAction<WithSelection<InputPayload>>) => {
             const { selection, type, value } = action.payload;
+            // const color = CellColors[value];
 
             const allHaveValue = selection.every(state => {
-                if (type === "corner" || type === "center") {
+                if (type === "corner" || type === "center" || type === "color") {
                     return state[type].has(value);
                 }
                 return state[type] === value;
             });
             if (allHaveValue) {
                 selection.forEach(state => {
-                    if (type === "corner" || type === "center") {
-                        state[type].delete(value);
+                    if (type === "value") {
+                        delete state[type];
                         return;
                     }
-                    delete state[type];
+                    if (type === "corner" || type === "center" || type === "color") {
+                        state[type].delete(value);
+                    }
                 });
                 return;
             }
             selection.forEach(state => {
-                if (type === "corner" || type === "center") {
-                    state[type].add(value);
+                if (type === "value") {
+                    state[type] = value;
                     return;
                 }
-                state[type] = value;
+                if (type === "corner" || type === "center" || type === "color") {
+                    state[type].add(value);
+                }
             });
         }),
         delete: selectRegionCells((draft, action: PayloadAction<WithSelection<RemovePayload>>) => {
             const { type, selection } = action.payload;
+            const nonEmpty = {
+                value: selection.filter(state => state.value !== undefined && !state.isGiven),
+                corner: selection.filter(state => state.corner.size),
+                center: selection.filter(state => state.center.size),
+                color: selection.filter(state => state.color.size),
+            };
 
-            const valueNonEmpty = selection.filter(state => state.value !== undefined);
-            if (valueNonEmpty.length) {
-                valueNonEmpty.forEach(state => delete state[type]);
+            if (
+                (
+                    type === "color"
+                    || ((type === "corner" || type === "center") && !nonEmpty.value.length)
+                )
+                && nonEmpty[type].length
+            ) {
+                nonEmpty[type].forEach(state => state[type].clear());
                 return;
             }
-            const cornerNonEmpty = selection.filter(state => state.corner.size);
-            const centerNonEmpty = selection.filter(state => state.center.size);
-            if ((type !== "corner" && centerNonEmpty.length > 0) || cornerNonEmpty.length === 0) {
-                centerNonEmpty.forEach(state => state.center.clear());
+            if (nonEmpty.value.length) {
+                nonEmpty.value.forEach(state => delete state.value);
                 return;
             }
-            cornerNonEmpty.forEach(state => state.corner.clear());
+            if (nonEmpty.center.length) {
+                nonEmpty.center.forEach(state => state.center.clear());
+                return;
+            }
+            if (nonEmpty.corner.length) {
+                nonEmpty.corner.forEach(state => state.corner.clear());
+                return;
+            }
+            if (nonEmpty.color.length) {
+                nonEmpty.color.forEach(state => state.color.clear());
+            }
         }),
     },
 });

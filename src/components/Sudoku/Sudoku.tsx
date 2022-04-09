@@ -15,7 +15,7 @@ import classes from "./Sudoku.module.scss";
 
 
 const Sudoku = () => {
-    const size = useGame(SAMURAI_SUDOKU);
+    const size = useGame(EASY_GAME);
     const cells = useCells(size);
     useInput(cells);
 

@@ -28,11 +28,20 @@ export const getModifiers = (
     };
 };
 
-// TODO: map modifier key combinations to cellstate types
 export const getType = (mods: ModifierKeys): keyof CellState => {
-    const meta = mods.meta || mods.ctrl;
-    // eslint-disable-next-line no-nested-ternary
-    return meta ? "center" : mods.shift ? "corner" : "value";
+    const center = mods.meta || mods.ctrl;
+    const corner = mods.alt || mods.shift;
+
+    if (center && corner) {
+        return "color";
+    }
+    if (center) {
+        return "center";
+    }
+    if (corner) {
+        return "corner";
+    }
+    return "value";
 };
 
 const useInput = (cells: CellIndex) => {

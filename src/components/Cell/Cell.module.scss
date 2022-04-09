@@ -1,5 +1,5 @@
-.cellRect {
-    fill: transparent;
+.color {
+    opacity: 0.5;
 }
 
 .cell {
@@ -49,9 +49,6 @@
         }
     }
 
-    .cellValue {
-    }
-    
     .cellValue, .given {
         font-size: 1.5em;
     }

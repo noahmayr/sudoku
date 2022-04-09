@@ -20,15 +20,15 @@ export interface GameSettings {
 }
 
 export const COLORS = {
-    purple: "#673AB7",
+    blue: "#1976D2",
     teal: "#009688",
-    amber: "#FFC107",
-    grey: "#616161",
-    orange: "#F57C00",
     green: "#4CAF50",
-    blue: "#3F51B5",
+    amber: "#FFC107",
+    orange: "#F57C00",
     red: "#FF5252",
-    brown: "#795548",
+    purple: "#673AB7",
+    brown: "#5D4037",
+    grey: "#616161",
     black: "#000",
 };
 export type ColorNames = keyof typeof COLORS;

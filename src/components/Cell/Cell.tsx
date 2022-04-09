@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { selectCell } from "../../state/slice/input";
+import { CellColors, selectCell } from "../../state/slice/input";
 import classes from "./Cell.module.scss";
 import { CellInterface } from "./useCells";
 
@@ -24,10 +24,26 @@ const Cell = ({ cell }: CellProps) => {
     if (state === undefined) {
         return null;
     }
-    const { isGiven, value, center, corner } = state;
+    const {
+        isGiven, value, center, corner, color: colors,
+    } = state;
+    const colorWidth = 100 / colors.size;
     return (
         <svg x={cell.x - 1} y={cell.y - 1} width={1} height={1} className={classes.cell}>
             <rect x="0%" y="0%" width="100%" height="100%" className={classes.cellRect} />
+            {
+                Array.from(colors).sort().map((color, index) => (
+                    <rect
+                        key={color}
+                        x={`${colorWidth * index}%`}
+                        width={`${colorWidth}%`}
+                        fill={CellColors[color]}
+                        y="0%"
+                        height="100%"
+                        className={classes.color}
+                    />
+                ))
+            }
             {
                 (value === undefined) ? (
                     <text width="1" height="1" x="50%" y="50%" className={classes.centerMark} data-count={center.size}>

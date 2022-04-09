@@ -59,18 +59,20 @@ const samevalueThunk = ({ type: originalType, position }: SelectAllOfTypeProps) 
             return;
         }
 
-        const active = cell[type];
-        if (!active.size) {
+        if (!cell[type].size) {
             return;
         }
 
         const region = findCellsWhere(
             input,
-            ({ state: { [type]: current } }) => {
-                if (current === undefined || !current.size) {
+            ({ state }) => {
+                if (state[type] === undefined || !state[type].size) {
                     return false;
                 }
-                return Array.from(active).every((value) => current.has(value));
+                if (type === "color") {
+                    return Array.from(cell[type]).every((value) => state[type].has(value));
+                }
+                return Array.from(cell[type]).every((value) => state[type].has(value));
             },
         );
         dispatch(selection.region({ region }));
