@@ -23,14 +23,29 @@ const findCellsWhere = (input: InputState, predicate: CellPredicate) => Array.fr
     .filter(([key, state]) => predicate({ key, state }))
     .reduce((set, [key]) => set.add(key), new Set() as Region);
 
-const determineType = (cell: CellState, originalType: keyof CellState): keyof CellState => {
+const determineType = (cell: CellState, type: keyof CellState): keyof CellState => {
+    if (
+        (
+            type === "color"
+            || ((type === "corner" || type === "center") && cell.value === undefined)
+        )
+        && cell[type].size
+    ) {
+        return type;
+    }
     if (cell.value !== undefined) {
         return "value";
     }
-    if (originalType !== "corner" && cell.center.size) {
+    if (cell.corner.size) {
+        return "corner";
+    }
+    if (cell.center.size) {
         return "center";
     }
-    return "corner";
+    if (cell.color.size) {
+        return "color";
+    }
+    return type;
 };
 
 const samevalueThunk = ({ type: originalType, position }: SelectAllOfTypeProps) => (
@@ -68,9 +83,6 @@ const samevalueThunk = ({ type: originalType, position }: SelectAllOfTypeProps) 
             ({ state }) => {
                 if (state[type] === undefined || !state[type].size) {
                     return false;
-                }
-                if (type === "color") {
-                    return Array.from(cell[type]).every((value) => state[type].has(value));
                 }
                 return Array.from(cell[type]).every((value) => state[type].has(value));
             },
