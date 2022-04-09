@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
-import UniqueRegion from "../Region/UniqueRegion";
+import ValidatedRegion from "../Region/ValidatedRegion";
 import { selectGame } from "../../state/slice/game";
+import classes from "./Regions.module.scss";
 
 const Columns = () => {
     const regions = useSelector(selectGame.rules)?.columns;
@@ -11,7 +12,13 @@ const Columns = () => {
 
     return (<>
         {regions.map(
-            (region, index) => <UniqueRegion key={index} region={region} />,
+            (region, index) => (
+                <ValidatedRegion
+                    key={index}
+                    region={region}
+                    validationClasses={{ error: classes.error, warning: classes.warning }}
+                />
+            ),
         )}
     </>);
 };
