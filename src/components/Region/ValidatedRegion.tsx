@@ -14,7 +14,7 @@ const filterItems = (
 
 export const uniqueConstraintValidator: Validator = (items: ValidatorItem[]) => {
     const seen: Map<CellValue, number> = new Map();
-    const filled = items.map(({ state: { value } }) => {
+    const filled = items.length > 0 && items.map(({ state: { value } }) => {
         if (value === undefined) {
             return false;
         }
