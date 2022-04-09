@@ -98,40 +98,40 @@ export const inputSlice = createSlice({
             const { selection, type, value } = action.payload;
 
             const allHaveValue = selection.every(state => {
+                if (state.value !== undefined && type !== "color") {
+                    return true;
+                }
                 if (type === "corner" || type === "center" || type === "color") {
                     return state[type].has(value);
-                }
-                if (state.isGiven) {
-                    return true;
                 }
                 return state[type] === value;
             });
 
             if (allHaveValue) {
                 selection.forEach(state => {
-                    if (type === "value") {
-                        if (state.isGiven) {
-                            return;
-                        }
-                        delete state[type];
+                    if (state.isGiven && type !== "color") {
                         return;
                     }
-                    if (type === "corner" || type === "center" || type === "color") {
+                    if (type === "color" || ((type === "corner" || type === "center") && state.value === undefined)) {
                         state[type].delete(value);
+                        return;
+                    }
+                    if (type === "value") {
+                        delete state[type];
                     }
                 });
                 return;
             }
 
             selection.forEach(state => {
+                if (state.isGiven && type !== "color") {
+                    return;
+                }
                 if (type === "value") {
-                    if (state.isGiven) {
-                        return;
-                    }
                     state[type] = value;
                     return;
                 }
-                if (type === "corner" || type === "center" || type === "color") {
+                if (type === "color" || ((type === "corner" || type === "center") && state.value === undefined)) {
                     state[type].add(value);
                 }
             });
