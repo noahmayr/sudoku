@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { PositionKey, Region } from "../../state/slice/game";
 import { CellState, InputState } from "../../state/slice/input";
-import { selection } from "../../state/slice/selection";
+import { selectionActions } from "../../state/slice/selection";
 import { AppDispatch, AppGetState } from "../../state/store";
 import getKey from "../../state/util/getKey";
 
@@ -70,7 +70,7 @@ const samevalueThunk = ({ type: originalType, position }: SelectAllOfTypeProps) 
                 input,
                 ({ state: { [type]: current } }) => current === active,
             );
-            dispatch(selection.region({ region }));
+            dispatch(selectionActions.region({ region }));
             return;
         }
 
@@ -87,7 +87,7 @@ const samevalueThunk = ({ type: originalType, position }: SelectAllOfTypeProps) 
                 return Array.from(cell[type]).every((value) => state[type].has(value));
             },
         );
-        dispatch(selection.region({ region }));
+        dispatch(selectionActions.region({ region }));
     }
 );
 

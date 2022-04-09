@@ -1,5 +1,5 @@
 /* eslint-disable no-sparse-arrays */
-import { MinifiedGame } from "./useGame";
+import { MinifiedGame } from "../../../hooks/useGame";
 
 // eslint-disable-next-line import/prefer-default-export
 export const SAMURAI_SUDOKU: MinifiedGame = {

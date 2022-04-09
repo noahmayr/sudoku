@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
+import { TypedUseSelectorHook, useDispatch, useSelector, useStore } from "react-redux";
 import game from "./slice/game";
 import input from "./slice/input";
 import selection from "./slice/selection";
@@ -26,5 +26,6 @@ export type RootState = ReturnType<AppGetState>
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+export const useAppStore: () => typeof store = useStore;
 
 export default store;

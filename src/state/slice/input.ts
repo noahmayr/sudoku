@@ -34,10 +34,11 @@ export interface CellStateWithGiven extends CellState {
 }
 
 export type InputState = PositionMap<CellStateWithGiven>;
+export type GivenMap = PositionMap<CellState["value"]>;
 
 export interface GivenPayload {
     grid: Region;
-    givens: PositionMap<CellState["value"]>
+    givens: GivenMap;
 }
 
 export interface RemovePayload {
@@ -173,7 +174,7 @@ export const inputSlice = createSlice({
     },
 });
 
-export const input = inputSlice.actions;
+export const inputActions = inputSlice.actions;
 export default inputSlice.reducer;
 
 const cellsSelector = (state: RootState) => state.input;

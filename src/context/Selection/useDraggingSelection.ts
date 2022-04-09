@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { selection } from "../../state/slice/selection";
+import { selectionActions } from "../../state/slice/selection";
 
 interface UseDraggingSelectionProps {
     shouldSelect: boolean;
@@ -13,10 +13,10 @@ const useDraggingSelection = ({ shouldSelect, position, intersect }: UseDragging
 
     useEffect(() => {
         if (!shouldSelect) {
-            dispatch(selection.stop());
+            dispatch(selectionActions.stop());
             return;
         }
-        dispatch(selection.drag({ position, intersect }));
+        dispatch(selectionActions.drag({ position, intersect }));
     }, [shouldSelect, JSON.stringify(position), dispatch, intersect]);
 };
 
