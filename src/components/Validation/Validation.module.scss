@@ -1,23 +1,20 @@
-.error {
-    fill: red;
+.error, .warning, .success {
     fill-opacity: 0.5;
-    opacity: 0.5;
-    stroke: red;
+    opacity: 0.75;
     stroke-width: 0.125em;
+}
+
+.error {
+    fill: var(--validation-color-error);
+    stroke: var(--validation-color-error);
 }
 
 .warning {
-    fill: orange;
-    fill-opacity: 0.5;
-    opacity: 0.5;
-    stroke: orange;
-    stroke-width: 0.125em;
+    fill: var(--validation-color-warning);
+    stroke: var(--validation-color-warning);
 }
 
 .success {
-    fill: green;
-    fill-opacity: 0.5;
-    opacity: 0.5;
-    stroke: green;
-    stroke-width: 0.125em;
+    fill: var(--validation-color-success);
+    stroke: var(--validation-color-success);
 }
