@@ -2,66 +2,79 @@ import {
     DependencyList,
     PropsWithChildren,
     createContext,
-    useCallback,
     useEffect,
     useMemo,
     useReducer,
     useRef,
 } from "react";
-import { CellState, InputState, useInputState } from "./Input";
-import { CellIndex, CellInterface } from "../components/Cell/useCells";
-import { RegionCells } from "../components/Region/useRegionPath";
+import { useSelector } from "react-redux";
 import useSafeContext from "../hooks/useSafeContext";
+import { PositionKey, Region } from "../state/slice/game";
+import { CellState, selectCell } from "../state/slice/input";
 
-interface ValidatorItem {
-    cell: CellInterface;
+export interface ValidatorItem {
+    key: PositionKey;
     state: CellState;
 }
 
-interface ValidatorProps {
-    items: ValidatorItem[]
-}
-
 export interface ValidationResult {
-    errors: RegionCells;
-    warnings: RegionCells;
+    errors: Region;
+    warnings: Region;
     filled?: boolean;
     errorMessage?: string;
     errorSource?: string;
 }
 
-export type Validator = (props: ValidatorProps) => ValidationResult;
-type ValidatorCallback = (cells: CellIndex, input: InputState) => ValidationResult;
+export type Validator = (items: ValidatorItem[]) => ValidationResult;
 
-type ValidatorRef = React.MutableRefObject<ValidatorCallback>;
+type ValidationRef = React.MutableRefObject<ValidationResult>;
 
-interface ValidatorReducerAction {
+interface RegisterValidationAction {
     type: "add" | "remove";
-    ref: ValidatorRef;
+    ref: ValidationRef;
 }
 
-type ValidationDispatch = React.Dispatch<ValidatorReducerAction>;
-type ValidationState = ValidatorRef[];
+interface UpdateValidationAction {
+    type: "update";
+    ref: ValidationRef;
+    result: ValidationResult;
+}
+
+type ValidationReducerAction = RegisterValidationAction | UpdateValidationAction;
+
+type ValidationDispatch = React.Dispatch<ValidationReducerAction>;
+type ValidationState = ValidationRef[];
 
 const ValidationDispatchContext = createContext<ValidationDispatch | undefined>(undefined);
 const ValidationStateContext = createContext<ValidationState | undefined>(undefined);
 
-const useValidationDispatch = () => { return useSafeContext(ValidationDispatchContext, "useValidationDispatch can only be used inside ValidationProvider"); };
+const useValidationDispatch = () => useSafeContext(
+    ValidationDispatchContext,
+    "useValidationDispatch can only be used inside ValidationProvider",
+);
 
-const useValidationState = () => { return useSafeContext(ValidationStateContext, "useValidationState can only be used inside ValidationProvider"); };
+const useValidationState = () => useSafeContext(
+    ValidationStateContext,
+    "useValidationState can only be used inside ValidationProvider",
+);
 
-const reduceValidatorList = (state: ValidatorRef[], { type, ref }: ValidatorReducerAction) => {
+const reduceValidatorList = (state: ValidationRef[], action: ValidationReducerAction) => {
+    const { ref, type } = action;
+    if (type === "update") {
+        ref.current = action.result;
+        return [...state];
+    }
     if (type === "add") {
         return [...state, ref];
     }
     if (type === "remove") {
-        return state.filter(item => { return item !== ref; });
+        return state.filter(item => item !== ref);
     }
     return state;
 };
 
 export const ValidationProvider = ({ children }: PropsWithChildren<unknown>) => {
-    const [state, dispatch] = useReducer(reduceValidatorList, []);
+    const [state, dispatch] = useReducer(reduceValidatorList, [] as ValidationState);
     return (
         <ValidationDispatchContext.Provider value={dispatch}>
             <ValidationStateContext.Provider value={state}>
@@ -71,21 +84,26 @@ export const ValidationProvider = ({ children }: PropsWithChildren<unknown>) => 
     );
 };
 
-export const useValidator = (region: RegionCells, validator: Validator, deps: DependencyList) => {
+export const useValidator = (region: Region, validator: Validator, deps: DependencyList = []) => {
     const dispatch = useValidationDispatch();
-    const callback: ValidatorCallback = useCallback((cellIndex, input) => {
-        const items = Object.keys(region)
-            .map((key): ValidatorItem => {
-                return { cell: cellIndex[key], state: input[key] ?? {} };
-            });
-        return validator({ items });
-    }, [region, ...deps]);
+    const selection = useSelector(selectCell.byRegion(region));
 
-    const ref: ValidatorRef = useRef<ValidatorCallback>(callback);
+    const result: ValidationResult = useMemo(() => {
+        const items = Array.from(selection, ([key, state]) => {
+            return { key, state };
+        });
+        return validator(items);
+    }, [selection, ...deps]);
+
+    const ref: ValidationRef = useRef<ValidationResult>(result);
 
     useEffect(() => {
-        ref.current = callback;
-    }, [callback]);
+        dispatch({
+            type: "update",
+            ref,
+            result,
+        });
+    }, [result]);
 
     useEffect(() => {
         dispatch({
@@ -101,11 +119,4 @@ export const useValidator = (region: RegionCells, validator: Validator, deps: De
     }, []);
 };
 
-export const useValidation = (cells: CellIndex): ValidationResult[] => {
-    const input = useInputState();
-    const state = useValidationState();
-    return useMemo(
-        () => { return state.map(validatorRef => { return validatorRef.current(cells, input); }); },
-        [input, state, JSON.stringify(cells)],
-    );
-};
+export const useValidation = (): ValidationResult[] => useValidationState().map(ref => ref.current);

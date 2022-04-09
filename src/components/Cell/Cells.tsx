@@ -1,20 +1,18 @@
 import { memo } from "react";
-import { getKey } from "../../util";
+import { useSelector } from "react-redux";
+import { RootState } from "../../state/store";
 import Cell from "./Cell";
-import { CellIndex } from "./useCells";
 
-interface CellsProps {
-    cells: CellIndex;
-}
-
-const Cells = ({ cells }: CellsProps) => {
+const Cells = () => {
+    const cells = useSelector((state: RootState) => state.game?.grid);
+    if (cells === undefined) {
+        return null;
+    }
     return (
         <g id="cells">
-            {Object.values(cells).map((cell) => {
-                return (
-                    <Cell key={getKey(cell)} cell={cell}></Cell>
-                );
-            })}
+            {Array.from(cells).map(([key, cell]) => (
+                <Cell key={key} cell={cell}></Cell>
+            ))}
         </g>
     );
 };

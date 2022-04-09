@@ -1,22 +1,14 @@
-import "./App.css";
+import cls from "classnames";
 import Sudoku from "../Sudoku/Sudoku";
 import { ValidationProvider } from "../../context/Validation";
-import { InputProvider } from "../../context/Input";
-import { SelectionProvider } from "../../context/Selection";
+import classes from "./App.module.scss";
 
 function App() {
     return (
-        <div className="App">
-            <header className="App-header">
-                <h1>Sudoku</h1>
-                <ValidationProvider>
-                    <InputProvider>
-                        <SelectionProvider>
-                            <Sudoku></Sudoku>
-                        </SelectionProvider>
-                    </InputProvider>
-                </ValidationProvider>
-            </header>
+        <div className={cls(classes.root, classes.lightTheme)}>
+            <ValidationProvider>
+                <Sudoku></Sudoku>
+            </ValidationProvider>
         </div>
     );
 }

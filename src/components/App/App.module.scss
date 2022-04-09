@@ -1,0 +1,32 @@
+.darkTheme {
+    --background: #161616;
+    --game-background: #2a2a2a;
+    --color: #fff;
+    --given-fill: #808080;
+    --grid: #fff6;
+    --region-border: #aaa;
+}
+
+.lightTheme {
+    --background: #ccc;
+    --game-background: #fff;
+    --color: #333;
+    --given-fill: #808080;
+    --grid: #0008;
+    --region-border: #555;
+}
+
+.root {
+  background-color: var(--background);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: var(--color);
+  --selection-color: #00ffdd;
+  --validation-color-error: #ff0022;
+  --validation-color-warning: #ff8800;
+  --validation-color-success: #00ff6a;
+}

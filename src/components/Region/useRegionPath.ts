@@ -1,41 +1,43 @@
 import { useMemo } from "react";
-import { getKey } from "../../util";
+import { Region } from "../../state/slice/game";
+import getKey, { decodeKey } from "../../state/util/getKey";
 import { PathCommand } from "../SVG/Path";
-
-export type RegionCells = Record<string, true>;
 
 type SimplePath = [Point, Point];
 
 export interface UseRegionPathProps {
-    region: RegionCells;
+    region: Region;
 }
+
+
+const START = -1;
+const END = 0;
 
 const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
     const segments = useMemo(() => {
         const paths: SimplePath[] = [];
-        Object.keys(region).map((key): Point => { return JSON.parse(key); }).forEach(cell => {
-            const x = cell.x + 0.5;
-            const y = cell.y + 0.5;
-            const topLeft = { x: x - 0.5, y: y - 0.5 };
-            const bottomLeft = { x: x - 0.5, y: y + 0.5 };
-            const topRight = { x: x + 0.5, y: y - 0.5 };
-            const bottomRight = { x: x + 0.5, y: y + 0.5 };
-            if (!region[getKey({ ...cell, x: cell.x - 1 })]) {
+        Array.from(region, (key): Point => decodeKey(key)).forEach(({ x, y }) => {
+            const topLeft = { x: x + START, y: y + START };
+            const bottomLeft = { x: x + START, y: y + END };
+            const topRight = { x: x + END, y: y + START };
+            const bottomRight = { x: x + END, y: y + END };
+
+            if (!region.has(getKey({ x: x - 1, y }))) {
                 paths.push([topLeft, bottomLeft]);
             }
-            if (!region[getKey({ ...cell, x: cell.x + 1 })]) {
+            if (!region.has(getKey({ x: x + 1, y }))) {
                 paths.push([bottomRight, topRight]);
             }
-            if (!region[getKey({ ...cell, y: cell.y - 1 })]) {
+            if (!region.has(getKey({ x, y: y - 1 }))) {
                 paths.push([topRight, topLeft]);
             }
-            if (!region[getKey({ ...cell, y: cell.y + 1 })]) {
+            if (!region.has(getKey({ x, y: y + 1 }))) {
                 paths.push([bottomLeft, bottomRight]);
             }
         });
 
         return paths;
-    }, [JSON.stringify(region)]);
+    }, [JSON.stringify(Array.from(region))]);
 
     const commands: PathCommand[] = useMemo(() => {
         const index: Record<string, Point[]> = {};
@@ -85,7 +87,7 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             const b = index[keyEnd];
 
             Object.entries(index)
-                .filter(([, value]) => { return [a, b].includes(value); })
+                .filter(([, value]) => [a, b].includes(value))
                 .forEach(([key]) => {
                     delete index[key];
                 });
@@ -107,8 +109,8 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
             index[getKey(newPath[0])] = newPath;
             index[getKey(newPath[newPath.length - 1])] = newPath;
         });
-        const x: PathCommand[][] = complete.map(path => {
-            return [...path.map((point, idx): PathCommand => {
+        const x: PathCommand[][] = complete.map(path => [
+            ...path.map((point, idx): PathCommand => {
                 if (idx === 0) {
                     return {
                         type: "M",
@@ -119,8 +121,9 @@ const useRegionPath = ({ region }: UseRegionPathProps): PathCommand[] => {
                     type: "L",
                     vector: point,
                 };
-            }), { type: "Z" }];
-        });
+            }),
+            { type: "Z" },
+        ]);
 
         return x.flat(1);
     }, [segments]);

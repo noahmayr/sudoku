@@ -1,14 +1,15 @@
-import { useSelectionState } from "../../context/Selection";
-import Region from "../Region/Region";
+import { memo } from "react";
+import { useSelectionState } from "../../state/slice/selection";
+import RegionPath from "../Region/RegionPath";
 import classes from "./Selection.module.scss";
 
 const SelectionRegion = () => {
     const selection = useSelectionState();
     return (
         <g id="selection">
-            <Region className={classes.root} region={selection} />
+            <RegionPath className={classes.root} region={selection} />
         </g>
     );
 };
 
-export default SelectionRegion;
+export default memo(SelectionRegion);

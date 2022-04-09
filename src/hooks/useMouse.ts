@@ -30,7 +30,7 @@ const MouseMasks = {
 type MouseMask = typeof MouseMasks[keyof typeof MouseMasks];
 
 // eslint-disable-next-line no-bitwise
-const isPressed = (mask: MouseMask, buttons: number) => { return (mask & buttons) === mask; };
+const isPressed = (mask: MouseMask, buttons: number) => (mask & buttons) === mask;
 
 const getMouseButtons = ({ buttons }: MouseEvent) => {
     return {

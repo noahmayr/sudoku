@@ -1,45 +1,48 @@
-import { useMemo } from "react";
+import { memo } from "react";
+import { useSelector } from "react-redux";
 import { useValidation } from "../../context/Validation";
-import { CellIndex } from "../Cell/useCells";
-import Region from "../Region/Region";
-import { RegionCells } from "../Region/useRegionPath";
+import { Region, selectGame } from "../../state/slice/game";
+import RegionPath from "../Region/RegionPath";
 import classes from "./Validation.module.scss";
 
-interface GridErrorsProps {
-    cells: CellIndex;
-    size: Size;
-}
-
 interface ValidationState {
-    errors: RegionCells;
-    warnings: RegionCells;
+    errors: Region;
+    warnings: Region;
     filled: boolean;
 }
 
-const Validation = ({ size, cells }: GridErrorsProps) => {
-    const results = useValidation(cells);
+const Validation = () => {
+    const results = useValidation();
+    const dimensions = useSelector(selectGame.dimensions);
 
-    const state = useMemo(() => {
-        return results.map(({ errors, warnings, filled = true }): ValidationState => {
-            return { errors, warnings, filled };
-        }).reduce((acc: ValidationState, next: ValidationState) => {
-            Object.assign(acc.errors, next.errors);
-            Object.assign(acc.warnings, next.warnings);
+    const state = results.map(
+        ({ errors, warnings, filled = true }): ValidationState => {
+            return {
+                errors, warnings, filled,
+            };
+        },
+    ).reduce(
+        (acc: ValidationState, next: ValidationState) => {
+            next.errors.forEach(acc.errors.add, acc.errors);
+            next.warnings.forEach(acc.warnings.add, acc.warnings);
             acc.filled &&= next.filled;
             return acc;
-        }, { errors: {}, warnings: {}, filled: true });
-    }, [JSON.stringify(cells), JSON.stringify(results)]);
+        },
+        {
+            errors: new Set(), warnings: new Set(), filled: true,
+        },
+    );
 
-    if (state.filled && Object.keys(state.errors).length === 0) {
-        return (<rect className={classes.success} {...size} />);
+    if (dimensions !== undefined && state.filled && state.errors.size === 0) {
+        return (<rect className={classes.success} {...dimensions} />);
     }
 
     return (
         <>
-            <Region className={classes.error} region={state.errors} />
-            <Region className={classes.warning} region={state.warnings} />
+            <RegionPath className={classes.error} region={state.errors} />
+            <RegionPath className={classes.warning} region={state.warnings} />
         </>
     );
 };
 
-export default Validation;
+export default memo(Validation);

@@ -19,9 +19,7 @@ type ListenerMap = {
 const getListener = <T extends EventKey>(
     events: ListenerMap,
     identifier: T,
-): ListenerFor<T> | undefined => {
-    return events[identifier];
-};
+): ListenerFor<T> | undefined => events[identifier];
 
 const eventReducer = (state: ListenerMap, change: ListenerMap): ListenerMap => {
     const identifiers: EventKey[] = [...Object.keys(state), ...Object.keys(change)] as EventKey[];
@@ -46,6 +44,7 @@ const eventReducer = (state: ListenerMap, change: ListenerMap): ListenerMap => {
 const useGlobalDomEvents = (props: ListenerMap) => {
     const [events, updateEvents] = useReducer(eventReducer, {});
 
+    // register events
     useEffect(() => {
         if (isDeepEqual(events, props)) {
             return;
@@ -53,11 +52,11 @@ const useGlobalDomEvents = (props: ListenerMap) => {
         updateEvents(props);
     }, [updateEvents, props]);
 
-    useEffect(() => {
-        return () => {
-            updateEvents({});
-        };
-    }, [updateEvents]);
+    // cleanup
+    useEffect(
+        () => () => updateEvents({}),
+        [updateEvents],
+    );
 };
 
 const useOnGlobalDomEvent = <K extends EventKey>(
@@ -67,7 +66,9 @@ const useOnGlobalDomEvent = <K extends EventKey>(
     const callback = useCallback(listener, deps);
     useGlobalDomEvents(events.map(key => {
         return { [key]: callback };
-    }).reduce((a, b) => { return { ...a, ...b }; }, {}));
+    }).reduce((a, b) => {
+        return { ...a, ...b };
+    }, {}));
 };
 
 export default useOnGlobalDomEvent;

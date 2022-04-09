@@ -1,20 +1,36 @@
 /* eslint-disable no-sparse-arrays */
 import { useEffect } from "react";
-import { CellValue, GivenDigits, useInputDispatch } from "../context/Input";
-import { getKey } from "../util";
+import { useDispatch } from "react-redux";
+import { ColorNames, game, PositionMap, Region } from "../state/slice/game";
+import { range } from "../util";
+import getKey from "../state/util/getKey";
+import { CellValue, input } from "../state/slice/input";
+import { AppDispatch } from "../state/store";
+
 
 export type GameGivens = (CellValue | undefined)[][];
 export type GameRegion = (true | undefined)[][];
-interface GameRules {
+
+type ColoredRegions = {
+    [key in ColorNames]?: GameRegion;
+}
+
+export interface GameRules {
     regions?: GameRegion[];
     rows?: Point[];
     columns?: Point[];
 }
-export interface Game {
+
+export interface GameExtras {
+    coloredRegions: ColoredRegions;
+}
+
+export interface MinifiedGame {
     width?: number;
     height?: number;
     cells?: GameGivens;
     rules?: GameRules;
+    extra?: GameExtras;
 }
 
 export const STANDARD_RULES: Required<Pick<GameRules, "regions"|"rows"|"columns">> = {
@@ -116,7 +132,7 @@ export const STANDARD_RULES: Required<Pick<GameRules, "regions"|"rows"|"columns"
     ],
 };
 
-export const EASY_GAME: Game = {
+export const EASY_GAME: MinifiedGame = {
     width: 9,
     height: 9,
     cells: [
@@ -133,7 +149,7 @@ export const EASY_GAME: Game = {
     rules: STANDARD_RULES,
 };
 
-export const HARD_GAME: Game = {
+export const HARD_GAME: MinifiedGame = {
     width: 9,
     height: 9,
     cells: [
@@ -150,29 +166,82 @@ export const HARD_GAME: Game = {
     rules: STANDARD_RULES,
 };
 
-const useGame = (game: Game) => {
-    const dispatch = useInputDispatch();
-    useEffect(() => {
-        dispatch({
-            type: "given",
-            values: game.cells?.map((row, y): GivenDigits[] => {
-                return row.map((value, x): GivenDigits => {
-                    if (value === null) {
-                        return {};
-                    }
-                    return { [getKey({ x, y })]: value };
-                });
-            }).flat(1).reduce((a, b) => { return Object.assign(a, b); }, {}) ?? {},
+const decompressRegion = (region: GameRegion): Region => {
+    const result: Region = new Set();
+    region.forEach((rows, y) => {
+        rows.forEach((included, x) => {
+            if (included) {
+                result.add(getKey({ x: x + 1, y: y + 1 }));
+            }
         });
+    });
+    return result;
+};
+
+const loadGameThunk = (minified: MinifiedGame) => async (dispatch: AppDispatch) => {
+    const { width = 9, height = 9, cells } = minified;
+    const grid: PositionMap<Point> = new Map();
+    const givens: PositionMap<CellValue> = new Map();
+    range(height, 1).map((y): Point[] => range(width, 1).map(
+        (x): Point => {
+            return {
+                x,
+                y,
+            };
+        },
+    )).flat(1).forEach(
+        (cell) => {
+            const key = getKey(cell);
+            grid.set(key, cell);
+
+            const given = cells?.[cell.y - 1]?.[cell.x - 1];
+            if (given !== undefined) {
+                givens.set(key, given);
+            }
+        },
+    );
+    dispatch(game.load({
+        dimensions: {
+            width,
+            height,
+        },
+        grid,
+        rules: {
+            regions: minified.rules?.regions?.map(decompressRegion),
+            rows: minified.rules?.rows?.map(
+                ({ x, y }) => new Set(range(9, 1).map(
+                    offset => getKey({ x: x + offset, y: y + 1 }),
+                )),
+            ),
+            columns: minified.rules?.columns?.map(
+                ({ x, y }) => new Set(range(9, 1).map(
+                    offset => getKey({ x: x + 1, y: y + offset }),
+                )),
+            ),
+        },
+        extras: {
+            coloredRegions: minified.extra?.coloredRegions ? new Map(
+                Object.entries(minified.extra?.coloredRegions).map(
+                    ([color, region]) => [color as ColorNames, decompressRegion(region)],
+                ),
+            ) : undefined,
+        },
+    }));
+    dispatch(input.givens({ givens, grid: new Set(grid.keys()) }));
+};
+
+const useGame = (minified: MinifiedGame) => {
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(loadGameThunk(minified));
     }, []);
     return {
-        width: game.width ?? 9,
-        height: game.height ?? 9,
-        /*
-         * rules: {
-         *     regions: game.rules.regions?.map
-         * }
-         */
+        width: minified.width ?? 9,
+        height: minified.height ?? 9,
+        // rules: {
+        //     regions: game.rules.regions?.map
+        // }
     };
 };
 

@@ -1,7 +1,11 @@
+import { useDispatch, useSelector } from "react-redux";
 import { CellIndex } from "../components/Cell/useCells";
-import { CellValue, useInputDispatch } from "../context/Input";
-import { useSelectionDispatch, useSelectionState } from "../context/Selection";
+import { selectGame } from "../state/slice/game";
+import { CellState, CellValue, input } from "../state/slice/input";
+import { selection, useSelectionState } from "../state/slice/selection";
+import { ModifierKeys } from "./useMouse";
 import useOnGlobalDomEvent from "./useOnGlobalDomEvent";
+import { shouldIntersect } from "./useSelection";
 
 const CELL_VALUES: CellValue[] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
@@ -16,47 +20,97 @@ const getCellValue = (value: number): CellValue|undefined => {
     return undefined;
 };
 
+export const getModifiers = (
+    { metaKey: meta, ctrlKey: ctrl, shiftKey: shift, altKey: alt }: KeyboardEvent|MouseEvent,
+): ModifierKeys => {
+    return {
+        meta, ctrl, shift, alt,
+    };
+};
+
+export const getType = (mods: ModifierKeys): keyof CellState => {
+    const center = mods.meta || mods.ctrl;
+    const corner = mods.alt || mods.shift;
+
+    if (center && corner) {
+        return "color";
+    }
+    if (center) {
+        return "center";
+    }
+    if (corner) {
+        return "corner";
+    }
+    return "value";
+};
+
 const useInput = (cells: CellIndex) => {
-    const dispatch = useInputDispatch();
-    const selection = useSelectionState();
-    const selectionDispatch = useSelectionDispatch();
+    const region = useSelectionState();
+    const grid = useSelector(selectGame.grid);
+    const size = useSelector(selectGame.dimensions);
+    const dispatch = useDispatch();
     useOnGlobalDomEvent(["keydown"], (event) => {
-        const meta = event.metaKey || event.ctrlKey;
-        // TODO: map modifier key combinations to cellstate types
-        // eslint-disable-next-line no-nested-ternary
-        const type = meta ? "center" : event.shiftKey ? "corner" : "value";
+        const mods = getModifiers(event);
+        const type = getType(mods);
+        const intersect = shouldIntersect(mods);
+
         if (event.code.startsWith("Digit")) {
             event.preventDefault();
             const value = getCellValue(Number(event.code.replace("Digit", "")));
             if (value === undefined) {
                 return;
             }
-            dispatch({
+            dispatch(input.value({
                 type,
+                region,
                 value,
-                selection,
-            });
+            }));
             return;
         }
         if (event.key === "Backspace") {
             event.preventDefault();
-            dispatch({
+            dispatch(input.delete({
                 type,
-                value: undefined,
-                selection,
-            });
+                region,
+            }));
             return;
         }
         if (event.key === "Escape") {
             event.preventDefault();
-            selectionDispatch({ type: "reset" });
+            dispatch(selection.reset());
         }
 
-        if (event.key === "a" && meta) {
+        if (event.key === "a" && mods.meta) {
             event.preventDefault();
-            selectionDispatch({ type: "all", cells });
+            dispatch(selection.region({ region: new Set(grid?.keys()) }));
         }
-    }, [selection, dispatch, JSON.stringify(cells)]);
+        if (size !== undefined) {
+            if (event.key.toLocaleLowerCase() === "w" || event.key === "ArrowUp") {
+                event.preventDefault();
+                dispatch(selection.move({
+                    intersect, direction: "up", size,
+                }));
+            }
+            if (event.key.toLocaleLowerCase() === "s" || event.key === "ArrowDown") {
+                event.preventDefault();
+                dispatch(selection.move({
+                    intersect, direction: "down", size,
+                }));
+            }
+            if (event.key.toLocaleLowerCase() === "a" || event.key === "ArrowLeft") {
+                event.preventDefault();
+                dispatch(selection.move({
+                    intersect, direction: "left", size,
+                }));
+            }
+            if (event.key.toLocaleLowerCase() === "d" || event.key === "ArrowRight") {
+                event.preventDefault();
+                dispatch(selection.move({
+                    intersect, direction: "right", size,
+                }));
+            }
+        }
+    }, [region, dispatch, JSON.stringify(cells)]);
 };
 
 export default useInput;

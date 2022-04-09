@@ -1,6 +1,6 @@
 .root {
-    stroke: aqua;
-    fill:aqua;
+    stroke: var(--selection-color);
+    fill:var(--selection-color);
     fill-opacity: 0.25;
     stroke-width: 0.25em;
     opacity: 0.5;
