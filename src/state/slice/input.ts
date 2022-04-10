@@ -90,7 +90,7 @@ export const inputSlice = createSlice({
             const { selection, type, value } = action.payload;
 
             const allHaveValue = selection.every(state => {
-                if (state.value !== undefined && type !== "color") {
+                if (state.value !== undefined && type !== "color" && type !== "value") {
                     return true;
                 }
                 if (type === "corner" || type === "center" || type === "color") {
