@@ -117,6 +117,8 @@ export const useValidator = (region: Region, validator: Validator, deps: Depende
             });
         };
     }, []);
+
+    return result;
 };
 
 export const useValidation = (): ValidationResult[] => useValidationState().map(ref => ref.current);

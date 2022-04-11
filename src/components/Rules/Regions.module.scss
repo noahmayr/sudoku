@@ -3,3 +3,13 @@
     stroke: var(--region-border);
     stroke-width: 0.125em;
 }
+
+.warning {
+    fill: var(--validation-color-warning);
+    fill-opacity: 0.1;
+}
+
+.error {
+    fill: var(--validation-color-error);
+    fill-opacity: 0.1;
+}

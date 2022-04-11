@@ -14,7 +14,7 @@ export interface MouseState {
         secondary: boolean;
         auxiliary: boolean;
     }
-    position: Point;
+    position: Position;
 }
 
 interface MouseEventProps {

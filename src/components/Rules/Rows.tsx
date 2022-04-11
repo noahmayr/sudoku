@@ -1,17 +1,25 @@
 import { useSelector } from "react-redux";
-import UniqueRegion from "../Region/UniqueRegion";
+import ValidatedRegion from "../Region/ValidatedRegion";
 import { selectGame } from "../../state/slice/game";
+import classes from "./Regions.module.scss";
+
 
 const Rows = () => {
-    const regions = useSelector(selectGame.rules)?.rows;
+    const { rows } = useSelector(selectGame.rules);
 
-    if (regions === undefined) {
+    if (rows === undefined) {
         return null;
     }
 
     return (<>
-        {regions.map(
-            (region, index) => <UniqueRegion key={index} region={region} />,
+        {rows.map(
+            (row, index) => (
+                <ValidatedRegion
+                    key={index}
+                    region={row}
+                    validationClasses={{ error: classes.error, warning: classes.warning }}
+                />
+            ),
         )}
     </>);
 };

@@ -3,11 +3,12 @@ import { TypedUseSelectorHook, useDispatch, useSelector, useStore } from "react-
 import game from "./slice/game";
 import input from "./slice/input";
 import selection from "./slice/selection";
+import settings from "./slice/settings";
 import { serializableMiddleware, serialize } from "./util/serialize";
 
 const store = configureStore({
     reducer: {
-        game, input, selection,
+        game, input, selection, settings,
     },
     middleware: (getDefaultMiddleWare) => [
         ...getDefaultMiddleWare({ serializableCheck: false }),

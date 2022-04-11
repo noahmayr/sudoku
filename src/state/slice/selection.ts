@@ -14,7 +14,7 @@ interface RegionPayload {
 }
 
 interface DragPayload {
-    position?: Point;
+    position?: Position;
     intersect: boolean;
 }
 
@@ -72,20 +72,20 @@ export const selectionSlice = createSlice({
             let key: PositionKey;
 
             switch (direction) {
-            case "left":
-                key = getKey({ x: x > 1 ? x - 1 : size.width, y });
-                break;
-            case "right":
-                key = getKey({ x: x < size.width ? x + 1 : 1, y });
-                break;
-            case "up":
-                key = getKey({ x, y: y > 1 ? y - 1 : size.height });
-                break;
-            case "down":
-                key = getKey({ x, y: y < size.height ? y + 1 : 1 });
-                break;
-            default:
-                return;
+                case "left":
+                    key = getKey({ x: x > 1 ? x - 1 : size.width, y });
+                    break;
+                case "right":
+                    key = getKey({ x: x < size.width ? x + 1 : 1, y });
+                    break;
+                case "up":
+                    key = getKey({ x, y: y > 1 ? y - 1 : size.height });
+                    break;
+                case "down":
+                    key = getKey({ x, y: y < size.height ? y + 1 : 1 });
+                    break;
+                default:
+                    return;
             }
 
             if (!intersect) {

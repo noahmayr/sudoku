@@ -1,5 +1,7 @@
 type KeyOf<T> = keyof T;
-type ValueOf<T> = T[KeyOf<T>];
+type ValueOf<T> = T extends unknown[]|readonly unknown[]
+    ? T[number]
+    : T[KeyOf<T>];
 type ValueForKey<T, K extends KeyOf<T>> = T[K];
 
 interface HasClassName {
@@ -11,7 +13,7 @@ interface Vector {
     y: number;
 }
 
-type Point = Vector;
+type Position = Vector;
 
 interface Size {
     width: number,

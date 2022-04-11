@@ -10,7 +10,7 @@
 .lightTheme {
     --background: #ccc;
     --game-background: #fff;
-    --color: #333;
+    --color: #444;
     --given-fill: #808080;
     --grid: #0008;
     --region-border: #555;
@@ -20,9 +20,10 @@
   background-color: var(--background);
   height: 100vh;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 2em;
   font-size: calc(10px + 2vmin);
   color: var(--color);
   --selection-color: #00ffdd;

@@ -2,7 +2,9 @@ import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { shallowEqual } from "react-redux";
 import { RootState } from "../store";
 import getKey from "../util/getKey";
-import { COLORS, PositionKey, PositionMap, Region } from "./game";
+import {
+    COLORS, gameActions, PositionKey, PositionMap, Region,
+} from "./game";
 
 export type CellValue = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
 // export type AbstractCellValue = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
@@ -36,10 +38,7 @@ export interface CellStateWithGiven extends CellState {
 export type InputState = PositionMap<CellStateWithGiven>;
 export type GivenMap = PositionMap<CellState["value"]>;
 
-export interface GivenPayload {
-    grid: Region;
-    givens: GivenMap;
-}
+export type GivenPayload = GivenMap;
 
 export interface RemovePayload {
     type: keyof CellState;
@@ -75,63 +74,56 @@ const selectRegionCells = <T extends RemovePayload>(
 
 export const inputSlice = createSlice({
     name: "input",
-    initialState: null as InputState|null,
+    initialState: new Map() as InputState,
     reducers: {
-        givens: (draft, action: PayloadAction<GivenPayload>) => {
-            const { givens, grid } = action.payload;
-            return new Map(Array.from(grid).map(
-                (key) => {
-                    const state: CellStateWithGiven = {
-                        isGiven: givens.has(key),
-                        center: new Set(),
-                        corner: new Set(),
-                        color: new Set(),
-                    };
-                    if (state.isGiven) {
-                        state.value = givens.get(key);
-                    }
-                    return [key, state];
-                },
-            ));
+        givens: (draft, { payload }: PayloadAction<GivenPayload>) => {
+            payload.forEach((value, key) => {
+                const cell = draft.get(key);
+                if (cell === undefined) {
+                    return;
+                }
+                cell.isGiven = true;
+                cell.value = value;
+            });
         },
         value: selectRegionCells((draft, action: PayloadAction<WithSelection<InputPayload>>) => {
             const { selection, type, value } = action.payload;
 
             const allHaveValue = selection.every(state => {
+                if (state.value !== undefined && type !== "color" && type !== "value") {
+                    return true;
+                }
                 if (type === "corner" || type === "center" || type === "color") {
                     return state[type].has(value);
-                }
-                if (state.isGiven) {
-                    return true;
                 }
                 return state[type] === value;
             });
 
             if (allHaveValue) {
                 selection.forEach(state => {
-                    if (type === "value") {
-                        if (state.isGiven) {
-                            return;
-                        }
-                        delete state[type];
+                    if (state.isGiven && type !== "color") {
                         return;
                     }
-                    if (type === "corner" || type === "center" || type === "color") {
+                    if (type === "color" || ((type === "corner" || type === "center") && state.value === undefined)) {
                         state[type].delete(value);
+                        return;
+                    }
+                    if (type === "value") {
+                        delete state[type];
                     }
                 });
                 return;
             }
 
             selection.forEach(state => {
+                if (state.isGiven && type !== "color") {
+                    return;
+                }
                 if (type === "value") {
-                    if (state.isGiven) {
-                        return;
-                    }
                     state[type] = value;
                     return;
                 }
-                if (type === "corner" || type === "center" || type === "color") {
+                if (type === "color" || ((type === "corner" || type === "center") && state.value === undefined)) {
                     state[type].add(value);
                 }
             });
@@ -172,15 +164,29 @@ export const inputSlice = createSlice({
             }
         }),
     },
+    extraReducers: (builder) => {
+        builder.addCase(gameActions.load, (draft, action) => {
+            const { grid } = action.payload;
+            return new Map(Array.from(grid.keys()).map(
+                (key) => {
+                    const state: CellStateWithGiven = {
+                        isGiven: false,
+                        center: new Set(),
+                        corner: new Set(),
+                        color: new Set(),
+                    };
+                    return [key, state];
+                },
+            ));
+        });
+    },
 });
 
 export const inputActions = inputSlice.actions;
 export default inputSlice.reducer;
 
 const cellsSelector = (state: RootState) => state.input;
-const cellByKeySelector = (key: PositionKey) => (state: RootState) => (
-    cellsSelector(state)?.get(key)
-);
+const cellByKeySelector = (key: PositionKey) => (state: RootState) => state.input.get(key);
 
 const isDefined = <T>(value: T|undefined): value is T => value !== undefined;
 const isTupleValueDefined = <K, V>(tuple: [K, V|undefined]): tuple is [K, V] => {
@@ -215,7 +221,7 @@ const cellsByRegion = (region: Region) => createSelector(
 
 export const selectCell = {
     all: cellsSelector,
-    byPosition: (position: Point) => cellByKeySelector(getKey(position)),
+    byPosition: (position: Position) => cellByKeySelector(getKey(position)),
     byKey: cellByKeySelector,
     byRegion: cellsByRegion,
 };

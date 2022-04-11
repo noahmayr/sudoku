@@ -5,7 +5,7 @@ export type PathCommandType = SimplePathCommandType | ScalarPathCommandType | Ve
 
 export interface VectorPathCommand {
     type: VectorPathCommandType;
-    vector: Vector | Point
+    vector: Vector | Position
 }
 
 export interface ScalarPathCommand {
@@ -26,21 +26,21 @@ export interface PathProps extends HasClassName {
 
 const stringifyPathCommands = (commands: PathCommand[]): string => commands.map(command => {
     switch (command.type) {
-    case "M":
-    case "m":
-    case "L":
-    case "l":
-        return `${command.type}${command.vector.x} ${command.vector.y}`;
-    case "H":
-    case "h":
-    case "V":
-    case "v":
-        return `${command.type}${command.scalar}`;
-    case "Z":
-    case "z":
-        return `${command.type}`;
-    default:
-        return undefined;
+        case "M":
+        case "m":
+        case "L":
+        case "l":
+            return `${command.type}${command.vector.x} ${command.vector.y}`;
+        case "H":
+        case "h":
+        case "V":
+        case "v":
+            return `${command.type}${command.scalar}`;
+        case "Z":
+        case "z":
+            return `${command.type}`;
+        default:
+            return undefined;
     }
 }).join(" ");
 
