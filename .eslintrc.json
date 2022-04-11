@@ -39,9 +39,33 @@
         "@typescript-eslint"
     ],
     "rules": {
-        "indent": [
-            "error",
-            4
+        "indent": ["error",
+            4,
+            {
+                "SwitchCase": 1,
+                "VariableDeclarator": 1,
+                "outerIIFEBody": 1,
+                // MemberExpression: null,
+                "FunctionDeclaration": {
+                    "parameters": 1,
+                    "body": 1
+                },
+                "FunctionExpression": {
+                    "parameters": 1,
+                    "body": 1
+                },
+                "CallExpression": {
+                    "arguments": 1
+                },
+                "ArrayExpression": 1,
+                "ObjectExpression": 1,
+                "ImportDeclaration": 1,
+                "flatTernaryExpressions": false,
+                // list derived from https://github.com/benjamn/ast-types/blob/HEAD/def/jsx.js
+                "ignoredNodes": ["JSXElement", "JSXElement > *", "JSXAttribute", "JSXIdentifier", "JSXNamespacedName", "JSXMemberExpression", "JSXSpreadAttribute", "JSXExpressionContainer", "JSXOpeningElement", "JSXClosingElement", "JSXFragment", "JSXOpeningFragment", "JSXClosingFragment", "JSXText", "JSXEmptyExpression", "JSXSpreadChild"
+                ],
+                "ignoreComments": false
+            }
         ],
         "linebreak-style": [
             "error",
@@ -50,7 +74,9 @@
         "quotes": [
             "error",
             "double",
-            {"allowTemplateLiterals": true}
+            {
+                "allowTemplateLiterals": true
+            }
         ],
         "semi": [
             "error",
@@ -70,23 +96,74 @@
         "no-restricted-exports": "off",
         "import/extensions": "off",
         "arrow-parens": "off",
-        "multiline-comment-style": ["error", "separate-lines"],
-        "arrow-body-style": ["error", "as-needed", { "requireReturnForObjectLiteral": true }],
+        "multiline-comment-style": [
+            "error",
+            "separate-lines"
+        ],
+        "arrow-body-style": [
+            "error",
+            "as-needed",
+            {
+                "requireReturnForObjectLiteral": true
+            }
+        ],
         "react/jsx-tag-spacing": "error",
-        "object-curly-newline": ["error", {
-            "ObjectExpression": { "multiline": true, "minProperties": 3 },
-            "ObjectPattern": { "multiline": true, "minProperties": 5 },
-            "ImportDeclaration": { "multiline": true, "minProperties": 5 },
-            "ExportDeclaration": { "multiline": true, "minProperties": 5 }
-        }],
-        "object-property-newline": ["error", {
-            "allowAllPropertiesOnSameLine": true
-        }],
-        "array-bracket-newline": ["error", {"multiline": true}],
-        "array-element-newline": ["error", "consistent"],
+        "object-curly-newline": [
+            "error",
+            {
+                "ObjectExpression": {
+                    "multiline": true,
+                    "minProperties": 3
+                },
+                "ObjectPattern": {
+                    "multiline": true,
+                    "minProperties": 5
+                },
+                "ImportDeclaration": {
+                    "multiline": true,
+                    "minProperties": 5
+                },
+                "ExportDeclaration": {
+                    "multiline": true,
+                    "minProperties": 5
+                }
+            }
+        ],
+        "object-property-newline": [
+            "error",
+            {
+                "allowAllPropertiesOnSameLine": true
+            }
+        ],
+        "array-bracket-newline": [
+            "error",
+            {
+                "multiline": true
+            }
+        ],
+        "array-element-newline": [
+            "error",
+            "consistent"
+        ],
         "radix": "off",
-        "no-param-reassign": ["error", {"ignorePropertyModificationsFor": ["draft"]}],
-        "brace-style": ["error", "1tbs", { "allowSingleLine": false }],
-        "function-paren-newline": ["error", "multiline-arguments"]
+        "no-param-reassign": [
+            "error",
+            {
+                "ignorePropertyModificationsFor": [
+                    "draft"
+                ]
+            }
+        ],
+        "brace-style": [
+            "error",
+            "1tbs",
+            {
+                "allowSingleLine": false
+            }
+        ],
+        "function-paren-newline": [
+            "error",
+            "multiline-arguments"
+        ]
     }
 }
