@@ -25,7 +25,7 @@ export const useSuppressAction = (callback: SuppressCallback, deps: DependencyLi
     }, []);
 };
 
-const suppressAction: Middleware<Record<string, never>, RootState> = storeApi => (
+const suppressAction: Middleware<Record<string, never>, RootState> = () => (
     next => (
         action => {
             if (shouldSuppress.some((callback) => callback.current(action))) {

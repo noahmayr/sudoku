@@ -1,7 +1,7 @@
 import "./immerSettings";
 import React from "react";
 import ReactDOM from "react-dom";
-import "./index.css";
+import "./index.scss";
 import { Provider } from "react-redux";
 import App from "./components/App";
 import reportWebVitals from "./reportWebVitals";

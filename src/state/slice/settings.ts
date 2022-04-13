@@ -15,16 +15,16 @@ const OPT = {
 export const SettingsMenu = optionGroup("Settings", {
     theme: option("Theme", OPT.theme, "light", "select"),
     validation: optionGroup("Validation", {
-        errors: option("Errors", OPT.validation, "both", "select"),
-        warnings: option("Warnings", OPT.validation, "both", "select"),
-        success: option("Success", OPT.yesno, true, "checkbox"),
+        errors: option("Show Highlighting for Errors", OPT.validation, "both", "select"),
+        warnings: option("Show Highlighting for Warnings", OPT.validation, "both", "select"),
+        success: option("Show Highlighting when solved correctly", OPT.yesno, true, "checkbox"),
     }),
 });
 
 type Settings = OptionGroupValue<typeof SettingsMenu>;
 
 const DEFAULT_SETTINGS: Settings = {
-    theme: "dark",
+    theme: "light",
     validation: {
         errors: "both",
         warnings: "both",

@@ -1,6 +1,6 @@
-import { AnyOption, AnyOptionGroup, AnyOptionOrGroup, OptionGroupValue } from "../../state/util/options";
 import Setting from "./Setting";
 import classes from "./Group.module.scss";
+import { AnyOption, AnyOptionGroup, AnyOptionOrGroup, OptionGroupValue } from "../../../state/util/options";
 
 type OptionMapCallback = (
     key: string,
