@@ -1,6 +1,7 @@
-import { AnyOption, AnyOptionGroup, AnyOptionOrGroup, OptionGroupValue } from "../../state/util/options";
+import { Stack } from "@mui/material";
 import Setting from "./Setting";
 import classes from "./Group.module.scss";
+import { AnyOption, AnyOptionGroup, AnyOptionOrGroup, OptionGroupValue } from "../../../state/util/options";
 
 type OptionMapCallback = (
     key: string,
@@ -38,17 +39,29 @@ export default function Group<T extends AnyOptionGroup>(
     return (
         <div className={classes.root}>
             <HeadingTag>{group.title}</HeadingTag>
-            {mapOptionGroup(group, state, (key, option: AnyOptionOrGroup, optionState) => {
-                const nextPath = path === undefined ? key : [path, key].join(".");
-                if (isOption(option)) {
+            <Stack spacing={"1em"}>
+                {mapOptionGroup(group, state, (key, option: AnyOptionOrGroup, optionState) => {
+                    const nextPath = path === undefined ? key : [path, key].join(".");
+                    if (isOption(option)) {
+                        return (
+                            <Setting
+                                key={key}
+                                path={nextPath}
+                                option={option}
+                                state={optionState}
+                            />
+                        );
+                    }
                     return (
-                        <Setting key={key} path={nextPath} option={option} state={optionState} />
+                        <Group
+                            key={key}
+                            path={nextPath}
+                            group={option}
+                            state={optionState}
+                        />
                     );
-                }
-                return (
-                    <Group key={key} path={nextPath} group={option} state={optionState} />
-                );
-            })}
+                })}
+            </Stack>
         </div>
     );
 }

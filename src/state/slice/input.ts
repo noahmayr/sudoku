@@ -87,10 +87,14 @@ export const inputSlice = createSlice({
             });
         },
         value: selectRegionCells((draft, action: PayloadAction<WithSelection<InputPayload>>) => {
-            const { selection, type, value } = action.payload;
+            const { selection, type: originalType, value } = action.payload;
 
-            const allHaveValue = selection.every(state => {
-                if (state.value !== undefined && type !== "color" && type !== "value") {
+            const allHaveValue = selection.every(state => state.value !== undefined);
+
+            const type = allHaveValue && originalType !== "color" ? "value" : originalType;
+
+            const allHaveType = selection.every(state => {
+                if (state.value !== undefined && type !== "color" && (type !== "value" || state.isGiven)) {
                     return true;
                 }
                 if (type === "corner" || type === "center" || type === "color") {
@@ -99,7 +103,7 @@ export const inputSlice = createSlice({
                 return state[type] === value;
             });
 
-            if (allHaveValue) {
+            if (allHaveType) {
                 selection.forEach(state => {
                     if (state.isGiven && type !== "color") {
                         return;

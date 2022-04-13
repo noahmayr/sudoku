@@ -1,0 +1,8 @@
+.root {
+    position: fixed;
+    inset-block-end: 1em;
+    inset-inline-end: 1em;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+}
