@@ -20,7 +20,7 @@ const getTheme = (mode: "dark"|"light") => createTheme({
         warning: { main: "#ff8800" },
         info: { main: "#00ffdd" },
         success: { main: "#00ff6a" },
-    }
+    },
 });
 
 function App() {
