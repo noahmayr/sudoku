@@ -11,7 +11,17 @@ import { selectSettings } from "../../state/slice/settings";
 
 type ThemeClass<T extends string> = `${T}Theme`;
 
-const getTheme = (mode: "dark"|"light") => createTheme({ palette: { mode } });
+const getTheme = (mode: "dark"|"light") => createTheme({
+    palette: {
+        mode,
+        primary: { main: "#1976D2" },
+        secondary: { main: mode === "light" ? "#444" : "#fff" },
+        error: { main: "#ff0022" },
+        warning: { main: "#ff8800" },
+        info: { main: "#00ffdd" },
+        success: { main: "#00ff6a" },
+    }
+});
 
 function App() {
     const theme = useSelector(createSelector(selectSettings, state => state.theme));
