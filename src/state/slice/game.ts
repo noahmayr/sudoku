@@ -66,7 +66,7 @@ export const EMPTY_GAME: GameBoard = {
 
 export const gameSlice = createSlice({
     name: "game",
-    initialState: EMPTY_GAME,
+    initialState: null as GameBoard|null,
     reducers: { load: (draft, { payload: game }: PayloadAction<LoadPayload>) => game },
 });
 
@@ -75,7 +75,7 @@ export const gameActions = gameSlice.actions;
 export default gameSlice.reducer;
 
 export const selectGame = {
-    grid: (state: RootState) => state.game.grid,
-    dimensions: (state: RootState) => state.game.dimensions,
-    rules: (state: RootState) => state.game.rules,
+    grid: (state: RootState) => state.game?.grid,
+    dimensions: (state: RootState) => state.game?.dimensions,
+    rules: (state: RootState) => state.game?.rules,
 };

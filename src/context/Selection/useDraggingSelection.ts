@@ -15,6 +15,9 @@ const draggingSelectionThunk = (
 ) => (
     (dispatch: AppDispatch, getState: AppGetState) => {
         const { selection, game } = getState();
+        if (game === null) {
+            return;
+        }
         if (!shouldSelect) {
             if (selection.selecting === undefined) {
                 return;

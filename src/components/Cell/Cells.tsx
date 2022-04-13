@@ -5,6 +5,10 @@ import Cell from "./Cell";
 
 const Cells = () => {
     const cells = useSelector(selectGame.grid);
+    if (cells === undefined) {
+        return null;
+    }
+
     return (
         <g id="cells">
             {Array.from(cells).map(([key, cell]) => (
