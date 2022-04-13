@@ -23,10 +23,10 @@ export const COLORS = {
     green: "#4CAF50",
     amber: "#FFC107",
     orange: "#F57C00",
-    red: "#FF5252",
-    purple: "#673AB7",
-    brown: "#5D4037",
-    grey: "#616161",
+    red: "#ff1744",
+    purple: "#7C4DFF",
+    brown: "#814731",
+    grey: "#888",
     black: "#000",
 };
 export type ColorNames = keyof typeof COLORS;
