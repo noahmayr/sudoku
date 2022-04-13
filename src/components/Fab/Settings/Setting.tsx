@@ -28,7 +28,6 @@ export default function Setting<T extends AnyOption>({ option, path, state }: Se
                 <FormControl fullWidth variant="standard">
                     <FormControlLabel label={option.title} labelPlacement="end" control={
                         <Switch
-                            color="primary"
                             checked={state}
                             onChange={event => changeSetting(event.target.checked)}
                         />
@@ -37,7 +36,7 @@ export default function Setting<T extends AnyOption>({ option, path, state }: Se
             );
         case "select":
             return (
-                <FormControl fullWidth variant="standard">
+                <FormControl fullWidth variant="outlined">
                     <InputLabel id={path}>{option.title}</InputLabel>
                     <Select
                         labelId={path}
