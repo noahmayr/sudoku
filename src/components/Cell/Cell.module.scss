@@ -1,16 +1,4 @@
-.color {
-    opacity: 0.6;
-}
-
 .cell {
-    width: 1px;
-    height: 1px;
-    &:hover, &.active {
-        .cellRect {
-            fill: #fff2;
-        }
-    }
-
     text-anchor: middle;
     dominant-baseline: central;
     stroke-linecap: butt;
@@ -18,6 +6,7 @@
     paint-order: stroke fill;
     pointer-events: none;
     user-select: none;
+
     text {
         fill: currentColor;
         stroke: currentColor;
@@ -30,7 +19,6 @@
     }
 
     .centerMark {
-        letter-spacing: -0.1em;
         font-size: 0.6em;
         &[data-count="5"] {
             font-size: 0.55em;
@@ -56,4 +44,8 @@
     .given {
         fill: var(--given-fill);
     }
+
+    .color {
+        opacity: 0.6;
+    }    
 }
