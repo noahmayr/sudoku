@@ -1,8 +1,8 @@
+import { memo } from "react";
 import Regions from "../Rules/Regions";
 import Validation from "../Validation/Validation";
 import Rows from "../Rules/Rows";
 import Columns from "../Rules/Columns";
-import useInput from "../../hooks/useInput";
 import Grid from "./Grid";
 import Cells from "../Cell/Cells";
 import SelectionRegion from "../Selection/SelectionRegion";
@@ -14,8 +14,6 @@ import { useAppSelector } from "../../state/store";
 
 
 const Sudoku = () => {
-    useInput();
-
     const size = useAppSelector(selectGame.dimensions);
     if (size === undefined) {
         return null;
@@ -40,4 +38,4 @@ const Sudoku = () => {
     );
 };
 
-export default Sudoku;
+export default memo(Sudoku);

@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { memo } from "react";
 import classes from "./Regions.module.scss";
 import ValidatedRegion from "../Region/ValidatedRegion";
 import { selectGame } from "../../state/slice/game";
@@ -24,4 +25,4 @@ const Regions = () => {
     </>);
 };
 
-export default Regions;
+export default memo(Regions);

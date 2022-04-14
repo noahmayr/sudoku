@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { range } from "../../util";
 import LinePath, { Line } from "../SVG/LinePath";
 import classes from "./Grid.module.scss";
@@ -26,4 +27,4 @@ const Grid = (size: Size) => {
     );
 };
 
-export default Grid;
+export default memo(Grid);
