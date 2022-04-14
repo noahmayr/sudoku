@@ -5,7 +5,7 @@ import classes from "./Regions.module.scss";
 
 
 const Rows = () => {
-    const { rows } = useSelector(selectGame.rules);
+    const rows = useSelector(selectGame.rules)?.rows;
 
     if (rows === undefined) {
         return null;

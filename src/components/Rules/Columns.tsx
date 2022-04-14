@@ -4,7 +4,7 @@ import { selectGame } from "../../state/slice/game";
 import classes from "./Regions.module.scss";
 
 const Columns = () => {
-    const { columns } = useSelector(selectGame.rules);
+    const columns = useSelector(selectGame.rules)?.columns;
 
     if (columns === undefined) {
         return null;

@@ -23,10 +23,10 @@ export const COLORS = {
     green: "#4CAF50",
     amber: "#FFC107",
     orange: "#F57C00",
-    red: "#FF5252",
-    purple: "#673AB7",
-    brown: "#5D4037",
-    grey: "#616161",
+    red: "#ff1744",
+    purple: "#7C4DFF",
+    brown: "#814731",
+    grey: "#888",
     black: "#000",
 };
 export type ColorNames = keyof typeof COLORS;
@@ -66,7 +66,7 @@ export const EMPTY_GAME: GameBoard = {
 
 export const gameSlice = createSlice({
     name: "game",
-    initialState: EMPTY_GAME,
+    initialState: null as GameBoard|null,
     reducers: { load: (draft, { payload: game }: PayloadAction<LoadPayload>) => game },
 });
 
@@ -75,7 +75,7 @@ export const gameActions = gameSlice.actions;
 export default gameSlice.reducer;
 
 export const selectGame = {
-    grid: (state: RootState) => state.game.grid,
-    dimensions: (state: RootState) => state.game.dimensions,
-    rules: (state: RootState) => state.game.rules,
+    grid: (state: RootState) => state.game?.grid,
+    dimensions: (state: RootState) => state.game?.dimensions,
+    rules: (state: RootState) => state.game?.rules,
 };
