@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ColorNames, EMPTY_GAME } from "../state/slice/game";
-import { CellValue } from "../state/slice/input";
+import { CellValue, inputActions } from "../state/slice/input";
 import { decompress, loadGameThunk } from "../state/global/load";
 import { useAppSelector } from "../state/store";
 
@@ -30,24 +30,23 @@ export interface MinifiedGame {
     extra?: GameExtras;
 }
 
-const currentUrl = () => new URL(window.location.href);
-
-const useGame = (fallback: string) => {
+const useGame = () => {
     const dispatch = useDispatch();
-    const currentGame = useAppSelector(state => state.game);
-    useEffect(() => {
-        if (currentGame !== null) {
-            return;
-        }
-        const url = currentUrl();
-        const data = url.searchParams.get("game") ?? fallback;
-        const game = decompress(data);
-        if (game === undefined) {
+
+    const loadGame = useCallback((compressed: string) => {
+        const newGame = decompress(compressed);
+        if (newGame === undefined) {
             dispatch(loadGameThunk({ board: EMPTY_GAME }));
             return;
         }
-        dispatch(loadGameThunk(game));
-    }, [currentGame]);
+        dispatch(loadGameThunk(newGame));
+    }, [dispatch]);
+
+    const resetGame = useCallback(() => {
+        dispatch(inputActions.clear());
+    }, [dispatch]);
+
+    return { loadGame, resetGame };
 };
 
 export default useGame;

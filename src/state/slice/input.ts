@@ -167,6 +167,16 @@ export const inputSlice = createSlice({
                 nonEmpty.color.forEach(state => state.color.clear());
             }
         }),
+        clear: (draft) => {
+            draft.forEach(state => {
+                if (!state.isGiven) {
+                    delete state.value;
+                }
+                state.center.clear();
+                state.corner.clear();
+                state.color.clear();
+            });
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(gameActions.load, (draft, action) => {

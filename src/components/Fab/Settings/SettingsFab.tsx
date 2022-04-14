@@ -8,7 +8,7 @@ import { selectSettings, SettingsMenu } from "../../../state/slice/settings";
 import { useSuppressAction } from "../../../state/middleware/suppressAction";
 import Group from "./Group";
 
-const FabContainer = () => {
+const SettingsFab = () => {
     const settings = useSelector(selectSettings);
     const [open, setOpen] = useState(false);
 
@@ -33,4 +33,4 @@ const FabContainer = () => {
     );
 };
 
-export default FabContainer;
+export default SettingsFab;

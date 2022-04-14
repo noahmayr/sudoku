@@ -109,7 +109,7 @@ const useInput = () => {
                 }));
             }
         }
-    }, [region, dispatch]);
+    }, [region, dispatch, grid, size]);
 };
 
 export default useInput;

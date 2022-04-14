@@ -3,7 +3,6 @@ import Validation from "../Validation/Validation";
 import Rows from "../Rules/Rows";
 import Columns from "../Rules/Columns";
 import useInput from "../../hooks/useInput";
-import useGame from "../../hooks/useGame";
 import Grid from "./Grid";
 import Cells from "../Cell/Cells";
 import SelectionRegion from "../Selection/SelectionRegion";
@@ -12,11 +11,9 @@ import ColoredRegions from "../Extras/ColoredRegions";
 import classes from "./Sudoku.module.scss";
 import { selectGame } from "../../state/slice/game";
 import { useAppSelector } from "../../state/store";
-import games from "../../state/global/games";
 
 
 const Sudoku = () => {
-    useGame(games.easy);
     useInput();
 
     const size = useAppSelector(selectGame.dimensions);
