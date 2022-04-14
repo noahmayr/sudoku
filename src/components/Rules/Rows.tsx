@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { memo } from "react";
 import ValidatedRegion from "../Region/ValidatedRegion";
 import { selectGame } from "../../state/slice/game";
 import classes from "./Regions.module.scss";
@@ -24,4 +25,4 @@ const Rows = () => {
     </>);
 };
 
-export default Rows;
+export default memo(Rows);
