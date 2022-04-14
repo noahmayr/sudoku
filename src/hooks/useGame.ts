@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { ColorNames, EMPTY_GAME } from "../state/slice/game";
 import { CellValue, inputActions } from "../state/slice/input";
 import { decompress, loadGameThunk } from "../state/global/load";
+import { selectionActions } from "../state/slice/selection";
 
 export type GameGivens = (CellValue | undefined)[][];
 export type GameRegion = (true | undefined)[][];
@@ -38,6 +39,7 @@ const useGame = () => {
             dispatch(loadGameThunk({ board: EMPTY_GAME }));
             return;
         }
+        dispatch(selectionActions.reset());
         dispatch(loadGameThunk(newGame));
     }, [dispatch]);
 

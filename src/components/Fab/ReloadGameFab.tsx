@@ -22,7 +22,7 @@ const getNameWithout = (current?: string) => (
 const ReloadGameFab = () => {
     const loadedGame = useSelector(selectGame.game);
     const [currentGame, setCurrentGame] = useState<GameName>();
-    const { loadGame, resetGame: reloadGame } = useGame();
+    const { loadGame, resetGame } = useGame();
 
     useEffect(() => {
         if (currentGame === undefined) {
@@ -40,8 +40,9 @@ const ReloadGameFab = () => {
     const onClick: MouseEventHandler<unknown> = (event) => {
         if (event.shiftKey) {
             setCurrentGame(getNameWithout(currentGame));
+            return;
         }
-        reloadGame();
+        resetGame();
     };
 
     return (
