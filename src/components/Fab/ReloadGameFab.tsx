@@ -1,8 +1,10 @@
 import { Fab } from "@mui/material";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { MouseEventHandler, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import games from "../../state/global/games";
 import useGame from "../../hooks/useGame";
+import { selectGame } from "../../state/slice/game";
 
 type GameName = keyof typeof games;
 
@@ -11,20 +13,33 @@ const getRandomGame = (names: GameName[]): GameName => (
     names[Math.floor(Math.random() * names.length)]
 );
 
-const gameNames = Object.keys(games) as GameName[];
+const GAME_NAMES = Object.keys(games) as GameName[];
+
+const getNameWithout = (current?: string) => (
+    getRandomGame(GAME_NAMES.filter(name => name !== current))
+);
 
 const ReloadGameFab = () => {
-    const [currentGame, setCurrentGame] = useState(getRandomGame(gameNames));
+    const loadedGame = useSelector(selectGame.game);
+    const [currentGame, setCurrentGame] = useState<GameName>();
     const { loadGame, resetGame: reloadGame } = useGame();
 
     useEffect(() => {
+        if (currentGame === undefined) {
+            return;
+        }
         loadGame(games[currentGame]);
-    }, [currentGame]);
+    }, [loadGame, currentGame]);
+
+    useEffect(() => {
+        if (loadedGame === undefined) {
+            setCurrentGame(getNameWithout(currentGame));
+        }
+    }, [loadedGame]);
 
     const onClick: MouseEventHandler<unknown> = (event) => {
         if (event.shiftKey) {
-            const nextGame = getRandomGame(gameNames.filter(name => name !== currentGame));
-            setCurrentGame(nextGame);
+            setCurrentGame(getNameWithout(currentGame));
         }
         reloadGame();
     };
